@@ -1,0 +1,6 @@
+youtube-transcript-api>=0.6.2
+yt-dlp>=2024.1.0
+anthropic>=0.40.0
+python-dotenv>=1.0.0
+openai-whisper>=20231117
+elevenlabs>=1.0.0
