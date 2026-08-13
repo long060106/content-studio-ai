@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Content Studio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+<link rel="stylesheet" href="/ui/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">▶</span>
+    <span>Content&nbsp;Studio</span>
+  </div>
+
+  <form class="runbar" id="run-form" autocomplete="off">
+    <input
+      id="url-input"
+      type="text"
+      placeholder="Paste a YouTube URL or video ID…"
+      spellcheck="false"
+      aria-label="YouTube URL"
+    />
+    <button type="submit" id="run-button">Generate</button>
+  </form>
+
+  <div class="env" id="env-status"></div>
+</header>
+
+<main class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <span>Library</span>
+      <span class="pill" id="lib-count">0</span>
+    </div>
+    <div id="library" class="library"></div>
+  </aside>
+
+  <section class="content" id="content"></section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/ui/app.js"></script>
+</body>
+</html>

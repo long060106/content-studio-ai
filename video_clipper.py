@@ -16,10 +16,44 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
+import time
 
 import yt_dlp
 
 from youtube_extractor import yt_dlp_cookie_opts
+
+# Re-encoding a 20-60s clip takes seconds; anything near this means ffmpeg is
+# stuck rather than slow.
+FFMPEG_TIMEOUT = 600
+
+
+def _progress_hook(status: dict) -> None:
+    """Print an occasional one-line progress update.
+
+    yt-dlp is otherwise completely silent here, and this step routinely runs
+    for minutes — without this the pipeline looks hung when it's working fine.
+    We print at most once every few seconds so logs stay readable.
+    """
+    if status.get("status") == "finished":
+        print("    …download finished, handing off to ffmpeg", flush=True)
+        return
+    if status.get("status") != "downloading":
+        return
+
+    now = time.monotonic()
+    if now - _progress_hook.last < 5:
+        return
+    _progress_hook.last = now
+
+    total = status.get("total_bytes") or status.get("total_bytes_estimate")
+    done = status.get("downloaded_bytes") or 0
+    if total:
+        print(f"    …downloading {done / total:.0%} ({done / 1e6:.1f} of {total / 1e6:.1f} MB)", flush=True)
+    else:
+        print(f"    …downloading {done / 1e6:.1f} MB", flush=True)
+
+
+_progress_hook.last = 0.0
 
 
 def download_clip(url: str, start_seconds: float, end_seconds: float, output_path: str) -> str:
@@ -40,6 +74,11 @@ def download_clip(url: str, start_seconds: float, end_seconds: float, output_pat
         "force_keyframes_at_cuts": True,
         "quiet": True,
         "no_warnings": True,
+        # Without these a stalled CDN connection hangs the whole pipeline
+        # indefinitely; retries cover the usual transient failures.
+        "socket_timeout": 30,
+        "retries": 3,
+        "progress_hooks": [_progress_hook],
         **yt_dlp_cookie_opts(),
     }
 
@@ -77,6 +116,9 @@ def convert_to_vertical(input_path: str, output_path: str) -> str:
 
     cmd = [
         "ffmpeg", "-y",
+        # -nostdin: ffmpeg inherits our stdin otherwise and can block on it
+        # when run from a server or a piped shell.
+        "-nostdin",
         "-i", input_path,
         "-filter_complex", filter_complex,
         "-map", "[outv]",
@@ -86,7 +128,15 @@ def convert_to_vertical(input_path: str, output_path: str) -> str:
         output_path,
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=FFMPEG_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(
+            f"ffmpeg didn't finish within {FFMPEG_TIMEOUT}s converting to vertical format. "
+            f"A 20-60s clip should take well under a minute — check that ffmpeg isn't "
+            f"waiting on something."
+        ) from None
+
     if result.returncode != 0:
         raise RuntimeError(f"ffmpeg failed converting to vertical format:\n{result.stderr[-2000:]}")
 

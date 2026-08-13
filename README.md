@@ -63,6 +63,37 @@ free-tier character usage low while testing.
 
 ## Usage
 
+### The web UI (easiest)
+
+```bash
+python webapp.py
+```
+
+Opens http://127.0.0.1:8420 in your browser. Paste a YouTube URL, hit
+**Generate**, and watch the pipeline work through its checklist live. When it
+finishes, every format is browsable in one place — blog post rendered from
+Markdown, thread as numbered tweet cards with character counts, carousel
+slides as images, the short-form clip in a player, the voice-over as audio —
+each with a copy or download button.
+
+Everything already in `./output/` shows up in the left-hand library, so past
+runs stay one click away.
+
+Notes:
+
+- It's the same pipeline: the server shells out to `cli.py` and streams its
+  output. Anything the CLI can do, the UI does.
+- Standard library only — no extra `pip install`, and it runs with or without
+  the venv activated (it uses `venv/`'s interpreter for the pipeline itself
+  when that venv exists).
+- Binds to `127.0.0.1` only, and reports *whether* your API keys are set
+  without ever sending the values to the browser.
+- One run at a time; a second request is rejected while one is in flight.
+- Change the port with `CONTENT_STUDIO_UI_PORT=9000 python webapp.py`, or set
+  `CONTENT_STUDIO_UI_NO_BROWSER=1` to stop it from opening a browser tab.
+
+### The CLI
+
 ```bash
 python cli.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
@@ -142,6 +173,11 @@ ai-content-studio/
 ├── clip_selector.py             # timestamped transcript → best clip window (Claude API)
 ├── video_clipper.py             # time range → vertical MP4 (yt-dlp + ffmpeg)
 ├── cli.py                       # orchestrates all of the above, saves output
+├── webapp.py                    # local web UI: runs cli.py, browses ./output (stdlib only)
+├── ui/                          # the UI's static files
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 ├── requirements.txt
 ├── .env.example
 └── output/                      # created at runtime, one folder per video_id
