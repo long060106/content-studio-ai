@@ -39,11 +39,54 @@ def yt_dlp_cookie_opts() -> dict:
     "firefox", "edge", "brave") lets yt-dlp reuse that browser's existing
     YouTube login cookies to get past the challenge. Leave unset if you're
     not hitting this error — most requests don't need it.
+
+    A cookies *file* is the more reliable of the two on Windows: Chrome and
+    Edge hold a lock on their cookie database while running, so reading them
+    directly fails with "Could not copy Chrome cookie database" unless the
+    browser is fully closed. Exporting once to a cookies.txt and pointing
+    YTDLP_COOKIES_FILE at it avoids that entirely, so it's checked first.
     """
+    cookie_file = os.environ.get("YTDLP_COOKIES_FILE")
+    if cookie_file and os.path.isfile(cookie_file):
+        return {"cookiefile": cookie_file}
+
     browser = os.environ.get("YTDLP_COOKIES_FROM_BROWSER")
     if browser:
         return {"cookiesfrombrowser": (browser,)}
     return {}
+
+
+# Checked in this order; the first one present on PATH wins. Deno is yt-dlp's
+# own recommendation, but Node is far more likely to already be installed.
+_JS_RUNTIMES = ("deno", "node", "bun")
+
+
+def yt_dlp_js_opts() -> dict:
+    """Point yt-dlp at a JavaScript runtime for YouTube's "n challenge".
+
+    YouTube requires solving a JS challenge before it will hand out working
+    media URLs. Without a runtime yt-dlp can't solve it, and the failure is
+    thoroughly misleading: most formats disappear from the listing, and the
+    few URLs that remain return HTTP 403 when you actually fetch them. It
+    looks exactly like an auth or bot-detection block, so it invites a long
+    detour through cookies and accounts — none of which touch the real cause.
+
+    yt-dlp only probes for Deno by default, so an installed Node is ignored
+    unless it's named explicitly. That's what this does.
+
+    Needs the solver scripts too: `pip install yt-dlp-ejs`.
+    """
+    import shutil
+
+    for runtime in _JS_RUNTIMES:
+        if shutil.which(runtime):
+            return {"js_runtimes": {runtime: {}}}
+    return {}
+
+
+def yt_dlp_base_opts() -> dict:
+    """The options every yt-dlp call in this project needs: cookies + JS runtime."""
+    return {**yt_dlp_cookie_opts(), **yt_dlp_js_opts()}
 
 
 class NoTranscriptAvailable(Exception):
@@ -162,7 +205,7 @@ def get_metadata(url: str) -> dict:
         "quiet": True,
         "no_warnings": True,
         "skip_download": True,
-        **yt_dlp_cookie_opts(),
+        **yt_dlp_base_opts(),
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)

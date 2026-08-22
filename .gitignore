@@ -16,3 +16,13 @@ output/
 # OS / editor
 .DS_Store
 .vscode/
+
+# Downloaded/stock media (the manifest is tracked, the files aren't)
+assets/video/
+assets/image/
+assets/music/
+
+# Live share link - contains the access key. Never publish.
+current_link.txt
+cookies.txt
+*.log

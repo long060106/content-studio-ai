@@ -23,11 +23,41 @@
       spellcheck="false"
       aria-label="YouTube URL"
     />
-    <button type="submit" id="run-button">Generate</button>
+    <button type="submit" id="run-button">Cut clips</button>
   </form>
+
+  <div class="running-chip" id="running-chip" hidden>
+    <span class="spinner"></span>
+    <button type="button" class="chip-label" id="running-label">Running…</button>
+    <button type="button" class="stop-btn" id="stop-button">Stop</button>
+  </div>
 
   <div class="env" id="env-status"></div>
 </header>
+
+<div class="shorts-options" id="shorts-options" hidden>
+  <label>Moments
+    <select id="opt-count">
+      <option value="auto" selected>Auto</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+    </select>
+  </label>
+  <label>Layout
+    <select id="opt-style">
+      <option value="broll" selected>B-roll behind the voice</option>
+      <option value="speaker">Speaker's own footage</option>
+      <option value="split">Split — speaker over b-roll</option>
+    </select>
+  </label>
+  <label class="check"><input type="checkbox" id="opt-carousel" checked /> Quote carousel</label>
+  <span class="assets-note" id="assets-note"></span>
+</div>
 
 <main class="layout">
   <aside class="sidebar">

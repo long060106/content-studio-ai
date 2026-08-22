@@ -3,7 +3,7 @@ content_brief.py
 
 Takes the raw transcript + metadata from youtube_extractor and turns it into a
 structured "Content Brief": the intermediate representation every downstream
-generator (blog, thread, LinkedIn post, etc.) will consume.
+generator (blog, thread, captions, etc.) will consume.
 
 Why an intermediate brief instead of generating each format directly from the
 raw transcript?

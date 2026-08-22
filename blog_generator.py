@@ -4,7 +4,7 @@ blog_generator.py
 Generates a publish-ready blog post (in Markdown) from a video's content
 brief. Reads the distilled brief rather than the raw transcript, so output
 is well-structured and consistent with the other formats generated from the
-same brief (Twitter thread, LinkedIn post, etc.).
+same brief (Twitter thread, captions, etc.).
 """
 
 from __future__ import annotations

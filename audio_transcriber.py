@@ -26,7 +26,7 @@ import tempfile
 import whisper
 import yt_dlp
 
-from youtube_extractor import yt_dlp_cookie_opts
+from youtube_extractor import yt_dlp_base_opts
 
 
 # Model size tradeoffs (speed vs accuracy vs download size):
@@ -61,7 +61,7 @@ def download_audio(url: str, download_dir: str) -> str:
             "preferredcodec": "wav",
             "preferredquality": "192",
         }],
-        **yt_dlp_cookie_opts(),
+        **yt_dlp_base_opts(),
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])

@@ -9,9 +9,9 @@ What it does:
   - Paste a YouTube URL and hit Run. The server shells out to `cli.py`
     (the exact same pipeline you'd run by hand), streams its stdout, and
     turns the progress lines into a live checklist.
-  - Browse everything already in ./output/ — blog post, thread, LinkedIn
-    post, captions, carousel slides, short-form clip, voice-over — in one
-    place, with copy buttons and inline players.
+  - Browse everything already in ./output/ — blog post, thread, captions,
+    carousel slides, short-form clip — in one place, with copy buttons and
+    inline players.
 
 Deliberately dependency-free: only the Python standard library is used, so
 the UI runs with or without the project's venv activated. It binds to
@@ -21,10 +21,15 @@ whether they are set).
 
 from __future__ import annotations
 
+import base64
+import hmac
 import json
 import mimetypes
 import os
 import re
+import shutil
+import signal
+import stat
 import subprocess
 import sys
 import threading
@@ -32,16 +37,124 @@ import time
 import uuid
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import unquote, urlparse
+from http.cookies import SimpleCookie
+from urllib.parse import parse_qs, unquote, urlparse
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UI_DIR = os.path.join(BASE_DIR, "ui")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
+def _load_env_file() -> None:
+    """Read .env into the environment, stdlib only.
+
+    webapp.py deliberately avoids third-party imports so it runs with or
+    without the venv, which rules out python-dotenv. Until now that was fine
+    because nothing here needed a value from .env — env_status only reports
+    whether keys exist. The sharing settings below genuinely need the values,
+    and a password that silently reads as empty is an unlocked door, so the
+    file gets parsed properly.
+
+    Real environment variables win, so a shell export still overrides .env.
+    """
+    path = os.path.join(BASE_DIR, ".env")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+    except (OSError, UnicodeDecodeError):
+        return
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        name = name.strip()
+        value = value.strip().strip("'\"")
+        if name and name not in os.environ:
+            os.environ[name] = value
+
+
+_load_env_file()
+
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("CONTENT_STUDIO_UI_PORT", "8420"))
 
 MAX_LOG_LINES = 4000
+
+# ---------------------------------------------------------------------------
+# Sharing controls
+#
+# The UI is harmless on localhost, but the moment it's reachable from outside
+# it hands strangers a button that spends the owner's Anthropic credits and
+# deletes their work. Both guards below are off by default so local use is
+# unchanged, and both switch on the moment a password is set.
+# ---------------------------------------------------------------------------
+
+# A secret carried in the link itself: ?k=<token>. The visitor types nothing
+# and sees no login box — clicking the link is the whole authentication — but
+# the bare URL without the key is useless to anyone who stumbles across it.
+# First request exchanges the key for a cookie, so the address bar stops
+# showing it and a shared screenshot doesn't leak access.
+LINK_TOKEN = os.environ.get("CONTENT_STUDIO_LINK_TOKEN", "").strip()
+COOKIE_NAME = "cs_key"
+
+# Optional username/password, kept for anyone who prefers a real login box.
+# Empty by default; the link token is the normal way in.
+PASSWORD = os.environ.get("CONTENT_STUDIO_PASSWORD", "").strip()
+USERNAME = os.environ.get("CONTENT_STUDIO_USER", "studio").strip()
+
+# A run costs roughly five cents, so the default caps a shared link at about
+# a dollar a day. Runs are counted rather than dollars because the count is
+# something we can know exactly and enforce before spending anything.
+DAILY_RUN_CAP = int(os.environ.get("CONTENT_STUDIO_DAILY_RUNS", "20") or 20)
+
+# Deleting is irreversible and this project isn't under version control, so
+# visitors arriving over a shared tunnel don't get it, while the owner sitting
+# at the machine keeps it. Set CONTENT_STUDIO_ALLOW_DELETE=1 to allow it for
+# everyone, or 0 to deny it to everyone including locally.
+_ALLOW_DELETE_SETTING = os.environ.get("CONTENT_STUDIO_ALLOW_DELETE", "").strip().lower()
+USAGE_PATH = os.path.join(OUTPUT_DIR, ".usage.json")
+USAGE_LOCK = threading.Lock()
+
+
+def _today() -> str:
+    return time.strftime("%Y-%m-%d")
+
+
+def runs_today() -> int:
+    with USAGE_LOCK:
+        try:
+            with open(USAGE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return 0
+        return int(data.get(_today(), 0) or 0)
+
+
+def record_run() -> int:
+    """Count one run against today's allowance, and return the new total.
+
+    Persisted to disk rather than held in memory so that restarting the server
+    doesn't hand out a fresh allowance — otherwise the cap is one crash away
+    from meaning nothing.
+    """
+    with USAGE_LOCK:
+        try:
+            with open(USAGE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            data = {}
+        today = _today()
+        data[today] = int(data.get(today, 0) or 0) + 1
+        # Keep the file from growing forever; a fortnight is plenty of history.
+        for key in sorted(data)[:-14]:
+            data.pop(key, None)
+        try:
+            os.makedirs(OUTPUT_DIR, exist_ok=True)
+            with open(USAGE_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+        except OSError:
+            pass
+        return data[today]
 
 # ---------------------------------------------------------------------------
 # Pipeline steps
@@ -51,29 +164,51 @@ MAX_LOG_LINES = 4000
 # without cli.py needing to know anything about the web layer.
 # ---------------------------------------------------------------------------
 
-STEPS = [
-    {"id": "transcript", "label": "Transcript"},
-    {"id": "brief", "label": "Content brief"},
-    {"id": "blog", "label": "Blog post"},
-    {"id": "thread", "label": "X / Twitter thread"},
-    {"id": "linkedin", "label": "LinkedIn post"},
-    {"id": "captions", "label": "Social captions"},
-    {"id": "voiceover", "label": "Voice-over"},
-    {"id": "carousel", "label": "Carousel slides"},
-    {"id": "clip", "label": "Short-form clip"},
-]
+STEPS_BY_KIND = {
+    # cli.py — one video, eight formats
+    "studio": [
+        {"id": "transcript", "label": "Transcript"},
+        {"id": "brief", "label": "Content brief"},
+        {"id": "blog", "label": "Blog post"},
+        {"id": "thread", "label": "X / Twitter thread"},
+        {"id": "captions", "label": "Social captions"},
+        {"id": "voiceover", "label": "Voice-over"},
+        {"id": "carousel", "label": "Carousel slides"},
+        {"id": "clip", "label": "Short-form clip"},
+    ],
+    # make_shorts.py — one talk, many motivational shorts
+    "shorts": [
+        {"id": "transcript", "label": "Transcript"},
+        {"id": "moments", "label": "Finding moments"},
+        {"id": "shorts", "label": "Building shorts"},
+        {"id": "carousel", "label": "Quote carousel"},
+    ],
+}
 
-_STEP_MATCHERS = [
-    ("transcript", ("extracting transcript",)),
-    ("brief", ("content brief",)),
-    ("blog", ("blog post",)),
-    ("thread", ("twitter",)),
-    ("linkedin", ("linkedin",)),
-    ("captions", ("generating captions",)),
-    ("voiceover", ("voice-over",)),
-    ("carousel", ("carousel",)),
-    ("clip", ("short-form",)),
-]
+STEPS = STEPS_BY_KIND["studio"]
+
+_MATCHERS_BY_KIND = {
+    "studio": [
+        ("transcript", ("extracting transcript",)),
+        ("brief", ("content brief",)),
+        ("blog", ("blog post",)),
+        ("thread", ("twitter",)),
+        ("captions", ("generating captions",)),
+        ("voiceover", ("voice-over",)),
+        ("carousel", ("carousel",)),
+        ("clip", ("short-form",)),
+    ],
+    "shorts": [
+        # carousel first: "quote carousel" would otherwise match the short rule
+        ("carousel", ("carousel",)),
+        ("transcript", ("building shorts for", "transcript")),
+        ("moments", ("strongest moments", "moments found")),
+        ("shorts", ("short ",)),
+    ],
+}
+
+# "→ Short 2/3: hook text" — the per-short progress line.
+_SHORT_PROGRESS = re.compile(r"^Short\s+(\d+)\s*/\s*(\d+)\s*:\s*(.*)$", re.IGNORECASE)
 
 _YOUTUBE_ID_PATTERNS = [
     r"(?:v=|\/)([0-9A-Za-z_-]{11}).*",
@@ -97,9 +232,9 @@ def guess_video_id(url: str) -> str | None:
     return None
 
 
-def _step_for_line(text: str) -> str | None:
+def _step_for_line(text: str, kind: str = "studio") -> str | None:
     lowered = text.lower()
-    for step_id, needles in _STEP_MATCHERS:
+    for step_id, needles in _MATCHERS_BY_KIND.get(kind, _MATCHERS_BY_KIND["studio"]):
         if any(n in lowered for n in needles):
             return step_id
     return None
@@ -111,20 +246,30 @@ def _step_for_line(text: str) -> str | None:
 
 
 class Job:
-    def __init__(self, url: str):
+    def __init__(self, url: str, kind: str = "studio", options: dict | None = None):
         self.id = uuid.uuid4().hex[:12]
         self.url = url
+        self.kind = kind if kind in STEPS_BY_KIND else "studio"
+        self.options = options or {}
         self.video_id = guess_video_id(url)
         self.status = "running"  # running | done | error | cancelled
         self.error: str | None = None
         self.created_at = time.time()
         self.finished_at: float | None = None
         self.log: list[str] = []
-        self.steps = {s["id"]: {"state": "pending", "detail": ""} for s in STEPS}
+        self.steps = {s["id"]: {"state": "pending", "detail": ""} for s in self.spec}
         self.current: str | None = None
         self.step_started: float = time.time()
+        # Stages that hit a ⚠ at some point. A stage covering several items
+        # (each short) keeps running afterwards, so the warning has to be
+        # remembered or the finished checklist reads as all-clear.
+        self.warned: set[str] = set()
         self._proc: subprocess.Popen | None = None
         self._lock = threading.Lock()
+
+    @property
+    def spec(self) -> list[dict]:
+        return STEPS_BY_KIND[self.kind]
 
     # -- state as seen by the browser ---------------------------------------
 
@@ -133,6 +278,8 @@ class Job:
             return {
                 "id": self.id,
                 "url": self.url,
+                "kind": self.kind,
+                "options": self.options,
                 "video_id": self.video_id,
                 "status": self.status,
                 "error": self.error,
@@ -145,7 +292,7 @@ class Job:
                 "step_elapsed": time.time() - self.step_started,
                 "steps": [
                     {"id": s["id"], "label": s["label"], **self.steps[s["id"]]}
-                    for s in STEPS
+                    for s in self.spec
                 ],
                 "log": self.log[log_from:],
                 "log_total": len(self.log),
@@ -157,10 +304,36 @@ class Job:
         threading.Thread(target=self._run, daemon=True).start()
 
     def cancel(self) -> bool:
+        """Stop the run — the whole process tree, not just the parent.
+
+        The pipeline's actual work happens in child processes: yt-dlp, ffmpeg
+        and Whisper. Terminating only the Python parent leaves those orphaned
+        and still running, so a "stopped" encode carries on burning CPU and
+        writing files. On Windows `taskkill /T` walks the tree; elsewhere the
+        process group gets the signal.
+        """
         with self._lock:
             proc = self._proc
             if proc is None or proc.poll() is not None:
                 return False
+
+        if os.name == "nt":
+            try:
+                subprocess.run(
+                    ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                    capture_output=True,
+                    timeout=30,
+                )
+                return True
+            except (OSError, subprocess.TimeoutExpired):
+                pass  # fall through to the plain terminate below
+        else:
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                return True
+            except (OSError, AttributeError):
+                pass
+
         proc.terminate()
         return True
 
@@ -175,6 +348,21 @@ class Job:
                 return path
         return sys.executable
 
+    def _command(self) -> list[str]:
+        python = self._python_exe()
+        if self.kind == "shorts":
+            cmd = [
+                python, "-u", "make_shorts.py", self.url,
+                "--style", str(self.options.get("style", "broll")),
+            ]
+            count = self.options.get("count")
+            if count:
+                cmd += ["--count", str(int(count))]
+            if self.options.get("carousel"):
+                cmd.append("--carousel")
+            return cmd
+        return [python, "-u", "cli.py", self.url]
+
     def _run(self) -> None:
         env = dict(os.environ)
         # cli.py prints →/✓/⚠; without this the child crashes writing them to
@@ -182,11 +370,11 @@ class Job:
         env["PYTHONIOENCODING"] = "utf-8"
         env["PYTHONUNBUFFERED"] = "1"
 
-        cmd = [self._python_exe(), "-u", "cli.py", self.url]
+        cmd = self._command()
         self._append(f"$ {' '.join(cmd)}")
 
-        # cli.py's imports (anthropic, yt-dlp, Pillow…) take ~10s before it
-        # prints anything, so show the first step as busy right away.
+        # The pipeline's imports (anthropic, yt-dlp, torch, Pillow…) take ~10s
+        # before anything is printed, so show the first step as busy right away.
         with self._lock:
             self.current = "transcript"
             self.steps["transcript"]["state"] = "running"
@@ -203,6 +391,9 @@ class Job:
                 errors="replace",
                 bufsize=1,
                 env=env,
+                # Own process group on POSIX so cancelling reaches ffmpeg and
+                # yt-dlp, not just the Python parent.
+                start_new_session=(os.name != "nt"),
             )
         except OSError as e:
             with self._lock:
@@ -228,9 +419,9 @@ class Job:
                         state["detail"] = "Cancelled"
             elif code == 0:
                 self.status = "done"
-                for state in self.steps.values():
+                for step_id, state in self.steps.items():
                     if state["state"] == "running":
-                        state["state"] = "done"
+                        self._finish(step_id)
             else:
                 self.status = "error"
                 if not self.error:
@@ -238,6 +429,16 @@ class Job:
                 for state in self.steps.values():
                     if state["state"] == "running":
                         state["state"] = "error"
+
+    def _finish(self, step_id: str) -> None:
+        """Close a stage, downgrading to 'warn' if anything went wrong in it.
+
+        Caller holds the lock.
+        """
+        state = self.steps[step_id]
+        if state["state"] in ("error", "skipped"):
+            return
+        state["state"] = "warn" if step_id in self.warned else "done"
 
     def _append(self, line: str) -> None:
         with self._lock:
@@ -252,15 +453,34 @@ class Job:
             return
 
         with self._lock:
-            if s.startswith("→"):
+            if s.startswith("·") and self.current:
+                # Progress chatter inside a stage — updates the detail line
+                # without changing the stage's state.
+                self.steps[self.current]["detail"] = s[1:].strip()
+            elif s.startswith("→"):
                 body = s[1:].strip()
-                step_id = _step_for_line(body)
+
+                # "Short 2/3: hook" keeps one step busy and counts through it,
+                # rather than flipping between stages for every short.
+                match = _SHORT_PROGRESS.match(body)
+                if match and "shorts" in self.steps:
+                    done_before, total, hook = match.groups()
+                    for other_id, state in self.steps.items():
+                        if other_id != "shorts" and state["state"] == "running":
+                            self._finish(other_id)
+                    self.current = "shorts"
+                    self.step_started = time.time()
+                    self.steps["shorts"]["state"] = "running"
+                    self.steps["shorts"]["detail"] = f"{done_before}/{total} — {hook}"
+                    return
+
+                step_id = _step_for_line(body, self.kind)
                 if step_id:
                     # Anything still marked running before this belongs to a
                     # finished stage.
                     for other_id, state in self.steps.items():
                         if other_id != step_id and state["state"] == "running":
-                            state["state"] = "done"
+                            self._finish(other_id)
                     self.current = step_id
                     self.step_started = time.time()
                     state = self.steps[step_id]
@@ -271,18 +491,21 @@ class Job:
                         state["state"] = "running"
                         state["detail"] = body
             elif s.startswith("✓ Done"):
-                for state in self.steps.values():
+                for step_id, state in self.steps.items():
                     if state["state"] == "running":
-                        state["state"] = "done"
+                        self._finish(step_id)
             elif s.startswith("✓") and self.current:
                 state = self.steps[self.current]
-                if state["state"] not in ("warn", "error"):
+                # The shorts stage emits a ✓ per clip, per caption pass and per
+                # render, so it stays busy until the run moves on or ends.
+                if self.current != "shorts" and state["state"] not in ("warn", "error"):
                     state["state"] = "done"
                 state["detail"] = s[1:].strip()
             elif s.startswith("⚠") and self.current:
                 state = self.steps[self.current]
                 state["state"] = "warn"
                 state["detail"] = s[1:].strip()
+                self.warned.add(self.current)
             elif s.startswith("✗"):
                 self.error = s[1:].strip()
                 if self.current:
@@ -341,14 +564,165 @@ def _read_json(path: str):
         return None
 
 
+# Everything that's worth reclaiming. The generated text and JSON is a few KB
+# per talk; the video is essentially all of it.
+MEDIA_EXTS = {".mp4", ".mp3", ".wav", ".m4a", ".webm", ".mkv", ".mov"}
+
+
+def _folder_bytes(folder: str) -> tuple[int, int]:
+    """(total bytes, media bytes) for everything under a folder."""
+    total = media = 0
+    for root, _dirs, names in os.walk(folder):
+        for name in names:
+            try:
+                size = os.path.getsize(os.path.join(root, name))
+            except OSError:
+                continue
+            total += size
+            if os.path.splitext(name)[1].lower() in MEDIA_EXTS:
+                media += size
+    return total, media
+
+
+def _safe_video_dir(video_id: str) -> str | None:
+    """Resolve a library id to a real folder inside OUTPUT_DIR, or None.
+
+    Deletion is the one operation here that can destroy work, and the id
+    arrives from an HTTP path, so it gets checked properly rather than
+    trusted: reject anything with a separator or a parent reference outright,
+    then confirm the *resolved* path is genuinely inside the resolved output
+    directory. The realpath comparison is what catches a symlink pointing
+    somewhere else entirely, which the string checks alone would miss.
+    """
+    if not video_id or video_id in (".", ".."):
+        return None
+    if "/" in video_id or "\\" in video_id or os.path.isabs(video_id):
+        return None
+
+    candidate = os.path.realpath(os.path.join(OUTPUT_DIR, video_id))
+    root = os.path.realpath(OUTPUT_DIR)
+    if candidate != root and not candidate.startswith(root + os.sep):
+        return None
+    if not os.path.isdir(candidate):
+        return None
+
+    # Same rule library_index() uses, so the only deletable things are the
+    # per-video folders the UI actually lists.
+    if not re.fullmatch(r"[0-9A-Za-z_-]{11}", video_id) and not os.path.exists(
+        os.path.join(candidate, "transcript.json")
+    ):
+        return None
+    return candidate
+
+
+def _force_rmtree(path: str) -> bool:
+    """Delete a tree, clearing read-only flags that would otherwise stop it.
+
+    Necessary because this project usually lives inside OneDrive, and OneDrive
+    marks synced folders ReadOnly with a reparse point (Files On-Demand).
+    `shutil.rmtree` fails outright on those with "Access is denied", even
+    though nothing is holding the files open — which is why deletes were
+    leaving empty husks behind while `Remove-Item -Force` cleared them fine.
+    Clearing the attribute and retrying is what -Force does.
+
+    Returns True if the tree is gone.
+    """
+    def on_error(func, target, _exc):
+        try:
+            os.chmod(target, stat.S_IWRITE)
+            func(target)
+        except OSError:
+            pass
+
+    shutil.rmtree(path, onerror=on_error)
+    return not os.path.exists(path)
+
+
+def sweep_deleting() -> None:
+    """Clear any `*.deleting` husks left by an earlier delete.
+
+    Removing a renamed folder can fail on the directories themselves even when
+    every file inside has gone — a sync client or indexer holding a handle is
+    enough. The entry has already left the library at that point, so the husk
+    is invisible clutter rather than a problem, but it would accumulate one
+    folder per delete forever. Retrying on the next pass clears them once
+    whatever held the handle has let go.
+    """
+    if not os.path.isdir(OUTPUT_DIR):
+        return
+    for name in os.listdir(OUTPUT_DIR):
+        if not name.endswith(".deleting"):
+            continue
+        path = os.path.join(OUTPUT_DIR, name)
+        if os.path.isdir(path):
+            _force_rmtree(path)
+
+
+def delete_library_item(video_id: str) -> dict:
+    """Remove a library entry: its folder and everything in it."""
+    sweep_deleting()
+
+    folder = _safe_video_dir(video_id)
+    if folder is None:
+        return {"error": "Unknown or unsafe library id", "status": 404}
+
+    # A run writing into this folder would recreate half of what we remove,
+    # and leave the job failing on missing files partway through.
+    with JOBS_LOCK:
+        busy = any(
+            job.status == "running" and getattr(job, "video_id", None) == video_id
+            for job in JOBS.values()
+        )
+    if busy:
+        return {"error": "A run is using this talk right now", "status": 409}
+
+    before_total, _media = _folder_bytes(folder)
+
+    # Rename first, delete second. rmtree removes files before directories, so
+    # a failure partway through leaves the folder gutted while still reporting
+    # an error — the worst outcome, because the caller thinks nothing happened.
+    # A rename is a single operation that either works or doesn't: if anything
+    # in here is locked, it fails with everything still intact.
+    staged = folder + ".deleting"
+    try:
+        if os.path.exists(staged):
+            _force_rmtree(staged)
+        os.rename(folder, staged)
+    except OSError as e:
+        return {
+            "error": f"Couldn't delete this talk — something is using its files ({e.strerror or e})",
+            "status": 409,
+        }
+
+    _force_rmtree(staged)
+    if os.path.isdir(staged):
+        # The contents are gone and the entry has left the library either way;
+        # only an empty directory skeleton remains, which is harmless and gets
+        # cleared on the next attempt.
+        return {"ok": True, "video_id": video_id, "freed_bytes": before_total,
+                "note": "Some empty folders could not be removed and were left behind."}
+    return {"ok": True, "video_id": video_id, "freed_bytes": before_total}
+
+
 def library_index() -> list[dict]:
     if not os.path.isdir(OUTPUT_DIR):
         return []
+
+    # Cheap, and it means husks disappear on their own as soon as whatever was
+    # holding them releases — without the user ever having to know they existed.
+    sweep_deleting()
 
     items = []
     for name in sorted(os.listdir(OUTPUT_DIR)):
         video_dir = os.path.join(OUTPUT_DIR, name)
         if not os.path.isdir(video_dir):
+            continue
+        # output/ also holds non-video working folders (posters/, projects/).
+        # A library entry is a per-video folder: an 11-character YouTube id,
+        # or anything that actually produced a transcript.
+        if not re.fullmatch(r"[0-9A-Za-z_-]{11}", name) and not os.path.exists(
+            os.path.join(video_dir, "transcript.json")
+        ):
             continue
 
         transcript = _read_json(os.path.join(video_dir, "transcript.json")) or {}
@@ -357,6 +731,8 @@ def library_index() -> list[dict]:
 
         def has(*parts: str) -> bool:
             return os.path.exists(os.path.join(video_dir, *parts))
+
+        sizes = _folder_bytes(video_dir)
 
         title = transcript.get("title") or (brief.get("title_suggestions") or [name])[0]
         items.append(
@@ -369,23 +745,87 @@ def library_index() -> list[dict]:
                 "summary": brief.get("summary", ""),
                 "topics": brief.get("topics", []),
                 "modified": os.path.getmtime(video_dir),
+                "size_bytes": sizes[0],
+                "media_bytes": sizes[1],
                 "assets": {
                     "brief": has("brief.json"),
                     "blog": has("blog_post.md"),
                     "thread": has("twitter_thread.json"),
-                    "linkedin": has("linkedin_post.md"),
                     "captions": has("captions.json"),
                     "carousel": os.path.isdir(carousel_dir)
                     and any(f.endswith(".png") for f in os.listdir(carousel_dir)),
                     "voiceover": has("voiceover.mp3") or has("voiceover_script.txt"),
                     "clip": has("short_form_clip.mp4"),
                     "transcript": has("transcript.json"),
+                    "motivational": bool(read_shorts(video_dir)["shorts"]),
                 },
             }
         )
 
     items.sort(key=lambda i: i["modified"], reverse=True)
     return items
+
+
+def read_shorts(video_dir: str) -> dict:
+    """Whatever the motivational-shorts pipeline left in this video's folder."""
+    shorts_dir = os.path.join(video_dir, "shorts")
+    if not os.path.isdir(shorts_dir):
+        return {"shorts": [], "carousel": []}
+
+    index = _read_json(os.path.join(shorts_dir, "index.json")) or {}
+    records = []
+
+    # Trust the folders on disk over index.json, so a run that was interrupted
+    # before writing the index still shows whatever it managed to render.
+    for name in sorted(os.listdir(shorts_dir)):
+        folder = os.path.join(shorts_dir, name)
+        if not os.path.isdir(folder) or name == "carousel":
+            continue
+        video_path = os.path.join(folder, "short.mp4")
+        if not os.path.isfile(video_path):
+            continue
+        moment = _read_json(os.path.join(folder, "moment.json")) or {}
+        moment["folder_name"] = name
+        moment["media"] = os.path.relpath(video_path, OUTPUT_DIR).replace("\\", "/")
+        records.append(moment)
+
+    carousel_dir = os.path.join(shorts_dir, "carousel")
+    slides = []
+    if os.path.isdir(carousel_dir):
+        slides = [
+            os.path.relpath(os.path.join(carousel_dir, f), OUTPUT_DIR).replace("\\", "/")
+            for f in sorted(os.listdir(carousel_dir))
+            if f.endswith(".png")
+        ]
+
+    return {"shorts": records, "carousel": slides, "source_url": index.get("source_url", "")}
+
+
+def asset_status() -> dict:
+    """Library counts plus whether a stock key is configured."""
+    manifest = _read_json(os.path.join(BASE_DIR, "assets", "library.json")) or {}
+    assets = manifest.get("assets", [])
+    counts = {kind: sum(1 for a in assets if a.get("kind") == kind)
+              for kind in ("video", "image", "music")}
+
+    keys = {"PEXELS_API_KEY": False, "PIXABAY_API_KEY": False}
+    env_text = _read_text(os.path.join(BASE_DIR, ".env")) or ""
+    for name in keys:
+        value = os.environ.get(name, "").strip()
+        if not value:
+            for line in env_text.splitlines():
+                line = line.strip()
+                if line.startswith(f"{name}=") and not line.startswith("#"):
+                    value = line.split("=", 1)[1].strip().strip("'\"")
+                    break
+        keys[name] = bool(value) and value != "your_key_here"
+
+    return {
+        "counts": counts,
+        "stock": keys["PEXELS_API_KEY"] or keys["PIXABAY_API_KEY"],
+        "pexels": keys["PEXELS_API_KEY"],
+        "pixabay": keys["PIXABAY_API_KEY"],
+    }
 
 
 def library_detail(video_id: str) -> dict | None:
@@ -405,15 +845,6 @@ def library_detail(video_id: str) -> dict | None:
     if os.path.isdir(carousel_dir):
         slide_files = sorted(f for f in os.listdir(carousel_dir) if f.endswith(".png"))
 
-    claims_raw = _read_text(os.path.join(video_dir, "linkedin_claims_to_verify.txt"))
-    claims = []
-    if claims_raw:
-        claims = [
-            line.lstrip("- ").strip()
-            for line in claims_raw.splitlines()
-            if line.strip().startswith("-")
-        ]
-
     segments = transcript.get("transcript_segments") or []
     transcript_text = transcript.get("transcript_text", "")
 
@@ -429,10 +860,6 @@ def library_detail(video_id: str) -> dict | None:
         "brief": brief,
         "blog": _read_text(os.path.join(video_dir, "blog_post.md")),
         "thread": thread,
-        "linkedin": {
-            "post": _read_text(os.path.join(video_dir, "linkedin_post.md")),
-            "claims": claims,
-        },
         "captions": captions,
         "carousel": {"slides": (carousel or {}).get("slides", []), "images": slide_files},
         "voiceover": {
@@ -443,6 +870,7 @@ def library_detail(video_id: str) -> dict | None:
             "info": clip_info,
             "video": os.path.exists(os.path.join(video_dir, "short_form_clip.mp4")),
         },
+        "motivational": read_shorts(video_dir),
         "transcript": {
             "language": transcript.get("transcript_language", ""),
             "word_count": len(transcript_text.split()),
@@ -483,17 +911,123 @@ def env_status() -> dict:
 # ---------------------------------------------------------------------------
 
 
+def _matches(supplied: str, secret: str) -> bool:
+    """Constant-time compare that tolerates a missing value."""
+    if not supplied or not secret:
+        return False
+    return hmac.compare_digest(supplied, secret)
+
+
+class _Auth:
+    """How a request proved it was allowed in."""
+    NONE = "none"
+    OPEN = "open"        # nothing configured; localhost use
+    COOKIE = "cookie"
+    LINK = "link"        # ?k=... — needs a cookie set on the way out
+    BASIC = "basic"
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "ContentStudioUI"
 
     def log_message(self, fmt, *args):  # quieter console
         pass
 
+    # -- access -------------------------------------------------------------
+
+    def _how_authorised(self) -> str:
+        """Which credential let this request through, if any."""
+        if not LINK_TOKEN and not PASSWORD:
+            return _Auth.OPEN
+
+        # The owner at the keyboard doesn't need the key. The server binds to
+        # 127.0.0.1, so a request without Cloudflare's headers came from this
+        # machine — and anyone sitting here can already read .env and the whole
+        # output folder, so a key would guard nothing.
+        #
+        # cloudflared also connects from 127.0.0.1, which is why the address
+        # can't be the test. Cf-Ray is added on Cloudflare's side and a visitor
+        # has no way to strip it, so its presence reliably marks tunnel traffic.
+        if not self._is_remote():
+            return _Auth.OPEN
+
+        if LINK_TOKEN:
+            cookie = SimpleCookie(self.headers.get("Cookie", ""))
+            if COOKIE_NAME in cookie and _matches(cookie[COOKIE_NAME].value, LINK_TOKEN):
+                return _Auth.COOKIE
+            supplied = (parse_qs(urlparse(self.path).query).get("k") or [""])[0]
+            if _matches(supplied, LINK_TOKEN):
+                return _Auth.LINK
+
+        if PASSWORD and self._basic_ok():
+            return _Auth.BASIC
+        return _Auth.NONE
+
+    def _authorised(self) -> bool:
+        return self._how_authorised() != _Auth.NONE
+
+    def _basic_ok(self) -> bool:
+        header = self.headers.get("Authorization", "")
+        if not header.startswith("Basic "):
+            return False
+        try:
+            decoded = base64.b64decode(header[6:]).decode("utf-8", "replace")
+            user, _, password = decoded.partition(":")
+        except Exception:
+            return False
+        return _matches(user, USERNAME) and _matches(password, PASSWORD)
+
+    def _is_remote(self) -> bool:
+        """True when this request arrived through the Cloudflare tunnel.
+
+        Cloudflare stamps every proxied request with Cf-Ray, and a visitor
+        cannot strip it — it's added on Cloudflare's side, not the client's.
+        Requests made directly to localhost carry none of these, so this
+        cleanly separates "the owner at the keyboard" from "someone I sent a
+        link to" without needing separate accounts.
+
+        Not a security boundary on its own: someone already on this machine
+        could forge the header, but they have full access regardless. It exists
+        to stop a guest deleting the owner's work.
+        """
+        return any(
+            self.headers.get(h)
+            for h in ("Cf-Ray", "Cf-Connecting-Ip", "X-Forwarded-For")
+        )
+
+    def _may_delete(self) -> bool:
+        if _ALLOW_DELETE_SETTING in ("1", "true", "yes"):
+            return True
+        if _ALLOW_DELETE_SETTING in ("0", "false", "no"):
+            return False
+        return not self._is_remote()
+
+    def _demand_login(self) -> None:
+        body = b'{"error": "Sign in required"}'
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Basic realm="Content Studio", charset="UTF-8"')
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     # -- helpers ------------------------------------------------------------
+
+    def _auth_cookie(self) -> None:
+        """Hand back the link key as a cookie, once, on the first request."""
+        if not getattr(self, "_set_cookie", False):
+            return
+        self.send_header(
+            "Set-Cookie",
+            f"{COOKIE_NAME}={LINK_TOKEN}; Path=/; Max-Age=2592000; "
+            "HttpOnly; SameSite=Lax",
+        )
+        self._set_cookie = False
 
     def _send_json(self, payload, status: int = 200) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
+        self._auth_cookie()
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
@@ -529,6 +1063,7 @@ class Handler(BaseHTTPRequestHandler):
 
         length = end - start + 1
         self.send_response(status)
+        self._auth_cookie()
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(length))
         self.send_header("Accept-Ranges", "bytes")
@@ -569,6 +1104,14 @@ class Handler(BaseHTTPRequestHandler):
     # -- routes -------------------------------------------------------------
 
     def do_GET(self):  # noqa: N802
+        mode = self._how_authorised()
+        if mode == _Auth.NONE:
+            self._demand_login()
+            return
+        # Arrived with ?k=... — swap it for a cookie so the key stops riding
+        # in the URL bar and survives navigation within the app.
+        self._set_cookie = (mode == _Auth.LINK)
+
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
 
@@ -591,11 +1134,18 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(
                 {
                     "env": env_status(),
+                    "assets": asset_status(),
                     "library": library_index(),
                     "jobs": sorted(jobs, key=lambda j: j["created_at"], reverse=True),
-                    "steps": STEPS,
+                    "steps": STEPS_BY_KIND,
                 }
             )
+            return
+
+        if path == "/api/assets":
+            self._send_json(asset_status())
+            return
+
             return
 
         if path == "/api/library":
@@ -641,7 +1191,43 @@ class Handler(BaseHTTPRequestHandler):
 
         self._send_json({"error": "Not found"}, 404)
 
+    def do_DELETE(self):  # noqa: N802
+        mode = self._how_authorised()
+        if mode == _Auth.NONE:
+            self._demand_login()
+            return
+        # Arrived with ?k=... — swap it for a cookie so the key stops riding
+        # in the URL bar and survives navigation within the app.
+        self._set_cookie = (mode == _Auth.LINK)
+
+        parsed = urlparse(self.path)
+        path = unquote(parsed.path)
+
+        if path.startswith("/api/library/"):
+            if not self._may_delete():
+                self._send_json(
+                    {"error": "Deleting is disabled on this link. The owner can "
+                              "enable it with CONTENT_STUDIO_ALLOW_DELETE=1."},
+                    403,
+                )
+                return
+            video_id = path[len("/api/library/") :]
+            result = delete_library_item(video_id)
+            status = result.pop("status", 200 if result.get("ok") else 400)
+            self._send_json(result, status)
+            return
+
+        self._send_json({"error": "Not found"}, 404)
+
     def do_POST(self):  # noqa: N802
+        mode = self._how_authorised()
+        if mode == _Auth.NONE:
+            self._demand_login()
+            return
+        # Arrived with ?k=... — swap it for a cookie so the key stops riding
+        # in the URL bar and survives navigation within the app.
+        self._set_cookie = (mode == _Auth.LINK)
+
         path = unquote(urlparse(self.path).path)
 
         if path == "/api/jobs":
@@ -674,8 +1260,36 @@ class Handler(BaseHTTPRequestHandler):
                     400,
                 )
                 return
+            # Checked before the job is created, so hitting the cap costs
+            # nothing. The count only matters on a shared link; locally the
+            # default of 20 is far more than anyone runs by hand in a day.
+            used = runs_today()
+            if DAILY_RUN_CAP > 0 and used >= DAILY_RUN_CAP:
+                self._send_json(
+                    {
+                        "error": (
+                            f"Daily limit reached ({used}/{DAILY_RUN_CAP} runs). "
+                            "This resets at midnight, or the owner can raise "
+                            "CONTENT_STUDIO_DAILY_RUNS in .env."
+                        )
+                    },
+                    429,
+                )
+                return
 
-            job = Job(url)
+            kind = body.get("kind", "studio")
+            # An absent count means "auto": make_shorts takes its number from
+            # the talk's replay peaks rather than being told one.
+            raw_count = body.get("count")
+            options = {
+                "count": (
+                    max(1, min(int(raw_count), 8)) if str(raw_count).strip().isdigit() else None
+                ),
+                "style": body.get("style", "broll"),
+                "carousel": bool(body.get("carousel", False)),
+            }
+            job = Job(url, kind=kind, options=options)
+            record_run()
             with JOBS_LOCK:
                 JOBS[job.id] = job
             job.start()

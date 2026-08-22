@@ -3,7 +3,7 @@ captions_generator.py
 
 Generates short-form social media captions (for Instagram, TikTok, YouTube
 Shorts, etc.) from a video's content brief. These are distinct from the
-LinkedIn post and Twitter thread: shorter, punchier, built around a strong
+Twitter thread: shorter, punchier, built around a strong
 first line (since most platforms truncate captions behind a "more" tap), and
 paired with relevant hashtags.
 

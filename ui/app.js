@@ -3,6 +3,8 @@
 
 const state = {
   env: { anthropic: false, elevenlabs: false },
+  assets: { counts: { video: 0, image: 0, music: 0 }, stock: false },
+  kind: "shorts",          // the only pipeline the UI offers
   library: [],
   view: { kind: "welcome", id: null },
   job: null,        // snapshot of the run currently being displayed
@@ -37,6 +39,14 @@ function fmtDuration(sec) {
   const s = sec % 60;
   return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
            : `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function fmtBytes(n) {
+  n = n || 0;
+  if (n < 1024) return `${n} B`;
+  if (n < 1048576) return `${Math.round(n / 1024)} KB`;
+  if (n < 1073741824) return `${Math.round(n / 1048576)} MB`;
+  return `${(n / 1073741824).toFixed(1)} GB`;
 }
 
 function fmtWhen(ts) {
@@ -87,7 +97,7 @@ function linkBtn(href, label) {
   return a;
 }
 
-/* Small Markdown subset: enough for the blog post and LinkedIn output. */
+/* Small Markdown subset: enough for the blog post. */
 function markdown(src) {
   const lines = esc(src).split("\n");
   const out = [];
@@ -160,15 +170,105 @@ function renderEnv() {
     el("span", {
       className: "badge " + (state.env.elevenlabs ? "ok" : "off"),
       textContent: state.env.elevenlabs ? "ElevenLabs ✓" : "ElevenLabs off",
-      title: state.env.elevenlabs ? "Voice-over will be generated" : "Optional — voice-over step is skipped",
+      title: state.env.elevenlabs
+        ? "Voice-over available — off unless you ask for it"
+        : "Optional — voice-over step is skipped",
     }),
   );
 }
 
 const ASSET_LABELS = {
-  blog: "Blog", thread: "Thread", linkedin: "LinkedIn", captions: "Captions",
-  carousel: "Carousel", clip: "Clip", voiceover: "Voice", transcript: "Transcript",
+  motivational: "Shorts", blog: "Blog", thread: "Thread",
+  captions: "Captions", carousel: "Carousel", clip: "Clip", voiceover: "Voice",
+  transcript: "Transcript",
 };
+
+function renderAssetsNote() {
+  const note = $("#assets-note");
+  if (!note) return;
+  const c = state.assets.counts || {};
+  const parts = [`${c.video || 0} b-roll`, `${c.image || 0} images`, `${c.music || 0} tracks`];
+  note.textContent = state.assets.stock
+    ? `Library: ${parts.join(" · ")} — stock API connected`
+    : `Library: ${parts.join(" · ")} — no stock key, using the talk's own footage`;
+}
+
+/* Cutting clips is the whole product, so there is no pipeline to choose.
+   `state.kind` stays in the payload because the server still routes on it and
+   cli.py remains runnable from the command line — the UI just never offers it. */
+function setKind(kind) {
+  state.kind = kind || "shorts";
+  const options = $("#shorts-options");
+  if (options) options.hidden = false;
+  $("#run-button").textContent = "Cut clips";
+}
+
+/* The run chip lives in the header and survives navigation, so a running job
+   is still stoppable after you click into the library. */
+function renderRunningChip(job) {
+  const chip = $("#running-chip");
+  if (!chip) return;
+
+  const active = job && job.status === "running";
+  chip.hidden = !active;
+  if (!active) return;
+
+  const stage = (job.steps || []).find((s) => s.state === "running");
+  const label = stage ? stage.label : "Starting…";
+  $("#running-label").textContent = `${label} · ${Math.round(job.elapsed)}s`;
+  $("#running-label").title = `${job.url}\nClick to view this run`;
+  $("#running-label").onclick = () => showJob(state.job || job);
+
+  const stop = $("#stop-button");
+  stop.disabled = false;
+  stop.textContent = "Stop";
+  stop.onclick = () => stopRun(job.id, stop);
+}
+
+/* Put the UI back to idle.
+
+   Needed because a job can vanish from under the client: the server holds jobs
+   in memory, so restarting webapp.py forgets every one of them while the open
+   page carries on polling an id that no longer exists. Without this the chip
+   sits on "Running…" forever and Stop can't clear it either, since cancelling
+   a job the server has never heard of just 404s. */
+function clearRunState(message) {
+  clearTimeout(state.pollTimer);
+  state.pollMisses = 0;
+  state.job = null;
+  renderRunningChip(null);
+  const run = $("#run-button");
+  if (run) run.disabled = false;
+  setKind(state.kind);
+  if (message) toast(message);
+}
+
+async function stopRun(jobId, button) {
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Stopping…";
+  }
+  try {
+    const job = await api(`/api/jobs/${jobId}/cancel`, { method: "POST" });
+    state.job = job;
+    if (state.view.kind === "job" && state.view.id === jobId) showJob(job);
+    renderRunningChip(job);
+    toast("Run stopped");
+  } catch (e) {
+    // Nothing to cancel means the run is already over — which is what the
+    // button was asking for, so treat it as success and clear the chip
+    // instead of leaving it stuck with an error toast.
+    if (e && e.status === 404) {
+      clearRunState("That run had already finished");
+      return;
+    }
+    toast(e.message);
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Stop";
+    }
+  }
+}
 
 function renderLibrary() {
   const wrap = $("#library");
@@ -192,10 +292,81 @@ function renderLibrary() {
           .filter(([k]) => item.assets[k])
           .map(([, label]) => el("span", { className: "chip on", textContent: label })),
       ),
+      buildRowActions(item),
     );
     node.onclick = () => openVideo(item.video_id);
     return node;
   }));
+}
+
+/* Disk actions for one library row.
+
+   Two separate buttons because they aren't the same decision: freeing space
+   strips the video and keeps everything Claude was paid to write, while
+   deleting removes the talk outright. Both confirm first — this project isn't
+   under version control, so neither is recoverable. */
+/* Disk actions for one library row.
+
+   Confirmation is done inline on the button rather than with window.confirm().
+   The native dialog is suppressed in embedded and automated browsers — it
+   returns false without ever showing, so a guarded delete silently did nothing
+   and looked like a broken button. A two-step button works everywhere, and it
+   also keeps a destructive action from being one stray click away. */
+function buildRowActions(item) {
+  const row = el("div", { className: "lib-actions" },
+    el("span", { className: "size", textContent: fmtBytes(item.size_bytes) }),
+  );
+
+  const wipe = el("button", {
+    className: "btn-sm danger",
+    textContent: "Delete",
+    title: "Remove this talk and everything generated from it",
+  });
+
+  let armed = null;
+  const disarm = () => {
+    clearTimeout(armed);
+    armed = null;
+    wipe.textContent = "Delete";
+    wipe.classList.remove("armed");
+  };
+
+  wipe.onclick = (e) => {
+    e.stopPropagation();
+    if (!armed) {
+      wipe.textContent = `Delete ${fmtBytes(item.size_bytes)}?`;
+      wipe.classList.add("armed");
+      // Re-arming shouldn't linger: an armed button left on screen invites a
+      // later click that the user has forgotten the meaning of.
+      armed = setTimeout(disarm, 4000);
+      return;
+    }
+    disarm();
+    removeLibraryItem(item.video_id, wipe);
+  };
+
+  row.append(wipe);
+  return row;
+}
+
+async function removeLibraryItem(videoId, button) {
+  button.disabled = true;
+  button.textContent = "…";
+  try {
+    const res = await api(`/api/library/${encodeURIComponent(videoId)}`, { method: "DELETE" });
+    toast(`Deleted — freed ${fmtBytes(res.freed_bytes)}`);
+
+    // A deleted talk can't stay open in the main pane.
+    if (state.view.kind === "video" && state.view.id === videoId) showWelcome();
+
+    const data = await api("/api/library");
+    state.library = data.library || [];
+    renderLibrary();
+  } catch (err) {
+    toast(err.message);
+    button.disabled = false;
+    button.textContent = "Delete";
+  }
 }
 
 /* ----------------------------------------------------------------- views */
@@ -207,7 +378,6 @@ function showWelcome() {
   const formats = [
     ["Blog post", "500–800 words, Markdown"],
     ["X / Twitter thread", "8–12 tweets under 280 chars"],
-    ["LinkedIn post", "150–250 words, hook first"],
     ["Social captions", "3 variants + hashtags"],
     ["Carousel", "Rendered PNG slides"],
     ["Short-form clip", "Vertical 9:16 MP4"],
@@ -255,12 +425,8 @@ function showJob(job) {
   );
 
   if (running) {
-    const cancel = el("button", { className: "btn-sm", textContent: "Cancel" });
-    cancel.onclick = async () => {
-      cancel.disabled = true;
-      try { showJob(await api(`/api/jobs/${job.id}/cancel`, { method: "POST" })); }
-      catch (e) { toast(e.message); }
-    };
+    const cancel = el("button", { className: "btn-sm", textContent: "Stop run" });
+    cancel.onclick = () => stopRun(job.id, cancel);
     header.append(cancel);
   }
   if (job.status === "done" && job.video_id) {
@@ -323,11 +489,13 @@ function renderVideo() {
   const d = state.detail;
   if (!d) return;
 
+  const motivational = d.motivational || { shorts: [], carousel: [] };
   const tabs = [
+    { id: "shorts", label: `Shorts${motivational.shorts.length ? ` (${motivational.shorts.length})` : ""}`,
+      on: !!motivational.shorts.length },
     { id: "overview", label: "Overview", on: !!d.brief },
     { id: "blog", label: "Blog", on: !!d.blog },
     { id: "thread", label: "Thread", on: !!(d.thread && d.thread.tweets) },
-    { id: "linkedin", label: "LinkedIn", on: !!d.linkedin.post },
     { id: "captions", label: "Captions", on: !!(d.captions && d.captions.captions) },
     { id: "carousel", label: "Carousel", on: !!d.carousel.images.length },
     { id: "clip", label: "Clip", on: !!d.clip.video },
@@ -371,6 +539,44 @@ function card(title, actions, ...body) {
 
 function renderTab(d, tab) {
   const media = (name) => `/media/${encodeURIComponent(d.video_id)}/${name}`;
+
+  if (tab === "shorts") {
+    const m = d.motivational || { shorts: [], carousel: [] };
+    if (!m.shorts.length) {
+      return notGenerated("short clips — run this video through \"Short clips\"");
+    }
+    return el("div", {},
+      card(`${m.shorts.length} short${m.shorts.length > 1 ? "s" : ""}`,
+        [copyBtn(() => m.shorts.map((s) =>
+          `${s.hook}\n"${s.quote}"\n${s.theme} · ${s.duration_seconds}s`).join("\n\n"), "Copy hooks")],
+        el("div", { className: "shorts-grid" }, m.shorts.map((s) =>
+          el("div", { className: "short-card" },
+            el("video", { src: `/media/${s.media}`, controls: true, preload: "metadata", playsInline: true }),
+            el("div", { className: "body" },
+              el("div", { className: "hook" }, s.hook || "—"),
+              s.quote && el("div", { className: "quote" }, `“${s.quote}”`),
+              el("div", { className: "row" },
+                s.theme && el("span", { className: "theme-tag" }, s.theme),
+                el("span", { className: "chip" },
+                  `${Math.round(s.duration_seconds || 0)}s`),
+                s.start_seconds != null && el("span", {
+                  className: "chip",
+                  title: "where this moment starts in the original talk",
+                }, `from ${fmtDuration(s.start_seconds)}`),
+                s.style && el("span", { className: "chip" }, s.style),
+                copyBtn(() => s.quote || s.hook, "Copy")),
+              s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
+            ))))),
+      m.carousel.length ? card(`Quote carousel · ${m.carousel.length} slides`, null,
+        el("div", { className: "slides" }, m.carousel.map((rel, i) => {
+          const href = `/media/${rel}`;
+          const a = el("a", { href, target: "_blank", rel: "noopener" },
+            el("img", { src: href, alt: `Slide ${i + 1}`, loading: "lazy" }));
+          a.style.display = "block";
+          return el("div", { className: "slide" }, a);
+        }))) : null,
+    );
+  }
 
   if (tab === "overview") {
     const b = d.brief;
@@ -429,19 +635,6 @@ function renderTab(d, tab) {
                 " ",
                 copyBtn(t))),
             el("div", { className: "tweet-body" }, t))))),
-    );
-  }
-
-  if (tab === "linkedin") {
-    if (!d.linkedin.post) return notGenerated("LinkedIn post");
-    const body = el("div", { className: "prose" });
-    body.innerHTML = markdown(d.linkedin.post);
-    return el("div", {},
-      d.linkedin.claims.length ? el("div", { className: "warnbox" },
-        el("h4", {}, "⚠ Verify before publishing"),
-        el("ul", {}, d.linkedin.claims.map((c) => el("li", {}, c)))) : null,
-      card(`linkedin_post.md · ${d.linkedin.post.split(/\s+/).filter(Boolean).length} words`,
-        [copyBtn(() => d.linkedin.post)], body),
     );
   }
 
@@ -526,18 +719,42 @@ function pollJob(jobId) {
     let job;
     try {
       job = await api(`/api/jobs/${jobId}`);
-    } catch {
+    } catch (err) {
+      // 404 is final: the server has no such job and never will again, so
+      // stop rather than retrying an id that cannot come back.
+      if (err && err.status === 404) {
+        clearRunState("That run is no longer on the server");
+        return;
+      }
+      // Anything else may be the server briefly restarting, so retry — but
+      // give up eventually instead of polling a dead endpoint all day.
+      state.pollMisses = (state.pollMisses || 0) + 1;
+      if (state.pollMisses > 15) {
+        clearRunState("Lost contact with the run");
+        return;
+      }
       state.pollTimer = setTimeout(tick, 2000);
       return;
     }
+    state.pollMisses = 0;
+    state.job = job;
+    renderRunningChip(job);
     if (state.view.kind === "job" && state.view.id === jobId) showJob(job);
     if (job.status === "running") {
       state.pollTimer = setTimeout(tick, 1200);
     } else {
       $("#run-button").disabled = false;
-      $("#run-button").textContent = "Generate";
+      setKind(state.kind);
+      renderRunningChip(job);
       await refreshLibrary();
-      if (job.status === "done") toast("Done — all formats generated");
+      try {
+        state.assets = await api("/api/assets");
+        renderAssetsNote();
+      } catch { /* leave the previous counts up */ }
+      if (job.status === "done") {
+        toast(job.kind === "shorts" ? "Shorts ready" : "Done — all formats generated");
+        if (job.video_id) openVideo(job.video_id, job.kind === "shorts" ? "shorts" : undefined);
+      }
     }
   };
   tick();
@@ -560,13 +777,23 @@ $("#run-form").addEventListener("submit", async (e) => {
   if (!url) return;
 
   const btn = $("#run-button");
+  const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Starting…";
   try {
+    const payload = { url, kind: state.kind };
+    if (state.kind === "shorts") {
+      // "auto" is sent as absence — the pipeline then takes its count from
+      // however many replay peaks the talk actually has.
+      const chosen = $("#opt-count").value;
+      if (chosen !== "auto") payload.count = Number(chosen);
+      payload.style = $("#opt-style").value;
+      payload.carousel = $("#opt-carousel").checked;
+    }
     const job = await api("/api/jobs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
+      body: JSON.stringify(payload),
     });
     input.value = "";
     btn.textContent = "Running…";
@@ -574,7 +801,7 @@ $("#run-form").addEventListener("submit", async (e) => {
     pollJob(job.id);
   } catch (err) {
     btn.disabled = false;
-    btn.textContent = "Generate";
+    btn.textContent = label;
     toast(err.message);
     if (err.data && err.data.job_id) { showJob(await api(`/api/jobs/${err.data.job_id}`)); pollJob(err.data.job_id); }
   }
@@ -584,9 +811,13 @@ $("#run-form").addEventListener("submit", async (e) => {
   try {
     const data = await api("/api/state");
     state.env = data.env;
+    state.assets = data.assets || state.assets;
     state.library = data.library;
     renderEnv();
+    renderAssetsNote();
     renderLibrary();
+    setKind(state.kind);
+
 
     const running = data.jobs.find((j) => j.status === "running");
     if (running) {

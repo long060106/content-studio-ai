@@ -21,7 +21,6 @@ from youtube_extractor import extract, InvalidYouTubeURL, NoTranscriptAvailable
 from content_brief import generate_brief
 from blog_generator import generate_blog_post
 from twitter_thread_generator import generate_twitter_thread
-from linkedin_generator import generate_linkedin_post
 from captions_generator import generate_captions
 from voiceover_script_generator import generate_voiceover_script
 from text_to_speech import synthesize_speech
@@ -36,8 +35,8 @@ def save(path: str, content: str) -> str:
 
     Everything is saved the moment it's generated rather than in one batch at
     the end. The clip stage can take minutes and is the most likely thing to
-    fail or be interrupted; when it does, the blog post, thread, LinkedIn post
-    and captions you already paid the API for are on disk instead of lost.
+    fail or be interrupted; when it does, the blog post, thread and captions you
+    already paid the API for are on disk instead of lost.
     """
     parent = os.path.dirname(path)
     if parent:
@@ -47,7 +46,7 @@ def save(path: str, content: str) -> str:
     return path
 
 
-def run(url: str, output_dir: str = "output") -> None:
+def run(url: str, output_dir: str = "output", voiceover: bool = False) -> None:
     print(f"→ Extracting transcript for: {url}")
     try:
         video = extract(url)
@@ -98,19 +97,6 @@ def run(url: str, output_dir: str = "output") -> None:
     saved.append(save(os.path.join(video_dir, "twitter_thread.json"), thread.to_json()))
     saved.append(save(os.path.join(video_dir, "twitter_thread.txt"), thread.to_text()))
 
-    print("→ Generating LinkedIn post...")
-    linkedin_result = generate_linkedin_post(brief)
-    print(f"  ✓ LinkedIn post generated ({len(linkedin_result.post.split())} words, "
-          f"{len(linkedin_result.claims_to_verify)} claim(s) flagged to verify)")
-    saved.append(save(os.path.join(video_dir, "linkedin_post.md"), linkedin_result.post))
-    if linkedin_result.claims_to_verify:
-        claims_path = save(
-            os.path.join(video_dir, "linkedin_claims_to_verify.txt"),
-            "Claims/quotes to verify against the original video before publishing:\n\n"
-            + "\n".join(f"- {c}" for c in linkedin_result.claims_to_verify),
-        )
-        saved.append(f"{claims_path}  ⚠ review before publishing")
-
     print("→ Generating captions...")
     caption_set = generate_captions(brief)
     print(f"  ✓ Captions generated ({len(caption_set.captions)} variants)")
@@ -119,7 +105,9 @@ def run(url: str, output_dir: str = "output") -> None:
 
     voiceover_script = None
     voiceover_audio_path = None
-    if os.environ.get("ELEVENLABS_API_KEY"):
+    # Off by default. AI narration over a real speaker is rarely what you want,
+    # so it runs only when explicitly asked for and a key is present.
+    if voiceover and os.environ.get("ELEVENLABS_API_KEY"):
         print("→ Generating voice-over script...")
         voiceover_script = generate_voiceover_script(brief)
         print(f"  ✓ Script generated ({len(voiceover_script.split())} words)")
@@ -135,8 +123,8 @@ def run(url: str, output_dir: str = "output") -> None:
         except Exception as e:
             print(f"  ⚠ Voice-over audio generation failed: {e}")
             print("  (Script was still generated and saved as text.)")
-    else:
-        print("→ Skipping voice-over (ELEVENLABS_API_KEY not set in .env — everything else still runs)")
+    elif voiceover:
+        print("→ Skipping voice-over (--voiceover requested, but ELEVENLABS_API_KEY isn't set)")
 
     print("→ Generating Instagram carousel...")
     carousel = generate_carousel(brief, video_title=video.title)
@@ -195,8 +183,13 @@ def main():
     parser.add_argument(
         "--output-dir", default="output", help="Directory to save results into (default: ./output)"
     )
+    parser.add_argument(
+        "--voiceover",
+        action="store_true",
+        help="Also generate an AI voice-over (off by default; needs ELEVENLABS_API_KEY)",
+    )
     args = parser.parse_args()
-    run(args.url, args.output_dir)
+    run(args.url, args.output_dir, voiceover=args.voiceover)
 
 
 if __name__ == "__main__":

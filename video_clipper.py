@@ -20,7 +20,7 @@ import time
 
 import yt_dlp
 
-from youtube_extractor import yt_dlp_cookie_opts
+from youtube_extractor import yt_dlp_base_opts
 
 # Re-encoding a 20-60s clip takes seconds; anything near this means ffmpeg is
 # stuck rather than slow.
@@ -56,6 +56,54 @@ def _progress_hook(status: dict) -> None:
 _progress_hook.last = 0.0
 
 
+class YouTubeBlockedDownload(RuntimeError):
+    """YouTube refused to serve the media, rather than anything being wrong locally."""
+
+
+def _explain_download_failure(error: Exception) -> Exception:
+    """Turn yt-dlp's opaque failures into something actionable.
+
+    The surface error is "ffmpeg exited with code 3436169992" — a meaningless
+    Windows exit status that sends you hunting through ffmpeg and the
+    filtergraph. Underneath it is an HTTP 403 on the media URL.
+
+    The usual cause is *not* authentication, however much it looks like it.
+    YouTube hands out media URLs that only work once a JavaScript "n challenge"
+    has been solved, and when yt-dlp can't solve it the URLs it does produce are
+    dead on arrival. Cookies and fresh accounts change nothing here; a JS
+    runtime does. So that's listed first, and the cookie advice second.
+    """
+    text = str(error)
+    blocked = (
+        "403" in text
+        or "Forbidden" in text
+        or "Sign in to confirm" in text
+        or "not a bot" in text
+        # yt-dlp reports the ffmpeg downloader's exit status rather than the
+        # 403 that caused it, so an ffmpeg failure here means the same thing.
+        or "ffmpeg exited with code" in text
+    )
+    if not blocked:
+        return error
+    from youtube_extractor import yt_dlp_js_opts
+
+    if not yt_dlp_js_opts():
+        return YouTubeBlockedDownload(
+            "YouTube refused to serve this video's media (HTTP 403), and no "
+            "JavaScript runtime was found — almost certainly the cause.\n"
+            "  Fix: install Node (or Deno) so yt-dlp can solve YouTube's n "
+            "challenge, plus the solver scripts:\n"
+            "    pip install yt-dlp-ejs"
+        )
+    return YouTubeBlockedDownload(
+        "YouTube refused to serve this video's media (HTTP 403), despite a JS "
+        "runtime being available.\n"
+        "  Check first: pip install yt-dlp-ejs, and that yt-dlp is current.\n"
+        "  If that's already so, try session cookies: export cookies.txt from a "
+        "logged-in browser and set YTDLP_COOKIES_FILE=<path> in .env."
+    )
+
+
 def download_clip(url: str, start_seconds: float, end_seconds: float, output_path: str) -> str:
     """Downloads only the given time range of the video as an MP4. Returns the path."""
     out_dir = os.path.dirname(output_path)
@@ -79,11 +127,14 @@ def download_clip(url: str, start_seconds: float, end_seconds: float, output_pat
         "socket_timeout": 30,
         "retries": 3,
         "progress_hooks": [_progress_hook],
-        **yt_dlp_cookie_opts(),
+        **yt_dlp_base_opts(),
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except Exception as e:
+        raise _explain_download_failure(e) from e
 
     if not os.path.exists(output_path):
         # yt-dlp may have produced a different container; find whatever it made.
@@ -98,6 +149,106 @@ def download_clip(url: str, start_seconds: float, end_seconds: float, output_pat
                 f"Expected downloaded clip at {output_path}, but it wasn't created."
             )
 
+    return output_path
+
+
+def download_full(url: str, output_path: str, max_height: int = 1080) -> str:
+    """Download the whole video once, so cuts can be taken locally.
+
+    Worth it as soon as a talk yields more than one cut. Each ranged download
+    costs 20-30 seconds on this machine, of which only about 7 is transfer —
+    the rest is yt-dlp re-extracting the video and re-solving YouTube's
+    JavaScript challenge through Node, and that price is paid again for every
+    single cut. Fetching once and slicing locally pays the extraction cost a
+    single time, and each cut afterwards costs no network at all.
+
+    Capped at 1080p on purpose: the short is a vertical crop out of the middle
+    of the frame, so beyond 1080 the extra pixels are mostly cropped away while
+    the download grows.
+    """
+    out_dir = os.path.dirname(output_path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+
+    if os.path.isfile(output_path) and os.path.getsize(output_path) > 0:
+        return output_path
+
+    base = output_path[:-4] if output_path.endswith(".mp4") else output_path
+    ydl_opts = {
+        "format": (
+            f"bestvideo[height<={max_height}][ext=mp4]+bestaudio[ext=m4a]/"
+            f"best[height<={max_height}][ext=mp4]/best"
+        ),
+        "outtmpl": base + ".%(ext)s",
+        "merge_output_format": "mp4",
+        "quiet": True,
+        "no_warnings": True,
+        "socket_timeout": 30,
+        "retries": 3,
+        "progress_hooks": [_progress_hook],
+        **yt_dlp_base_opts(),
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except Exception as e:
+        raise _explain_download_failure(e) from e
+
+    if not os.path.exists(output_path):
+        for ext in ("mp4", "mkv", "webm"):
+            candidate = f"{base}.{ext}"
+            if os.path.exists(candidate):
+                if candidate != output_path:
+                    os.replace(candidate, output_path)
+                break
+        else:
+            raise FileNotFoundError(f"Expected the video at {output_path}, but it wasn't created.")
+    return output_path
+
+
+def cut_from_file(source_path: str, start_seconds: float, end_seconds: float, output_path: str) -> str:
+    """Cut a time range out of a video already on disk. Returns the path.
+
+    The offline counterpart to `download_clip`, for when you have the whole
+    talk as a local file. Everything downstream is identical — the callers only
+    care that a clip lands at `output_path`.
+
+    Worth preferring where possible: one local file serves every cut of every
+    short, so a talk needs a single fetch instead of one per cut, and no cut
+    can fail halfway through a batch because the network changed its mind.
+
+    `-ss` before `-i` seeks fast, and because the output is re-encoded rather
+    than stream-copied, the cut is still frame-accurate — ffmpeg decodes from
+    the preceding keyframe and discards the lead-in. A stream copy would be
+    faster again but would snap to keyframes, which loses words at the start.
+    """
+    if not os.path.isfile(source_path):
+        raise FileNotFoundError(f"Source video not found: {source_path}")
+
+    duration = max(0.1, float(end_seconds) - float(start_seconds))
+    out_dir = os.path.dirname(output_path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+
+    cmd = [
+        "ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error",
+        "-ss", f"{float(start_seconds):.3f}",
+        "-i", os.path.abspath(source_path),
+        "-t", f"{duration:.3f}",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+        os.path.abspath(output_path),
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"ffmpeg didn't finish cutting within 600s: {source_path}") from None
+    if result.returncode != 0:
+        raise RuntimeError(f"ffmpeg couldn't cut the clip:\n{result.stderr[-2000:]}")
+    if not os.path.isfile(output_path):
+        raise RuntimeError(f"ffmpeg reported success but no clip appeared at {output_path}")
     return output_path
 
 
