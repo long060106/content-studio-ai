@@ -35,6 +35,12 @@ FPS = 30
 
 RENDER_TIMEOUT = 1800  # a 35s short encodes in well under a minute
 
+# The canvas stitched cuts are joined on, before any layout decision is made.
+# Landscape on purpose: these are pieces of a filmed talk, and joining is not
+# the place to decide how they sit in a vertical frame.
+JOIN_W = 1920
+JOIN_H = 1080
+
 MUSIC_GAIN = 0.22       # bed level before ducking
 FADE_OUT = 1.2
 
@@ -117,36 +123,47 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
     )
 
 
-def _band_height(speech_source: str) -> int:
-    """How tall the letterbox band is, measured from the talk itself.
+# The window. Every shot in every short from every talk sits in a band of
+# exactly this height, centred on black.
+#
+# It is a constant, and an earlier version measured it from each talk instead.
+# That was a mistake worth spelling out, because measuring looks more careful.
+# It kept the speaker and the b-roll matched *within* one short — which is what
+# it was written for, and it did that correctly — but it made the window a
+# different size for every talk, and for a source that was already vertical it
+# produced a band the full height of the frame: no black at all, the whole
+# format gone. One talk in a batch came out looking like a different account.
+#
+# The window belongs to the account, not to the footage. Whatever comes in gets
+# fitted to it.
+BAND_H = (VIDEO_W * 9 // 16) // 2 * 2  # 608
 
-    Every shot in a short sits in a band of exactly this height, centred on
-    black — the speaker and the b-roll cutaways alike. Keeping the window one
-    fixed size is the point of the layout: the footage inside it changes, the
-    frame around it does not.
+# Where to take the crop from when a source is taller than the band.
+#
+# Dead centre is wrong for people. A talking head shot vertically has the face
+# in the upper half and empty room below, so a centred crop takes the chin and
+# the chest and loses the eyes. Biasing upward keeps the face.
+CROP_BIAS = 0.35
 
-    It is measured rather than assumed because the band has to be the height
-    the *speaker* actually renders at. The speaker is scaled to the full width
-    and whatever height its aspect ratio gives; if the b-roll band were
-    hardcoded to 16:9 and a talk arrived at 2.39:1 or 4:3, the two would sit at
-    different sizes and every cutaway would visibly resize the window — the
-    exact fault this layout exists to remove.
 
-    Falls back to 16:9 when the source cannot be probed, which is both the
-    overwhelmingly common case and a safe guess.
+def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") -> str:
+    """Fit any source into the band: full width, cropped to height if taller.
+
+    A 16:9 source lands exactly on the band with nothing cropped, which is the
+    common case and unchanged from before. Anything taller — 4:3, 4:5, a
+    vertical phone recording — is cropped rather than given a taller band, so
+    the window stays the same size no matter what came in.
+
+    `extra` carries filters that belong to one kind of shot only, such as the
+    b-roll grade and slow-down.
     """
-    fallback = (VIDEO_W * 9 // 16) // 2 * 2
-    try:
-        _duration, width, height = ffmpeg_probe(speech_source)
-    except Exception:
-        return fallback
-    if width <= 0 or height <= 0:
-        return fallback
-    band = int(round(VIDEO_W * height / width)) // 2 * 2
-    # A source taller than it is wide would ask for a band taller than the
-    # frame. Nothing here produces one, but clamping costs nothing and a
-    # negative pad offset fails the render outright.
-    return max(2, min(band, VIDEO_H))
+    return (
+        f"[{label_in}]scale={VIDEO_W}:{BAND_H}:force_original_aspect_ratio=increase,"
+        f"crop={VIDEO_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
+        f"setsar=1,fps={FPS},{extra}"
+        f"pad={VIDEO_W}:{VIDEO_H}:0:{(VIDEO_H - BAND_H) // 2}:black,"
+        f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
+    )
 
 
 def _on_black(label_in: str, label_out: str, duration: float) -> str:
@@ -161,12 +178,13 @@ def _on_black(label_in: str, label_out: str, duration: float) -> str:
     black. That was rejected on sight: on dark footage the blurred copy puts a
     large out-of-focus head above the speaker. Black is what the accounts in
     this format actually use, and the bands are where the caption goes.
+
+    It delegates to `_to_band` so this path — the fallback taken when no
+    footage is available — produces the same window as the main one. It
+    previously scaled to whatever height the source's aspect ratio gave, which
+    is how a vertical source came out filling the frame with no bands at all.
     """
-    return (
-        f"[{label_in}]scale={VIDEO_W}:-2,setsar=1,fps={FPS},"
-        f"pad={VIDEO_W}:{VIDEO_H}:0:({VIDEO_H}-ih)/2:black,"
-        f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
-    )
+    return _to_band(label_in, label_out, duration)
 
 
 def build_short(spec: ShortSpec) -> str:
@@ -308,11 +326,25 @@ def join_clips(paths: list[str], out_path: str) -> str:
 
     # Normalise each piece before concatenating so mismatched sources can't
     # desync: common frame rate, sample rate, channel layout and PTS reset.
+    #
+    # **Fit, never crop.** This used to scale each piece up and crop it to
+    # 1080x1920, which quietly turned a stitched clip into vertical footage
+    # before the layout stage ever saw it — the exact crop-and-zoom that was
+    # rejected on quality grounds, surviving in the one path nobody looked at.
+    # The result was a batch where seven shorts were letterboxed and the
+    # stitched one filled the frame, zoomed and soft, looking like a different
+    # account.
+    #
+    # This is a joining step. Its only job is to make the pieces compatible
+    # enough to concatenate; deciding how footage sits in the frame belongs to
+    # `_to_band`, further down the pipeline, and doing it here as well meant
+    # doing it twice and disagreeing.
     parts = []
     for i in range(len(paths)):
         parts.append(
-            f"[{i}:v]scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=increase,"
-            f"crop={VIDEO_W}:{VIDEO_H},setsar=1,fps={FPS},setpts=PTS-STARTPTS[v{i}];"
+            f"[{i}:v]scale={JOIN_W}:{JOIN_H}:force_original_aspect_ratio=decrease,"
+            f"pad={JOIN_W}:{JOIN_H}:(ow-iw)/2:(oh-ih)/2:black,"
+            f"setsar=1,fps={FPS},setpts=PTS-STARTPTS[v{i}];"
             f"[{i}:a]aresample=48000,asetpts=PTS-STARTPTS[a{i}]"
         )
     streams = "".join(f"[v{i}][a{i}]" for i in range(len(paths)))
@@ -379,8 +411,6 @@ def build_rough_cut(
     speech_index = len(shots)
     inputs += ["-i", speech_abs]
 
-    band_h = _band_height(speech_abs)
-
     parts: list[str] = []
     for i, (path, _source_start, seconds) in enumerate(shots):
         span = max(0.2, float(seconds))
@@ -401,11 +431,7 @@ def build_rough_cut(
             # design. The empty space is not a gap to be patched — it is where
             # the caption sits, which is the whole reason this layout works on
             # the accounts using it.
-            parts.append(
-                f"[{i}:v]scale={VIDEO_W}:-2,setsar=1,fps={FPS},"
-                f"pad={VIDEO_W}:{VIDEO_H}:0:({VIDEO_H}-ih)/2:black,"
-                f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
-            )
+            parts.append(_to_band(f"{i}:v", f"v{i}", span))
         else:
             # B-roll sits in the same band as the speaker, at the same size and
             # the same position, so the window never changes shape across a cut.
@@ -429,13 +455,10 @@ def build_rough_cut(
             # the register the format uses.
             #
             # Graded per shot, not over the finished video. See BROLL_GRADE.
-            parts.append(
-                f"[{i}:v]scale={VIDEO_W}:{band_h}:force_original_aspect_ratio=increase,"
-                f"crop={VIDEO_W}:{band_h},setsar=1,fps={FPS},"
-                f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,{BROLL_GRADE},"
-                f"pad={VIDEO_W}:{VIDEO_H}:0:{(VIDEO_H - band_h) // 2}:black,"
-                f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
-            )
+            parts.append(_to_band(
+                f"{i}:v", f"v{i}", span,
+                extra=f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,{BROLL_GRADE},",
+            ))
     streams = "".join(f"[v{i}]" for i in range(len(shots)))
     parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
     parts.append(
