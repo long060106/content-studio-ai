@@ -92,8 +92,14 @@ if (-not $up) {
 # 127.0.0.1 rather than localhost: on Windows "localhost" resolves to ::1
 # first, the server listens on IPv4 only, and every request 502s.
 Remove-Item $log -ErrorAction SilentlyContinue
+# --protocol http2: cloudflared prefers QUIC, which is UDP on port 7844, and
+# this network drops it. The symptom is not an error at startup - the tunnel
+# registers, prints a perfectly good URL, and then loops forever on "failed to
+# dial to edge with quic: timeout: no recent network activity" while every
+# visitor gets a Cloudflare 530. http2 rides TCP 443, which goes through
+# anywhere a browser does.
 Start-Process -FilePath $cloudflared `
-              -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:8420" `
+              -ArgumentList "tunnel", "--no-autoupdate", "--protocol", "http2", "--url", "http://127.0.0.1:8420" `
               -RedirectStandardError $log `
               -RedirectStandardOutput "$env:LOCALAPPDATA\cloudflared\tunnel.out" `
               -WindowStyle Hidden
