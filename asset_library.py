@@ -339,8 +339,15 @@ def fetch_pexels(query: str, kind: str = "video", count: int = 3, vertical: bool
     return added
 
 
-def fetch_pixabay(query: str, kind: str = "video", count: int = 3) -> list[Asset]:
-    """Same idea against Pixabay. Needs PIXABAY_API_KEY in .env."""
+def fetch_pixabay(
+    query: str, kind: str = "video", count: int = 3, vertical: bool = True
+) -> list[Asset]:
+    """Same idea against Pixabay. Needs PIXABAY_API_KEY in .env.
+
+    `vertical` is accepted and ignored: Pixabay's video endpoint has no
+    orientation filter. It is in the signature so that `fetch_stock` can pass
+    the same arguments to every provider rather than special-casing this one.
+    """
     key = os.environ.get("PIXABAY_API_KEY", "").strip()
     if not key:
         raise RuntimeError(
@@ -741,13 +748,23 @@ def query_variants(query: str) -> list[str]:
     return ordered
 
 
-def fetch_stock(query: str, kind: str = "video", count: int = 3) -> list[Asset]:
+def fetch_stock(
+    query: str, kind: str = "video", count: int = 3, vertical: bool = True
+) -> list[Asset]:
     """Try each provider in turn, broadening the query until results appear.
 
     Pexels and Pixabay need a free key and have much better search relevance;
     Openverse and Wikimedia need no key, which is why images can be sourced
     with nothing configured at all. Providers are tried in that order, and each
     one gets the full query before any broadened form.
+
+    `vertical` decides the orientation asked for, and which one is right
+    changed when the shorts layout did. B-roll now renders into the same wide
+    band as the speaker rather than filling the screen, so **landscape footage
+    is the better source for it**: a 1920x1080 clip scales to exactly the band
+    with nothing cropped, while a portrait clip has roughly two thirds of its
+    height thrown away. The default stays vertical because other callers still
+    want full-frame footage; b-roll gathering passes `vertical=False`.
     """
     errors = []
     providers = (fetch_pexels, fetch_pixabay)
@@ -756,10 +773,15 @@ def fetch_stock(query: str, kind: str = "video", count: int = 3) -> list[Asset]:
 
     variants = query_variants(query) if kind == "image" else [query]
 
+    # Only the video providers take an orientation. Openverse and Wikimedia are
+    # image-only and have no such parameter, so it is passed by kind rather than
+    # to everything.
+    extra = {"vertical": vertical} if kind == "video" else {}
+
     for fetcher in providers:
         for variant in variants:
             try:
-                found = fetcher(variant, kind=kind, count=count)
+                found = fetcher(variant, kind=kind, count=count, **extra)
             except RuntimeError as e:
                 errors.append(str(e))
                 break  # missing key — no point retrying this provider

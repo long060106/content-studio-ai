@@ -40,23 +40,23 @@ import asset_library
 # grateful.
 LIBRARY: dict[str, list[str]] = {
     # The general mood shots — dark, slow, cinematic-adjacent.
-    "general/night": ["silhouette night", "city night alone", "street lamp rain night"],
-    "general/rain": ["slow motion rain", "rain on window", "storm clouds dark"],
-    "general/training": ["dark gym single light", "hands chalk closeup", "boxer shadow training"],
-    "general/nature": ["fog forest run", "cold breath winter", "mountain fog sunrise"],
-    "general/solitude": ["empty road night", "lone figure walking", "empty hallway light"],
+    "general/night": ["empty street night wide", "city skyline night", "headlights road night"],
+    "general/rain": ["rain windshield wide", "storm clouds moving", "wet road reflections"],
+    "general/training": ["dark gym wide shot", "boxer profile shadow", "running track dawn"],
+    "general/nature": ["misty valley wide", "forest path tracking", "mountain ridge sunrise"],
+    "general/solitude": ["empty road horizon", "figure walking away wide", "long empty corridor"],
 
     # Emotional register. The pipeline names a feeling before it picks
     # footage, so these map straight onto what it asks for.
-    "emotion/angry": ["boxer punching bag dark", "storm sea waves crashing", "clenched fist closeup"],
-    "emotion/depressed": ["man alone dark room", "rain window night sad", "empty bed morning"],
-    "emotion/lost": ["fog forest walking alone", "empty crossroads", "person staring distance"],
-    "emotion/sad": ["rain on window slow", "empty park bench", "looking away window"],
-    "emotion/happy": ["friends laughing golden hour", "sunrise silhouette jumping", "child running field"],
-    "emotion/grateful": ["hands open warm light", "sunrise mountains silhouette", "candle flame dark"],
-    "emotion/accepted": ["still lake sunrise", "calm breathing meditation", "sitting quietly window"],
-    "emotion/numb": ["blank stare window", "empty room grey light", "grey ocean horizon"],
-    "emotion/resolve": ["running stairs dawn", "lifting heavy weight strain", "walking into storm"],
+    "emotion/angry": ["storm sea waves wide", "boxer profile hitting bag", "fire burning close"],
+    "emotion/depressed": ["man sitting dark room wide", "grey rain street", "empty apartment window light"],
+    "emotion/lost": ["fog road wide", "empty crossroads aerial", "figure small in landscape"],
+    "emotion/sad": ["rain running down glass", "empty park bench wide", "face profile window light"],
+    "emotion/happy": ["friends laughing golden hour", "sunrise field wide", "running through field"],
+    "emotion/grateful": ["hands open warm light", "sunrise mountains wide", "candle flame dark"],
+    "emotion/accepted": ["still lake horizon", "calm sea sunrise wide", "sitting by window profile"],
+    "emotion/numb": ["grey ocean horizon", "empty room grey light", "blank window stare profile"],
+    "emotion/resolve": ["running stairs profile", "walking into storm wide", "rowing sunrise wide"],
 }
 
 # Left for the user to fill; see the module docstring.
@@ -88,7 +88,16 @@ def gather(folder: str, queries: list[str], per_query: int, target: int) -> int:
         if have + added >= target:
             break
         try:
-            found = asset_library.fetch_stock(query, kind="video", count=per_query)
+            # Landscape, not portrait — which is the reverse of what this used
+            # to ask for. B-roll now renders into the same wide band as the
+            # speaker instead of filling the screen, so a 1920x1080 clip scales
+            # to exactly that band with nothing cropped, while a portrait clip
+            # has about two thirds of its height discarded. The queries above
+            # were rewritten for the same reason: compositions that read across
+            # the frame rather than down it.
+            found = asset_library.fetch_stock(
+                query, kind="video", count=per_query, vertical=False
+            )
         except Exception as e:
             print(f"  {folder:24} search failed for {query!r}: {str(e)[:60]}")
             continue
