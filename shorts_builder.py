@@ -117,6 +117,38 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
     )
 
 
+def _band_height(speech_source: str) -> int:
+    """How tall the letterbox band is, measured from the talk itself.
+
+    Every shot in a short sits in a band of exactly this height, centred on
+    black — the speaker and the b-roll cutaways alike. Keeping the window one
+    fixed size is the point of the layout: the footage inside it changes, the
+    frame around it does not.
+
+    It is measured rather than assumed because the band has to be the height
+    the *speaker* actually renders at. The speaker is scaled to the full width
+    and whatever height its aspect ratio gives; if the b-roll band were
+    hardcoded to 16:9 and a talk arrived at 2.39:1 or 4:3, the two would sit at
+    different sizes and every cutaway would visibly resize the window — the
+    exact fault this layout exists to remove.
+
+    Falls back to 16:9 when the source cannot be probed, which is both the
+    overwhelmingly common case and a safe guess.
+    """
+    fallback = (VIDEO_W * 9 // 16) // 2 * 2
+    try:
+        _duration, width, height = ffmpeg_probe(speech_source)
+    except Exception:
+        return fallback
+    if width <= 0 or height <= 0:
+        return fallback
+    band = int(round(VIDEO_W * height / width)) // 2 * 2
+    # A source taller than it is wide would ask for a band taller than the
+    # frame. Nothing here produces one, but clamping costs nothing and a
+    # negative pad offset fails the render outright.
+    return max(2, min(band, VIDEO_H))
+
+
 def _on_black(label_in: str, label_out: str, duration: float) -> str:
     """Speaker footage uncropped and centred on solid black.
 
@@ -347,6 +379,8 @@ def build_rough_cut(
     speech_index = len(shots)
     inputs += ["-i", speech_abs]
 
+    band_h = _band_height(speech_abs)
+
     parts: list[str] = []
     for i, (path, _source_start, seconds) in enumerate(shots):
         span = max(0.2, float(seconds))
@@ -373,21 +407,37 @@ def build_rough_cut(
                 f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
             )
         else:
-            # B-roll is already vertical from the stock search, so filling the
-            # frame costs nothing. Slowed down because these cuts are meant to
-            # sit under a voice — footage moving at normal speed pulls attention
-            # off the words, and slow motion is the register the format uses.
+            # B-roll sits in the same band as the speaker, at the same size and
+            # the same position, so the window never changes shape across a cut.
+            #
+            # This costs real picture. The library is vertical — 87 portrait
+            # clips, no landscape — so cropping into a wide band throws away
+            # most of each frame's height, and the argument against doing it is
+            # genuinely strong: nothing here needs rescuing from the wrong
+            # aspect ratio the way the speaker does.
+            #
+            # It is done anyway, because the letterbox is not a repair. It is
+            # the format's identity: a fixed window that footage changes inside
+            # while the frame stays put. A cutaway that expands to fill the
+            # screen breaks that every couple of seconds, and side by side the
+            # consistent version wins clearly enough that the lost height is
+            # worth paying. If this is ever reverted, revert the library toward
+            # footage that reads in a wide strip at the same time.
+            #
+            # Slowed down because these cuts sit under a voice — footage moving
+            # at normal speed pulls attention off the words, and slow motion is
+            # the register the format uses.
+            #
+            # Graded per shot, not over the finished video. See BROLL_GRADE.
             parts.append(
-                f"[{i}:v]scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=increase,"
-                f"crop={VIDEO_W}:{VIDEO_H},setsar=1,fps={FPS},"
-                f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,"
+                f"[{i}:v]scale={VIDEO_W}:{band_h}:force_original_aspect_ratio=increase,"
+                f"crop={VIDEO_W}:{band_h},setsar=1,fps={FPS},"
+                f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,{BROLL_GRADE},"
+                f"pad={VIDEO_W}:{VIDEO_H}:0:{(VIDEO_H - band_h) // 2}:black,"
                 f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
             )
     streams = "".join(f"[v{i}]" for i in range(len(shots)))
-    parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vcat]")
-    # Slight darkening: stock footage is often brighter than the speaker's own
-    # material, and captions get added over this later.
-    parts.append("[vcat]eq=brightness=-0.05:saturation=1.05[v]")
+    parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
     parts.append(
         f"[{speech_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
         f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11[a]"
@@ -416,6 +466,26 @@ def build_rough_cut(
 # with the words for attention. Slowing it makes the picture read as mood
 # rather than as action, which is the register this format uses throughout.
 BROLL_SPEED = 0.7
+
+# Grading applied to b-roll, and only to b-roll.
+#
+# Stock footage and a filmed talk are lit nothing alike. The talks this runs on
+# are dark studio interiors; stock clips of rain, forests and streets are shot
+# in bright overcast daylight. Cutting straight between them makes the screen
+# jump from near-black to mid-grey every couple of seconds, and the cutaway
+# stops reading as part of the same film — it reads as a stock clip dropped in,
+# which is exactly what it is and exactly what should not be visible.
+#
+# Darkening and pulling the colour back closes most of that gap. It cannot be
+# closed completely without crushing the footage into mud, and it should not
+# be: some lift on the cutaway is what makes it a cutaway.
+#
+# **Per shot, not over the finished video.** An earlier version graded the
+# concatenated result, which meant the speaker got darkened too — and the
+# speaker is the one thing already near black — while saturation was pushed
+# *up*, the opposite of what the mismatch needs. A grade meant for one kind of
+# footage has to be applied to that footage, not to everything.
+BROLL_GRADE = "eq=brightness=-0.10:saturation=0.80:contrast=1.05"
 
 
 _DURATION_RE = re.compile(r"Duration:\s*(\d+):(\d\d):(\d\d(?:\.\d+)?)")
