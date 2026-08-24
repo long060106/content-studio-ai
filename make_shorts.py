@@ -860,6 +860,33 @@ def make_shorts(
         except Exception as e:
             say(f"  ⚠ Couldn't write the caption: {e}")
 
+        # The comment to post under your own short, and pin.
+        #
+        # A short lands on a feed with no thread under it, and the first comment
+        # decides whether one forms. Left alone it is usually praise for the
+        # speaker, which reads well and generates nothing, because there is no
+        # reply to praise. An open question gives every later viewer something
+        # obvious to do.
+        #
+        # Written per clip rather than once per talk: the question has to be
+        # about *this* statement. One that would fit any motivational video is
+        # a wasted comment.
+        try:
+            import comment_prompt
+
+            prompt = comment_prompt.for_moment(
+                moment,
+                means=(tags.means if tags is not None else ""),
+                context=talk_context if tags is not None else "",
+            )
+            with open(os.path.join(folder, "comment.txt"), "w", encoding="utf-8") as f:
+                f.write(prompt.to_text())
+            with open(os.path.join(folder, "comment.json"), "w", encoding="utf-8") as f:
+                json.dump(prompt.to_dict(), f, indent=2, ensure_ascii=False)
+            say(f"  ✓ comment to pin: {prompt.question}")
+        except Exception as e:
+            say(f"  ⚠ Couldn't write the comment: {e}")
+
         # --- b-roll, one distinct shot per beat --------------------------------
         broll_local: list[str] = []
         credits: dict = {}

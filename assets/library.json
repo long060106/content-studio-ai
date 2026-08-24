@@ -758,6 +758,181 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:4806561",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-4806561.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 7.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-using-his-elbows-to-hit-the-heavy-bags-4806561/",
+      "credit": "Ketut Subiyanto",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6637263",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-6637263.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-male-boxer-training-with-his-coach-6637263/",
+      "credit": "Gustavo Fring",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478073",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-8478073.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-hitting-a-punching-bag-8478073/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478081",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-8478081.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-hitting-a-punching-bag-8478081/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9945079",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-9945079.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-hitting-the-punching-bag-9945079/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7187405",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-7187405.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-shadow-boxing-7187405/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8473160",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-8473160.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 51.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/boxer-punching-a-bag-8473160/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478320",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-8478320.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 24.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-training-at-the-boxing-gym-8478320/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9943810",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-9943810.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 18.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-throwing-and-catching-a-ball-9943810/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9944847",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-9944847.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 10.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-boxer-training-9944847/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:5752370",
       "kind": "video",
       "path": "assets/video/pexels-boxer-punching-bag-dark-5752370.mp4",
@@ -1057,6 +1232,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:2989890",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-2989890.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-scenic-view-of-sea-under-a-line-of-clouds-formation-in-the-sky-2989890/",
+      "credit": "Ronald Hayward",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34754858",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-34754858.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 19.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/stunning-ocean-sunset-with-vibrant-colors-34754858/",
+      "credit": "Mike Tyurin",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35684418",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-35684418.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-ocean-horizon-at-sunrise-35684418/",
+      "credit": "Marianna Sigov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4600703",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-4600703.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-aerial-footage-of-the-golden-sun-4600703/",
+      "credit": "ArtHouse Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7358099",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-7358099.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-calm-sea-and-a-golden-sky-7358099/",
+      "credit": "Atlantic Ambience",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:19997487",
       "kind": "video",
       "path": "assets/video/pexels-candle-flame-in-dark-room-19997487.mp4",
@@ -1227,6 +1492,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-man-crossing-a-street-7252264/",
       "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34398886",
+      "kind": "video",
+      "path": "assets/video/pexels-city-skyline-night-34398886.mp4",
+      "tags": [
+        "city",
+        "night",
+        "skyline"
+      ],
+      "duration": 16.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/breathtaking-cityscape-at-night-in-black-and-white-34398886/",
+      "credit": "Altaf Shah",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35379336",
+      "kind": "video",
+      "path": "assets/video/pexels-city-skyline-night-35379336.mp4",
+      "tags": [
+        "city",
+        "night",
+        "skyline"
+      ],
+      "duration": 35.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/stunning-night-view-of-saigon-river-skyline-35379336/",
+      "credit": "SÀI GÒN CÔNG TY CP SẢN XUẤT - THƯƠNG MẠI",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5422261",
+      "kind": "video",
+      "path": "assets/video/pexels-city-skyline-night-5422261.mp4",
+      "tags": [
+        "city",
+        "night",
+        "skyline"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/view-of-city-skyscrapers-at-night-5422261/",
+      "credit": "Everett Bumstead",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:856442",
+      "kind": "video",
+      "path": "assets/video/pexels-city-skyline-night-856442.mp4",
+      "tags": [
+        "city",
+        "night",
+        "skyline"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/blinking-lights-856442/",
+      "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8951964",
+      "kind": "video",
+      "path": "assets/video/pexels-city-skyline-night-8951964.mp4",
+      "tags": [
+        "city",
+        "night",
+        "skyline"
+      ],
+      "duration": 59.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-shot-of-a-town-during-night-time-8951964/",
+      "credit": "Altaf Shah",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1535,6 +1885,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:30193707",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-30193707.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 3.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/nighttime-basketball-hoop-with-spinning-ball-30193707/",
+      "credit": "Content Factory",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36623800",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-36623800.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 19.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-gym-workout-in-dimly-lit-setting-36623800/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296581",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296581.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-putting-on-his-boxing-gloves-6296581/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296636",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296636.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 25.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-putting-on-his-boxing-gloves-6296636/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296692",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296692.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-boxing-gloves-6296692/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:30562535",
       "kind": "video",
       "path": "assets/video/pexels-disciple-bowing-in-courtyard-30562535.mp4",
@@ -1815,6 +2255,91 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:30353676",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-30353676.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/lonely-figure-walking-an-empty-crossroad-at-dawn-30353676/",
+      "credit": "IsaaK Alexandre KaRslian",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30840340",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-30840340.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 28.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-empty-highway-intersections-30840340/",
+      "credit": "Toàn BDS",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31137808",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-31137808.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-urban-intersection-in-sunny-weather-31137808/",
+      "credit": "Toàn BDS",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34731008",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-34731008.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 19.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-motorcycle-journey-on-rural-road-34731008/",
+      "credit": "Tom Jurman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6180145",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-6180145.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 17.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/empty-road-intersection-6180145/",
+      "credit": "Braeson Holland",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:18941350",
       "kind": "video",
       "path": "assets/video/pexels-empty-gym-at-dawn-18941350.mp4",
@@ -1934,6 +2459,181 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:1756902",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-1756902.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/view-of-the-park-in-autumn-1756902/",
+      "credit": "Ricky Esquivel",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30965520",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-30965520.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 6.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/snow-covered-park-benches-at-night-30965520/",
+      "credit": "Yunus  Kılıç",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7261383",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-7261383.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-on-a-picnic-table-7261383/",
+      "credit": "Be The Observer",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8301731",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-8301731.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 17.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-empty-bench-8301731/",
+      "credit": "AdLib Mishiko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:854575",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-854575.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 12.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/empty-bench-in-a-park-854575/",
+      "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11276661",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-11276661.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 6.0,
+      "width": 2732,
+      "height": 1148,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clouds-over-empty-road-11276661/",
+      "credit": "Артём Старшинов",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:25753515",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-25753515.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-road-with-grass-and-clouds-in-the-distance-25753515/",
+      "credit": "Zacchaeus Rains",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35028944",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-35028944.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/long-deserted-road-under-overcast-sky-35028944/",
+      "credit": "Николай Викторович Ульяненко",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6497572",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-6497572.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 36.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/wide-angle-shot-of-a-road-6497572/",
+      "credit": "Neugiernase",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8630305",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-8630305.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-video-footage-of-a-road-8630305/",
+      "credit": "Kampus Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:19816870",
       "kind": "video",
       "path": "assets/video/pexels-empty-road-night-19816870.mp4",
@@ -2020,6 +2720,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:10639202",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-10639202.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 17.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/rear-view-on-man-walking-through-door-10639202/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:10639959",
       "kind": "video",
       "path": "assets/video/pexels-empty-room-grey-light-10639959.mp4",
@@ -2035,6 +2753,78 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/man-lying-down-and-moving-on-floor-10639959/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19217895",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-19217895.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-dark-hallway-with-a-light-on-the-floor-19217895/",
+      "credit": "Nino Souza",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19217898",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-19217898.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-dark-hallway-with-a-light-on-the-ceiling-19217898/",
+      "credit": "Nino Souza",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5742363",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-5742363.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/graffiti-painted-on-wall-in-abandoned-building-5742363/",
+      "credit": "Luis Quintero",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6076828",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-6076828.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 25.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/3d-rendering-of-a-concrete-building-6076828/",
+      "credit": "TREEDEO.ST",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2071,6 +2861,96 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/female-hand-holding-blank-gray-card-6486442/",
       "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:2980638",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-street-night-wide-2980638.mp4",
+      "tags": [
+        "empty",
+        "night",
+        "street",
+        "wide"
+      ],
+      "duration": 11.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-empty-street-in-london-at-night-2980638/",
+      "credit": "George Morina",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3007238",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-street-night-wide-3007238.mp4",
+      "tags": [
+        "empty",
+        "night",
+        "street",
+        "wide"
+      ],
+      "duration": 23.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/night-travel-on-an-open-flow-traffic-in-london-street-in-wee-hours-of-the-night-3007238/",
+      "credit": "George Morina",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30270138",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-street-night-wide-30270138.mp4",
+      "tags": [
+        "empty",
+        "night",
+        "street",
+        "wide"
+      ],
+      "duration": 22.0,
+      "width": 2560,
+      "height": 1440,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-night-view-of-city-street-lights-30270138/",
+      "credit": "SINAL Multimédia",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3150345",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-street-night-wide-3150345.mp4",
+      "tags": [
+        "empty",
+        "night",
+        "street",
+        "wide"
+      ],
+      "duration": 10.0,
+      "width": 4096,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/free-flowing-traffic-on-a-one-way-road-3150345/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6470927",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-street-night-wide-6470927.mp4",
+      "tags": [
+        "empty",
+        "night",
+        "street",
+        "wide"
+      ],
+      "duration": 55.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-raindrops-in-the-road-6470927/",
+      "credit": "gusat silviu",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2227,6 +3107,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:12967968",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-12967968.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-walking-under-clouds-on-sky-12967968/",
+      "credit": "Mohammad Husaini",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:28870899",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-28870899.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/couple-silhouette-at-sunset-in-scenic-mountains-28870899/",
+      "credit": "Khanh Hoang Minh 2",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6466848",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-6466848.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-walking-on-the-snow-6466848/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7038135",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-7038135.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 17.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-a-man-walking-away-7038135/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7934973",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-7934973.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-holding-a-skateboard-while-walking-away-7934973/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:19237065",
       "kind": "video",
       "path": "assets/video/pexels-fog-forest-run-19237065.mp4",
@@ -2367,6 +3337,176 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:14017303",
+      "kind": "video",
+      "path": "assets/video/pexels-fog-road-wide-14017303.mp4",
+      "tags": [
+        "fog",
+        "road",
+        "wide"
+      ],
+      "duration": 33.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clear-sky-over-road-near-trees-14017303/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:28464450",
+      "kind": "video",
+      "path": "assets/video/pexels-fog-road-wide-28464450.mp4",
+      "tags": [
+        "fog",
+        "road",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-bridge-over-a-river-with-fog-and-trees-28464450/",
+      "credit": "AP Vibes",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30013250",
+      "kind": "video",
+      "path": "assets/video/pexels-fog-road-wide-30013250.mp4",
+      "tags": [
+        "fog",
+        "road",
+        "wide"
+      ],
+      "duration": 28.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-flyover-of-foggy-countryside-landscape-30013250/",
+      "credit": "Tom Schönmann",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4881975",
+      "kind": "video",
+      "path": "assets/video/pexels-fog-road-wide-4881975.mp4",
+      "tags": [
+        "fog",
+        "road",
+        "wide"
+      ],
+      "duration": 22.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-footage-of-the-countryside-in-lush-green-4881975/",
+      "credit": "Natasha Filippovskaya",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6943577",
+      "kind": "video",
+      "path": "assets/video/pexels-fog-road-wide-6943577.mp4",
+      "tags": [
+        "fog",
+        "road",
+        "wide"
+      ],
+      "duration": 30.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-footage-of-a-road-6943577/",
+      "credit": "Mikhail Nilov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35779924",
+      "kind": "video",
+      "path": "assets/video/pexels-forest-path-tracking-35779924.mp4",
+      "tags": [
+        "forest",
+        "path",
+        "tracking"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-winter-forest-path-with-snowfall-35779924/",
+      "credit": "Unfiltered Natures",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:39010085",
+      "kind": "video",
+      "path": "assets/video/pexels-forest-path-tracking-39010085.mp4",
+      "tags": [
+        "forest",
+        "path",
+        "tracking"
+      ],
+      "duration": 25.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/tranquil-forest-pathway-in-dense-woodland-39010085/",
+      "credit": "Teemu Vehkasaari",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5803091",
+      "kind": "video",
+      "path": "assets/video/pexels-forest-path-tracking-5803091.mp4",
+      "tags": [
+        "forest",
+        "path",
+        "tracking"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/two-men-riding-a-dirt-bike-5803091/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5803098",
+      "kind": "video",
+      "path": "assets/video/pexels-forest-path-tracking-5803098.mp4",
+      "tags": [
+        "forest",
+        "path",
+        "tracking"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-footage-of-two-motocyclists-in-the-forest-5803098/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:854543",
+      "kind": "video",
+      "path": "assets/video/pexels-forest-path-tracking-854543.mp4",
+      "tags": [
+        "forest",
+        "path",
+        "tracking"
+      ],
+      "duration": 15.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/single-trail-mountain-bike-race-854543/",
+      "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:34781502",
       "kind": "video",
       "path": "assets/video/pexels-friends-laughing-golden-hour-34781502.mp4",
@@ -2403,6 +3543,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7147256",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147256.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 15.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/two-women-having-a-conversation-and-laughing-at-the-shore-7147256/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147260",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147260.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-sitting-at-the-lifeguard-tower-7147260/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147268",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147268.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-enjoying-sunset-by-the-beach-7147268/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147374",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147374.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-walking-by-the-shore-7147374/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147375",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147375.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-walking-by-the-shore-7147375/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8695010",
       "kind": "video",
       "path": "assets/video/pexels-friends-laughing-golden-hour-8695010.mp4",
@@ -2436,6 +3666,176 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/women-laughing-together-9187875/",
       "credit": "Darina Belonogova",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11415810",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-11415810.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 16.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sea-and-clouds-11415810/",
+      "credit": "Salva F. Ayala",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31456820",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-31456820.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-ocean-scene-with-seagulls-31456820/",
+      "credit": "Ahmed ؜",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35978507",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-35978507.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/overcast-view-of-the-bosphorus-strait-35978507/",
+      "credit": "Sururi Ballıdağ Director",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37097532",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-37097532.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-misty-seascape-with-calm-waters-37097532/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3987780",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-3987780.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-body-of-water-3987780/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:14501261",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-rain-street-14501261.mp4",
+      "tags": [
+        "grey",
+        "rain",
+        "street"
+      ],
+      "duration": 5.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/heavy-rain-falling-on-the-street-14501261/",
+      "credit": "Wizarto Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4031697",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-rain-street-4031697.mp4",
+      "tags": [
+        "grey",
+        "rain",
+        "street"
+      ],
+      "duration": 33.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-falling-on-the-pavement-4031697/",
+      "credit": "WeStarMoney  Rec",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6070849",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-rain-street-6070849.mp4",
+      "tags": [
+        "grey",
+        "rain",
+        "street"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raining-in-asphalt-road-6070849/",
+      "credit": "Marc Onana",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6070850",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-rain-street-6070850.mp4",
+      "tags": [
+        "grey",
+        "rain",
+        "street"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raining-in-the-asphalt-6070850/",
+      "credit": "Marc Onana",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9345855",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-rain-street-9345855.mp4",
+      "tags": [
+        "grey",
+        "rain",
+        "street"
+      ],
+      "duration": 15.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-falling-on-the-pavement-9345855/",
+      "credit": "Kmeel.com Videos",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -3032,6 +4432,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:15249167",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-15249167.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-a-person-holding-a-twig-at-sunset-15249167/",
+      "credit": "Henrique Feiten",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:19150699",
       "kind": "video",
       "path": "assets/video/pexels-hands-open-warm-light-19150699.mp4",
@@ -3068,6 +4486,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:5155181",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-5155181.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-open-arm-stretches-for-a-dance-form-5155181/",
+      "credit": "ArtHouse Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:6650586",
       "kind": "video",
       "path": "assets/video/pexels-hands-open-warm-light-6650586.mp4",
@@ -3086,6 +4522,42 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:6666523",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-6666523.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 10.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-spinning-the-bottle-cap-6666523/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6815174",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-6815174.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 14.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-covering-her-face-6815174/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7477542",
       "kind": "video",
       "path": "assets/video/pexels-hands-open-warm-light-7477542.mp4",
@@ -3101,6 +4573,24 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/female-s-hands-covering-her-body-7477542/",
       "credit": "Angela Roma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8116553",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-8116553.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 14.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-a-woman-s-hand-8116553/",
+      "credit": "https://kaboompics.com/",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -3772,6 +5262,101 @@
       "height": 2048,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/old-man-alone-in-a-dark-room-waiting-8860238/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6470619",
+      "kind": "video",
+      "path": "assets/video/pexels-man-sitting-dark-room-wide-6470619.mp4",
+      "tags": [
+        "dark",
+        "man",
+        "room",
+        "sitting",
+        "wide"
+      ],
+      "duration": 17.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-smoking-tobacco-pipe-while-sitting-6470619/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6944065",
+      "kind": "video",
+      "path": "assets/video/pexels-man-sitting-dark-room-wide-6944065.mp4",
+      "tags": [
+        "dark",
+        "man",
+        "room",
+        "sitting",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-closing-the-drapes-6944065/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6944084",
+      "kind": "video",
+      "path": "assets/video/pexels-man-sitting-dark-room-wide-6944084.mp4",
+      "tags": [
+        "dark",
+        "man",
+        "room",
+        "sitting",
+        "wide"
+      ],
+      "duration": 54.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-closing-the-curtain-6944084/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7118136",
+      "kind": "video",
+      "path": "assets/video/pexels-man-sitting-dark-room-wide-7118136.mp4",
+      "tags": [
+        "dark",
+        "man",
+        "room",
+        "sitting",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-brewing-coffee-by-the-windowsill-7118136/",
+      "credit": "Michael Burrows",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8860242",
+      "kind": "video",
+      "path": "assets/video/pexels-man-sitting-dark-room-wide-8860242.mp4",
+      "tags": [
+        "dark",
+        "man",
+        "room",
+        "sitting",
+        "wide"
+      ],
+      "duration": 36.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-silhouette-of-a-man-sitting-alone-beside-a-window-8860242/",
       "credit": "cottonbro studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -4716,6 +6301,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/close-up-of-clock-hands-7034335/",
       "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:12306382",
+      "kind": "video",
+      "path": "assets/video/pexels-misty-valley-wide-12306382.mp4",
+      "tags": [
+        "misty",
+        "valley",
+        "wide"
+      ],
+      "duration": 16.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clear-sky-over-mountains-and-hills-12306382/",
+      "credit": "Daniel Torobekov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:17875525",
+      "kind": "video",
+      "path": "assets/video/pexels-misty-valley-wide-17875525.mp4",
+      "tags": [
+        "misty",
+        "valley",
+        "wide"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-view-of-the-mountains-and-valleys-under-a-cloudy-sky-17875525/",
+      "credit": "Khanh Hoang Minh 2",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:18726302",
+      "kind": "video",
+      "path": "assets/video/pexels-misty-valley-wide-18726302.mp4",
+      "tags": [
+        "misty",
+        "valley",
+        "wide"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-river-is-seen-in-the-foggy-forest-18726302/",
+      "credit": "Ash Haghighi",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:32824750",
+      "kind": "video",
+      "path": "assets/video/pexels-misty-valley-wide-32824750.mp4",
+      "tags": [
+        "misty",
+        "valley",
+        "wide"
+      ],
+      "duration": 27.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/breathtaking-aerial-view-of-lush-mountain-ranges-32824750/",
+      "credit": "just a hobby",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34650142",
+      "kind": "video",
+      "path": "assets/video/pexels-misty-valley-wide-34650142.mp4",
+      "tags": [
+        "misty",
+        "valley",
+        "wide"
+      ],
+      "duration": 57.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/scenic-misty-landscape-with-rolling-hills-34650142/",
+      "credit": "Andreas Ebner",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6404,6 +8074,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:11286564",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-running-down-glass-11286564.mp4",
+      "tags": [
+        "down",
+        "glass",
+        "rain",
+        "running"
+      ],
+      "duration": 169.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/droplets-on-glass-11286564/",
+      "credit": "LEONARDO LEAL",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36408448",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-running-down-glass-36408448.mp4",
+      "tags": [
+        "down",
+        "glass",
+        "rain",
+        "running"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/abstract-water-drops-on-glass-window-36408448/",
+      "credit": "정규송 Nui MALAMA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4786522",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-running-down-glass-4786522.mp4",
+      "tags": [
+        "down",
+        "glass",
+        "rain",
+        "running"
+      ],
+      "duration": 90.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/droplets-of-water-over-glass-surface-4786522/",
+      "credit": "Mark Warner",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5197762",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-running-down-glass-5197762.mp4",
+      "tags": [
+        "down",
+        "glass",
+        "rain",
+        "running"
+      ],
+      "duration": 51.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/rain-water-sliding-down-the-glass-window-surface-5197762/",
+      "credit": "Aleks BM",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5366344",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-running-down-glass-5366344.mp4",
+      "tags": [
+        "down",
+        "glass",
+        "rain",
+        "running"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-on-window-glass-close-up-5366344/",
+      "credit": "Zuzanna Musial",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:15283975",
       "kind": "video",
       "path": "assets/video/pexels-rain-window-night-sad-15283975.mp4",
@@ -6473,6 +8233,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/nighttime-cityscape-with-rain-on-window-35099181/",
       "credit": "dicle dağkıran",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10541023",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-windshield-wide-10541023.mp4",
+      "tags": [
+        "rain",
+        "wide",
+        "windshield"
+      ],
+      "duration": 11.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-on-a-vehicle-windshield-10541023/",
+      "credit": "Aleks BM",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:13395797",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-windshield-wide-13395797.mp4",
+      "tags": [
+        "rain",
+        "wide",
+        "windshield"
+      ],
+      "duration": 16.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-on-car-window-13395797/",
+      "credit": "Vung Nguyen",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:15814789",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-windshield-wide-15814789.mp4",
+      "tags": [
+        "rain",
+        "wide",
+        "windshield"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-view-from-inside-a-car-on-a-rainy-day-15814789/",
+      "credit": "Nothing Ahead",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5378927",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-windshield-wide-5378927.mp4",
+      "tags": [
+        "rain",
+        "wide",
+        "windshield"
+      ],
+      "duration": 90.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-car-wipers-5378927/",
+      "credit": "Klaus",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9101557",
+      "kind": "video",
+      "path": "assets/video/pexels-rain-windshield-wide-9101557.mp4",
+      "tags": [
+        "rain",
+        "wide",
+        "windshield"
+      ],
+      "duration": 60.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/rain-falling-on-a-windshield-of-a-car-9101557/",
+      "credit": "Dmitry Marchenkov",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6848,6 +8693,91 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-woman-running-on-the-stairs-8402087/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3048199",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-3048199.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 6.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-running-through-the-stairs-3048199/",
+      "credit": "fauxels",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7876580",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-7876580.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 13.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-jogging-up-the-stairs-7876580/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7877140",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-7877140.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 10.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-jogging-downstairs-7877140/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7877142",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-7877142.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 9.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-running-up-stairs-7877142/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8401312",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-8401312.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-going-up-the-stairs-8401312/",
       "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -7590,6 +9520,91 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:28510326",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-28510326.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 51.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-water-at-misty-lake-28510326/",
+      "credit": "TJ",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3151454",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-3151454.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 22.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/swan-birds-floating-motionless-on-a-lake-surface-3151454/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37473337",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-37473337.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 11.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-lakeside-view-on-a-clear-blue-day-37473337/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38131278",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-38131278.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-paddleboarding-on-tranquil-lake-38131278/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5819728",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-5819728.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 26.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-a-calm-lake-5819728/",
+      "credit": "KATRIN  BOLOVTSOVA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:12595945",
       "kind": "video",
       "path": "assets/video/pexels-still-lake-sunrise-12595945.mp4",
@@ -7802,6 +9817,91 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:16602048",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-clouds-moving-16602048.mp4",
+      "tags": [
+        "clouds",
+        "moving",
+        "storm"
+      ],
+      "duration": 5.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/time-lapse-of-dark-storm-clouds-covering-the-sky-16602048/",
+      "credit": "Swapnil Sharma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:33511285",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-clouds-moving-33511285.mp4",
+      "tags": [
+        "clouds",
+        "moving",
+        "storm"
+      ],
+      "duration": 13.0,
+      "width": 2560,
+      "height": 1440,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/dramatic-storm-clouds-moving-across-the-sky-33511285/",
+      "credit": "Larkkid Dung",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4312865",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-clouds-moving-4312865.mp4",
+      "tags": [
+        "clouds",
+        "moving",
+        "storm"
+      ],
+      "duration": 30.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/time-lapse-of-moving-clouds-4312865/",
+      "credit": "Ilya Klimenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4377444",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-clouds-moving-4377444.mp4",
+      "tags": [
+        "clouds",
+        "moving",
+        "storm"
+      ],
+      "duration": 37.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-timelapse-video-of-a-moving-clouds-4377444/",
+      "credit": "Ilya Klimenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4377446",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-clouds-moving-4377446.mp4",
+      "tags": [
+        "clouds",
+        "moving",
+        "storm"
+      ],
+      "duration": 18.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-timelapse-video-of-a-moving-clouds-4377446/",
+      "credit": "Ilya Klimenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:30474580",
       "kind": "video",
       "path": "assets/video/pexels-storm-sea-waves-crashing-30474580.mp4",
@@ -7874,6 +9974,96 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:1879456",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-sea-waves-wide-1879456.mp4",
+      "tags": [
+        "sea",
+        "storm",
+        "waves",
+        "wide"
+      ],
+      "duration": 26.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/storm-at-sea-1879456/",
+      "credit": "Peggy Johnson Philip Waikoloa",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3339411",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-sea-waves-wide-3339411.mp4",
+      "tags": [
+        "sea",
+        "storm",
+        "waves",
+        "wide"
+      ],
+      "duration": 40.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/strong-sea-waves-breaks-along-the-beach-shore-3339411/",
+      "credit": "Engin Akyurt",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3719411",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-sea-waves-wide-3719411.mp4",
+      "tags": [
+        "sea",
+        "storm",
+        "waves",
+        "wide"
+      ],
+      "duration": 25.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/series-of-strong-waves-in-the-sea-3719411/",
+      "credit": "Ronald Hayward",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37259189",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-sea-waves-wide-37259189.mp4",
+      "tags": [
+        "sea",
+        "storm",
+        "waves",
+        "wide"
+      ],
+      "duration": 59.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/dramatic-ocean-waves-in-slow-motion-37259189/",
+      "credit": "Mario Krimer",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4009789",
+      "kind": "video",
+      "path": "assets/video/pexels-storm-sea-waves-wide-4009789.mp4",
+      "tags": [
+        "sea",
+        "storm",
+        "waves",
+        "wide"
+      ],
+      "duration": 29.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/surge-of-sea-waves-crashing-the-shore-4009789/",
+      "credit": "Ronald Hayward",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:29719718",
       "kind": "video",
       "path": "assets/video/pexels-sunlight-breaking-through-clouds-29719718.mp4",
@@ -7925,6 +10115,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/dramatic-cloudscape-with-bright-glow-39024911/",
       "credit": "Anna Lupa",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:14118684",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-14118684.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 51.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-footage-of-foggy-grass-fields-14118684/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:27665959",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-27665959.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 46.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-sunrise-over-a-foggy-field-with-trees-27665959/",
+      "credit": "Tom Fisk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3121393",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-3121393.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 4.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-bright-light-of-the-morning-sun-over-a-vast-land-of-wilderness-3121393/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31282160",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-31282160.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-expansive-rural-landscape-at-sunrise-31282160/",
+      "credit": "Piotr Wojnowski",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6035709",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-6035709.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-footage-of-field-6035709/",
+      "credit": "Mario Sharma",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -7993,6 +10268,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/stunning-mountain-sunset-sky-in-serene-landscape-39137891/",
       "credit": "Yunus Terk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38258815",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-mountains-wide-38258815.mp4",
+      "tags": [
+        "mountains",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/stunning-sunrise-over-mountainous-landscape-38258815/",
+      "credit": "Major &Wang",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4288029",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-mountains-wide-4288029.mp4",
+      "tags": [
+        "mountains",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-shot-of-the-mountain-peak-during-sunset-4288029/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7437719",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-mountains-wide-7437719.mp4",
+      "tags": [
+        "mountains",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 11.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/mountain-range-during-sunrise-7437719/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7438340",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-mountains-wide-7438340.mp4",
+      "tags": [
+        "mountains",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-aerial-footage-of-a-landscape-during-golden-hour-7438340/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:854768",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-mountains-wide-854768.mp4",
+      "tags": [
+        "mountains",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-video-of-a-foggy-island-854768/",
+      "credit": "Pixabay",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -8226,6 +10586,96 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-person-putting-down-a-box-6646665/",
       "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3283080",
+      "kind": "video",
+      "path": "assets/video/pexels-walking-into-storm-wide-3283080.mp4",
+      "tags": [
+        "into",
+        "storm",
+        "walking",
+        "wide"
+      ],
+      "duration": 41.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clouds-formation-hiding-the-sun-in-the-sky-3283080/",
+      "credit": "Ilya Klimenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3558716",
+      "kind": "video",
+      "path": "assets/video/pexels-walking-into-storm-wide-3558716.mp4",
+      "tags": [
+        "into",
+        "storm",
+        "walking",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clouds-in-the-sky-moves-by-the-wind-blows-3558716/",
+      "credit": "Viktoria B.",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4500715",
+      "kind": "video",
+      "path": "assets/video/pexels-walking-into-storm-wide-4500715.mp4",
+      "tags": [
+        "into",
+        "storm",
+        "walking",
+        "wide"
+      ],
+      "duration": 43.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-walking-on-salt-flats-4500715/",
+      "credit": "Ton Souza",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6121159",
+      "kind": "video",
+      "path": "assets/video/pexels-walking-into-storm-wide-6121159.mp4",
+      "tags": [
+        "into",
+        "storm",
+        "walking",
+        "wide"
+      ],
+      "duration": 46.0,
+      "width": 1280,
+      "height": 720,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/women-walking-in-the-field-of-wildflowers-6121159/",
+      "credit": "Steven Van Elk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:854367",
+      "kind": "video",
+      "path": "assets/video/pexels-walking-into-storm-wide-854367.mp4",
+      "tags": [
+        "into",
+        "storm",
+        "walking",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-walking-around-the-city-854367/",
+      "credit": "Pixabay",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
