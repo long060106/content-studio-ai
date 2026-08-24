@@ -296,9 +296,19 @@ def fetch_pexels(query: str, kind: str = "video", count: int = 3, vertical: bool
             continue
 
         if kind == "video":
+            # Pick the rendition closest to what actually gets used, which
+            # depends on orientation. A portrait clip wants the 1080x1920 file;
+            # a landscape clip wants 1920x1080.
+            #
+            # Targeting 1920 regardless was right while everything was portrait
+            # and quietly wrong once landscape was asked for: 2160 is nearer to
+            # 1920 than 1080 is, so every landscape result came back as 4K —
+            # three to four times the bytes, downscaled on the way into a
+            # 1080-wide frame, for nothing visible.
+            target_h = 1920 if vertical else 1080
             files = sorted(
                 (f for f in item.get("video_files", []) if f.get("height")),
-                key=lambda f: abs(f.get("height", 0) - 1920),
+                key=lambda f: abs(f.get("height", 0) - target_h),
             )
             if not files:
                 continue
