@@ -787,18 +787,26 @@ def read_shorts(video_dir: str) -> dict:
         moment = _read_json(os.path.join(folder, "moment.json")) or {}
         moment["folder_name"] = name
         moment["media"] = os.path.relpath(video_path, OUTPUT_DIR).replace("\\", "/")
+        # The editing brief travels with the clip: it is the part that says
+        # what must not be trimmed, and it is useless if you have to go
+        # looking for it in a folder.
+        moment["brief"] = _read_text(os.path.join(folder, "brief.md")) or ""
+        tags = _read_json(os.path.join(folder, "hashtags.json")) or {}
+        moment["hashtags"] = tags.get("hashtags", [])
         records.append(moment)
 
+    # The carousel is words now, not pictures — the cards get designed by hand
+    # afterwards, so what's wanted here is the copy to paste, not an image.
     carousel_dir = os.path.join(shorts_dir, "carousel")
-    slides = []
-    if os.path.isdir(carousel_dir):
-        slides = [
-            os.path.relpath(os.path.join(carousel_dir, f), OUTPUT_DIR).replace("\\", "/")
-            for f in sorted(os.listdir(carousel_dir))
-            if f.endswith(".png")
-        ]
+    carousel_text = _read_text(os.path.join(carousel_dir, "carousel.txt")) or ""
+    carousel_cards = (_read_json(os.path.join(carousel_dir, "carousel.json")) or {})
 
-    return {"shorts": records, "carousel": slides, "source_url": index.get("source_url", "")}
+    return {
+        "shorts": records,
+        "carousel": carousel_text,
+        "carousel_cards": carousel_cards.get("cards", carousel_cards.get("slides", [])),
+        "source_url": index.get("source_url", ""),
+    }
 
 
 def asset_status() -> dict:
@@ -958,6 +966,13 @@ class Handler(BaseHTTPRequestHandler):
             supplied = (parse_qs(urlparse(self.path).query).get("k") or [""])[0]
             if _matches(supplied, LINK_TOKEN):
                 return _Auth.LINK
+            # /s/<key> as well as ?k=<key>. A path survives sharing better than
+            # a query string: a trailing "?k=..." is easy to lose when a long
+            # URL wraps onto two lines, and some apps trim query parameters
+            # when they generate a link preview.
+            here = unquote(urlparse(self.path).path)
+            if here.startswith("/s/") and _matches(here[3:].strip("/"), LINK_TOKEN):
+                return _Auth.LINK
 
         if PASSWORD and self._basic_ok():
             return _Auth.BASIC
@@ -1114,6 +1129,17 @@ class Handler(BaseHTTPRequestHandler):
 
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+
+        # Trade the key for a cookie, then send them on to a clean address, so
+        # the key stops showing in the URL bar — a screenshot of the studio
+        # shouldn't hand out access to it.
+        if path.startswith("/s/"):
+            self.send_response(302)
+            self._auth_cookie()
+            self.send_header("Location", "/")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
 
         if path in ("/", "/index.html"):
             self._send_file(os.path.join(UI_DIR, "index.html"))

@@ -22,6 +22,11 @@ assets/video/
 assets/image/
 assets/music/
 
+# The curated b-roll library. Nearly a gigabyte of stock footage, and it is
+# rebuildable: `python gather_broll.py` refills the folders from their
+# searches. The folder structure is what carries the meaning, not the files.
+assets/broll/
+
 # Live share link - contains the access key. Never publish.
 current_link.txt
 cookies.txt

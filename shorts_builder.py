@@ -8,8 +8,8 @@ Three layouts:
 
   broll    Full-frame stock footage, the speaker heard but not seen. The
            default, and what most motivational accounts run.
-  speaker  The speaker's own footage, scaled to fill with a blurred copy of
-           itself behind — same treatment the existing clip pipeline uses.
+  speaker  The speaker's own footage, uncropped and centred on black. The
+           bands above and below are where the caption sits.
   split    Speaker on top, b-roll underneath.
 
 The audio is the part that's easy to get wrong. Music sits under speech via
@@ -117,14 +117,22 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
     )
 
 
-def _blurred_fill(label_in: str, label_out: str, duration: float) -> str:
-    """Speaker footage centred over a blurred, zoomed copy of itself."""
+def _on_black(label_in: str, label_out: str, duration: float) -> str:
+    """Speaker footage uncropped and centred on solid black.
+
+    The counterpart to `_fill` above, and deliberately not the same treatment.
+    B-roll fills the frame because it is backdrop; the speaker must not, because
+    cropping 16:9 to 9:16 discards two thirds of the width and upscales the
+    rest.
+
+    This used to lay the frame over a blurred, zoomed copy of itself instead of
+    black. That was rejected on sight: on dark footage the blurred copy puts a
+    large out-of-focus head above the speaker. Black is what the accounts in
+    this format actually use, and the bands are where the caption goes.
+    """
     return (
-        f"[{label_in}]split=2[sp_bg][sp_fg];"
-        f"[sp_bg]scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=increase,"
-        f"crop={VIDEO_W}:{VIDEO_H},gblur=sigma=22[sp_bgb];"
-        f"[sp_fg]scale={VIDEO_W}:-2[sp_fgs];"
-        f"[sp_bgb][sp_fgs]overlay=(W-w)/2:(H-h)/2,setsar=1,fps={FPS},"
+        f"[{label_in}]scale={VIDEO_W}:-2,setsar=1,fps={FPS},"
+        f"pad={VIDEO_W}:{VIDEO_H}:0:({VIDEO_H}-ih)/2:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
 
@@ -176,7 +184,7 @@ def build_short(spec: ShortSpec) -> str:
             # Slight darkening keeps white captions readable over bright footage.
             filters.append("[base]eq=brightness=-0.05:saturation=1.05[vbase]")
         elif style == "speaker":
-            filters.append(_blurred_fill(f"{idx['speaker']}:v", "base", duration))
+            filters.append(_on_black(f"{idx['speaker']}:v", "base", duration))
             filters.append("[base]null[vbase]")
         else:  # split
             half = VIDEO_H // 2
@@ -291,6 +299,123 @@ def join_clips(paths: list[str], out_path: str) -> str:
     )
     _run(cmd)
     return out_path
+
+
+def build_rough_cut(
+    speech_source: str,
+    shots: list[tuple[str, float, float]],
+    out_path: str,
+    duration: float,
+) -> str:
+    """Cut between the speaker and b-roll over one continuous speech track.
+
+    `shots` is (path, source_start, seconds) in playing order. The audio runs
+    underneath unbroken; only the picture changes.
+
+    The `source_start` is what makes cutting back to the speaker work. A shot
+    of the speaker at 8s into the clip has to show the speaker *at 8s* — their
+    mouth has to match the words being heard. Starting it from zero would put
+    the picture out of sync with its own audio, which is instantly obvious and
+    looks broken. B-roll has no such constraint and starts wherever.
+
+    Alternating back to the speaker is the format, not a fallback: holding
+    b-roll for the whole clip loses the person saying it, and the cut back to a
+    face is what makes the words feel said rather than narrated.
+
+    B-roll inputs are opened with `-stream_loop -1` so a four-second stock clip
+    can still fill its slot. Captions are deliberately not burned in — the SRT
+    beside the file covers that, and text baked into the picture fights the
+    edit this file exists to start.
+    """
+    if not shots:
+        raise RenderError("No shots to assemble.")
+    if not os.path.isfile(speech_source):
+        raise RenderError(f"Speech source not found: {speech_source}")
+
+    duration = max(1.0, float(duration))
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
+    speech_abs = os.path.abspath(speech_source)
+
+    inputs: list[str] = []
+    for path, source_start, _seconds in shots:
+        if os.path.abspath(path) == speech_abs:
+            # Seek to the matching moment so the picture stays in sync with
+            # the audio it belongs to.
+            inputs += ["-ss", f"{max(0.0, float(source_start)):.3f}", "-i", speech_abs]
+        else:
+            inputs += ["-stream_loop", "-1", "-i", os.path.abspath(path)]
+    speech_index = len(shots)
+    inputs += ["-i", speech_abs]
+
+    parts: list[str] = []
+    for i, (path, _source_start, seconds) in enumerate(shots):
+        span = max(0.2, float(seconds))
+        is_speaker = os.path.abspath(path) == speech_abs
+
+        if is_speaker:
+            # The whole 16:9 frame, uncropped, centred on solid black.
+            #
+            # Nothing is cropped and nothing is enlarged. Cropping 16:9 footage
+            # to fill a 9:16 frame throws away two thirds of the width and
+            # upscales what is left, which is what made the speaker look soft
+            # and over-zoomed.
+            #
+            # The bands above and below are deliberately black rather than
+            # filled. An earlier version put a blurred, zoomed copy of the same
+            # frame back there; on dark footage that puts a large out-of-focus
+            # head above the speaker and reads as a smudge rather than as
+            # design. The empty space is not a gap to be patched — it is where
+            # the caption sits, which is the whole reason this layout works on
+            # the accounts using it.
+            parts.append(
+                f"[{i}:v]scale={VIDEO_W}:-2,setsar=1,fps={FPS},"
+                f"pad={VIDEO_W}:{VIDEO_H}:0:({VIDEO_H}-ih)/2:black,"
+                f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
+            )
+        else:
+            # B-roll is already vertical from the stock search, so filling the
+            # frame costs nothing. Slowed down because these cuts are meant to
+            # sit under a voice — footage moving at normal speed pulls attention
+            # off the words, and slow motion is the register the format uses.
+            parts.append(
+                f"[{i}:v]scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=increase,"
+                f"crop={VIDEO_W}:{VIDEO_H},setsar=1,fps={FPS},"
+                f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,"
+                f"trim=duration={span:.3f},setpts=PTS-STARTPTS[v{i}]"
+            )
+    streams = "".join(f"[v{i}]" for i in range(len(shots)))
+    parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vcat]")
+    # Slight darkening: stock footage is often brighter than the speaker's own
+    # material, and captions get added over this later.
+    parts.append("[vcat]eq=brightness=-0.05:saturation=1.05[v]")
+    parts.append(
+        f"[{speech_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
+        f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11[a]"
+    )
+
+    cmd = (
+        ["ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error"]
+        + inputs
+        + [
+            "-filter_complex", ";".join(parts),
+            "-map", "[v]", "-map", "[a]",
+            "-t", f"{duration:.3f}",
+            *video_encoder_args(),
+            "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+            "-movflags", "+faststart",
+            os.path.abspath(out_path),
+        ]
+    )
+    _run(cmd)
+    return out_path
+
+
+# B-roll playback rate. Below 1.0 is slow motion.
+#
+# These cuts sit under a voice, and footage moving at normal speed competes
+# with the words for attention. Slowing it makes the picture read as mood
+# rather than as action, which is the register this format uses throughout.
+BROLL_SPEED = 0.7
 
 
 _DURATION_RE = re.compile(r"Duration:\s*(\d+):(\d\d):(\d\d(?:\.\d+)?)")

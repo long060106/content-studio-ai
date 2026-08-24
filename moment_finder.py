@@ -45,21 +45,48 @@ MAX_SEGMENTS = 1200
 # A single cut shorter than this can't carry a complete thought.
 MIN_CUT_SECONDS = 4
 
+# Breathing room after the last word, before the clip ends.
+#
+# Caption timings from YouTube tend to run early, so cutting exactly on a
+# segment boundary clips the final word or ends on it. Ending the instant a
+# speaker stops also just feels abrupt — the line needs a moment to land. This
+# is capped at whatever gap actually exists before the next words, so it never
+# eats into the following sentence.
+LULL_SECONDS = 0.6
+
 # The finished short, all cuts added together. Overridable per run via
 # make_shorts.py's --min-seconds / --max-seconds.
 MIN_TOTAL_SECONDS = 7
-MAX_TOTAL_SECONDS = 25
+MAX_TOTAL_SECONDS = 45
 
 # More than a couple of jumps stops reading as an edit and starts reading as a
 # supercut of unrelated fragments.
 MAX_CUTS = 3
 
-# When nobody asks for a specific number, the talk decides: one moment per
-# replay peak worth cutting. The cap stops a noisy retention curve turning into
-# a twenty-short run, and the fallback covers videos YouTube publishes no
-# heatmap for (it needs a view threshold), where there are no peaks to count.
+# How many moments a talk yields is a RESULT, not a target.
+#
+# Two things were tried and both were wrong. Sizing by the number of replay
+# peaks missed everything the audience didn't happen to rewatch. Sizing by the
+# talk's length assumed minutes predict material, when a dense twelve-minute
+# talk holds more than a rambling forty-minute one.
+#
+# So the model returns every passage that stands alone, each with a strength
+# score, and only those clearing the bar are cut. A weak talk gives three; a
+# rich one gives eight. Nothing is padded to reach a number, and nothing good
+# is discarded to respect one.
 MAX_MOMENTS = 8
-DEFAULT_MOMENTS = 5
+
+# On a 1-10 scale, where 5 is "fine but forgettable". Raise it if the weakest
+# clips in a batch aren't worth posting; lower it if good material is missing.
+STRENGTH_THRESHOLD = 6.0
+
+
+def transcript_seconds(segments: list[dict]) -> float:
+    """Playing time covered by the transcript."""
+    if not segments:
+        return 0.0
+    last = segments[-1]
+    return float(last.get("start", 0.0)) + float(last.get("duration", 0.0))
 
 SYSTEM_PROMPT = """You are an editor who cuts motivational shorts for TikTok, \
 Reels and YouTube Shorts out of long-form talks, interviews and podcasts.
@@ -120,6 +147,21 @@ the second, and the join must sound deliberate. If a listener would hear the \
 jump as a mistake, use one cut instead.
 - Each cut must itself start and end on sentence boundaries.
 
+END ON THE POINT. The last line heard is what the viewer leaves with, and a \
+moment that trails off into whatever the speaker said next wastes everything \
+before it. Every moment must finish on a line that lands its idea.
+
+- Prefer a passage that already ends on its own conclusion.
+- If the strongest closing line sits somewhere else in the talk, stitch it on \
+as a final cut. This is common in compilations, where the same idea is stated \
+several times and the sharpest phrasing is not always in the same place as the \
+fullest explanation.
+- A closer is a statement, not a summary: the line that makes someone stop and \
+think, not a restatement of what was just said.
+- Read the finished moment back as a whole. If the ending is weaker than the \
+middle, you have not finished — either trim back to the strong ending or \
+stitch a better one on.
+
 Avoid: housekeeping, introductions, thanking the audience, references to slides \
 or "as I mentioned earlier", statistics without a point, and anything that needs \
 the previous five minutes to make sense.
@@ -146,6 +188,8 @@ Return a JSON object with exactly this shape:
       "stitch_reason": string,       // if more than one cut: why they belong together.
                                      // "" for a single cut.
       "peak_rank": number,           // which replay peak this came from (its #), 0 if none
+      "strength": number,            // 1-10: how strongly this would stop a stranger
+                                     // scrolling, judged cold with no context
       "hook": string,                // <= 60 chars, the on-screen title card. Punchy, no hashtags,
                                      // no quotation marks. This is the scroll-stopper.
       "quote": string,               // the single strongest verbatim line in the moment
@@ -191,6 +235,9 @@ class Moment:
     # Measured from the finished cuts rather than taken from the model's own
     # answer — see `_peak_for` for why that self-report can't be trusted.
     peak_rank: int = 0
+    # 1-10, the model's own judgement of how hard this lands cold. Used to
+    # decide how many moments a talk yields — see STRENGTH_THRESHOLD.
+    strength: float = 0.0
     # How strongly this overlaps a most-replayed peak, when YouTube publishes
     # one. 0 means either no heatmap or a moment the audience didn't return to.
     heat: float = 0.0
@@ -218,6 +265,7 @@ class Moment:
             "cuts": [asdict(c) for c in self.cuts],
             "stitch_reason": self.stitch_reason,
             "peak_rank": self.peak_rank,
+            "strength": self.strength,
             "hook": self.hook,
             "quote": self.quote,
             "theme": self.theme,
@@ -278,20 +326,33 @@ def _build_user_prompt(
         )
 
     if auto and hot_windows:
-        # No target number. The talk has as many moments as it has peaks worth
-        # cutting, and saying so explicitly stops the model padding the list
-        # out with weak passages to reach a count it was given.
+        # Peaks first, then the rest of the talk. Peaks are the best evidence
+        # available, but a talk holds more good material than it has peaks —
+        # people rewatch what surprised them, not everything that would stop a
+        # stranger scrolling. Cutting only at peaks leaves most of it behind.
         instruction = (
-            f"Work through the replay peaks above and return one moment for each "
-            f"peak that genuinely stands alone — up to {count}. There is no "
-            f"target number: if only three of those peaks survive the test, "
-            f"return three. A short list of strong moments is the goal; padding "
-            f"it with passages that need context ruins the batch.\n"
-            f"For every peak you skip, you do not need to explain yourself — "
-            f"just leave it out.\n\n"
-            f"For each one you keep, apply STAGE 2 before writing timestamps: "
-            f"expand outwards from the peak to the complete statement, then read "
-            f"the boundaries off the segment times."
+            f"Return every passage in this talk that works as a standalone "
+            f"short, up to {count}. There is NO target number — the right answer "
+            f"is however many the talk actually contains.\n\n"
+            f"START WITH THE REPLAY PEAKS above. They are the best evidence "
+            f"available about what lands, so take every peak that stands alone.\n\n"
+            f"THEN READ THE WHOLE TRANSCRIPT for the best statements anywhere "
+            f"else, peak or no peak. A talk usually holds more good material than "
+            f"it has peaks: the audience replays what surprised them, which is "
+            f"not the same as everything that would stop a stranger scrolling.\n\n"
+            f"SCORE EACH ONE 1-10 in `strength`, judged cold — imagine it "
+            f"arriving in a stranger's feed with no context, no speaker they "
+            f"recognise, and a thumb ready to scroll. Be honest and use the whole "
+            f"range. A typical talk has one or two passages at 8+, a few at 6-7, "
+            f"and a lot of material around 4-5 that is perfectly reasonable to "
+            f"listen to and would still be scrolled past.\n\n"
+            f"Do NOT inflate a score to get a passage included, and do not hold "
+            f"back a high one to seem discerning. Anything below the bar is "
+            f"dropped automatically, so an accurate low score costs nothing — an "
+            f"inflated one puts a weak clip in front of an audience.\n\n"
+            f"For every moment, apply STAGE 2 before writing timestamps: expand "
+            f"outwards to the complete statement, then read the boundaries off "
+            f"the segment times."
         )
     else:
         instruction = (
@@ -311,14 +372,33 @@ Timestamped transcript segments:
 """
 
 
-def _snap_cut(start: float, end: float, segments: list[dict]) -> tuple[float, float]:
-    """Nudge one cut onto real segment boundaries.
+def _snap_cut(
+    start: float,
+    end: float,
+    segments: list[dict],
+    tail: float = LULL_SECONDS,
+) -> tuple[float, float]:
+    """Nudge one cut onto real segment boundaries, and let the ending breathe.
 
     The model works from printed timestamps and is usually close but rarely
     exact. Snapping keeps cuts off the middle of a word.
+
+    The tail matters as much as the snap. YouTube's caption timings routinely
+    end a beat before the speaker actually stops, so a cut placed exactly on a
+    segment boundary clips the final word or lands hard on it — the statement
+    finishes and the video ends in the same instant, which feels abrupt and
+    cheap. A short tail lets the last word finish and gives it a moment to
+    land.
+
+    How far to extend depends on what follows:
+
+    - If the speaker carries straight on, stop just before the next segment
+      begins. That is roughly where the last word truly ends, and it takes back
+      what the early caption timing stole without stealing the next sentence.
+    - If there is a real pause, take the full lull.
     """
     if not segments:
-        return round(start, 2), round(end, 2)
+        return round(start, 2), round(end + tail, 2)
 
     starts = [float(s["start"]) for s in segments]
     snapped_start = min(starts, key=lambda t: abs(t - start))
@@ -329,7 +409,51 @@ def _snap_cut(start: float, end: float, segments: list[dict]) -> tuple[float, fl
         if float(s["start"]) >= snapped_start
     ]
     snapped_end = min(ends, key=lambda t: abs(t - end)) if ends else end
-    return round(snapped_start, 2), round(snapped_end, 2)
+
+    if tail > 0:
+        following = [t for t in starts if t > snapped_end + 0.05]
+        if following:
+            # Never run into the next words; stop a hair short of them.
+            snapped_end = min(snapped_end + tail, min(following) - 0.05)
+        else:
+            snapped_end = snapped_end + tail
+
+    return round(snapped_start, 2), round(max(snapped_end, snapped_start + 0.1), 2)
+
+
+# A gap this long between caption segments means the speaker actually stopped —
+# end of a sentence, or at least of a thought.
+PAUSE_SECONDS = 0.35
+
+
+def _natural_breaks(segments: list[dict], lo: float, hi: float) -> list[float]:
+    """Times inside (lo, hi) where it is safe to end a clip.
+
+    Not every caption boundary is one. YouTube breaks captions every few
+    seconds regardless of grammar, so ending on an arbitrary segment lands
+    mid-sentence — which is exactly how a clip came to end on "...and at least
+    in the Kung Fu training it".
+
+    Two signals mark a real break, and both are needed because transcripts vary:
+
+    - **Punctuation**, when the transcript has any. Manually written captions
+      usually do.
+    - **A pause**, when it doesn't. Auto-generated captions frequently carry no
+      punctuation at all, and then the only evidence of a sentence ending is
+      that the speaker stopped talking for a moment.
+    """
+    breaks: list[float] = []
+    for i, seg in enumerate(segments):
+        end = float(seg.get("start", 0.0)) + float(seg.get("duration", 0.0))
+        if not (lo < end < hi):
+            continue
+        text = str(seg.get("text", "")).rstrip()
+        gap = 0.0
+        if i + 1 < len(segments):
+            gap = float(segments[i + 1].get("start", 0.0)) - end
+        if text.endswith((".", "!", "?")) or gap >= PAUSE_SECONDS:
+            breaks.append(end)
+    return sorted(breaks)
 
 
 def _trim_to_budget(
@@ -350,16 +474,40 @@ def _trim_to_budget(
     overrun = total - max_total
     last = cuts[-1]
 
-    boundaries = sorted(
+    target = last.end_seconds - overrun
+
+    def fits(times: list[float]) -> list[float]:
+        return [
+            t for t in times
+            if t <= target and t - last.start_seconds >= MIN_CUT_SECONDS
+        ]
+
+    natural = fits(_natural_breaks(segments, last.start_seconds, last.end_seconds))
+    anywhere = fits(sorted(
         float(s["start"]) + float(s.get("duration", 0.0))
         for s in segments
-        if last.start_seconds < float(s["start"]) + float(s.get("duration", 0.0)) < last.end_seconds
-    )
-    target = last.end_seconds - overrun
-    usable = [b for b in boundaries if b <= target and b - last.start_seconds >= MIN_CUT_SECONDS]
+        if last.start_seconds
+        < float(s["start"]) + float(s.get("duration", 0.0))
+        < last.end_seconds
+    ))
 
-    if usable:
-        cuts[-1] = Cut(last.start_seconds, round(usable[-1], 2))
+    # Prefer a real pause or full stop — but not at any price. On a
+    # well-punctuated transcript there are plenty to choose from. On
+    # auto-generated captions there may be almost none (this video had 29
+    # across twenty minutes), and the nearest one can sit thirty seconds early:
+    # taking it would cut a 43-second clip down to 11. A clip ending on a
+    # caption boundary is imperfect; one cut to a quarter of its length is
+    # ruined, so the natural break has to keep most of the clip to win.
+    chosen = None
+    if natural:
+        chosen = natural[-1]
+    if anywhere:
+        best = anywhere[-1]
+        if chosen is None or (chosen - last.start_seconds) < 0.6 * (best - last.start_seconds):
+            chosen = best
+
+    if chosen is not None:
+        cuts[-1] = Cut(last.start_seconds, round(chosen, 2))
     elif len(cuts) > 1 and (total - last.duration) >= MIN_TOTAL_SECONDS:
         # No usable boundary inside the last cut — drop it rather than mangle it.
         cuts = cuts[:-1]
@@ -425,9 +573,10 @@ def find_moments(
         raise ValueError("No timestamped transcript segments to search for moments.")
 
     auto = count is None
-    if auto:
-        count = min(len(hot_windows), MAX_MOMENTS) if hot_windows else DEFAULT_MOMENTS
-    count = max(1, min(int(count), MAX_MOMENTS))
+    # In auto mode the number is decided after the fact, by which candidates
+    # clear the bar. The model is asked for the maximum so it has room to
+    # return everything worth cutting.
+    count = MAX_MOMENTS if auto else max(1, min(int(count), MAX_MOMENTS))
 
     client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
     response = client.messages.create(
@@ -497,11 +646,32 @@ def find_moments(
             reason=item.get("reason", "").strip(),
             stitch_reason=item.get("stitch_reason", "").strip(),
             peak_rank=_peak_for(cuts, hot_windows),
+            strength=float(item.get("strength", 0) or 0),
             heat=_heat_for(cuts, hot_windows),
         ))
 
-    # Moments the audience actually rewatched lead the list.
-    moments.sort(key=lambda m: m.heat, reverse=True)
+    # This is where the count is actually decided: not by a number handed to
+    # the model, but by how many passages cleared the bar. Only in auto mode —
+    # an explicit --count means the user asked for exactly that many.
+    if auto:
+        kept = [m for m in moments if m.strength >= STRENGTH_THRESHOLD]
+        if not kept and moments:
+            best = max(moments, key=lambda m: m.strength)
+            print(
+                f"  · Nothing cleared {STRENGTH_THRESHOLD:.0f}/10 "
+                f"(best was {best.strength:.0f}) — keeping the strongest anyway. "
+                f"This talk may not have much that stands alone."
+            )
+            kept = [best]
+        elif len(kept) < len(moments):
+            print(
+                f"  · {len(moments) - len(kept)} passage(s) scored below "
+                f"{STRENGTH_THRESHOLD:.0f}/10 and were dropped"
+            )
+        moments = kept
+
+    # Strongest first, with replay evidence breaking ties.
+    moments.sort(key=lambda m: (m.strength, m.heat), reverse=True)
     return moments
 
 

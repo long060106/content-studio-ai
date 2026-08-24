@@ -179,7 +179,7 @@ function renderEnv() {
 
 const ASSET_LABELS = {
   motivational: "Shorts", blog: "Blog", thread: "Thread",
-  captions: "Captions", carousel: "Carousel", clip: "Clip", voiceover: "Voice",
+  captions: "Captions", carousel: "Carousel", voiceover: "Voice",
   transcript: "Transcript",
 };
 
@@ -298,6 +298,20 @@ function renderLibrary() {
     return node;
   }));
 }
+
+/* The editing brief, folded away until wanted.
+
+   It is long by design — where the clip came from, what is said, what must not
+   be trimmed — and printing all of that under every clip would bury the clips
+   themselves. Collapsed, it is one line; open, it is the whole brief. */
+function briefBlock(short) {
+  const wrap = el("details", { className: "brief" },
+    el("summary", {}, "Editing brief"),
+    el("pre", { className: "text-block", style: "white-space:pre-wrap;margin-top:8px" }, short.brief),
+  );
+  return wrap;
+}
+
 
 /* Disk actions for one library row.
 
@@ -497,21 +511,28 @@ function renderVideo() {
     { id: "blog", label: "Blog", on: !!d.blog },
     { id: "thread", label: "Thread", on: !!(d.thread && d.thread.tweets) },
     { id: "captions", label: "Captions", on: !!(d.captions && d.captions.captions) },
-    { id: "carousel", label: "Carousel", on: !!d.carousel.images.length },
-    { id: "clip", label: "Clip", on: !!d.clip.video },
+    { id: "carousel", label: "Carousel",
+      on: !!(motivational.carousel || d.carousel.images.length) },
     { id: "voiceover", label: "Voice-over", on: !!(d.voiceover.script || d.voiceover.audio) },
     { id: "transcript", label: "Transcript", on: !!d.transcript.word_count },
   ];
 
-  // Tabs without content stay clickable — they explain what's missing —
-  // but a freshly opened video lands on the first tab that has something.
-  if (!state.tab || !tabs.some((t) => t.id === state.tab)) {
-    state.tab = (tabs.find((t) => t.on) || tabs[0]).id;
+  // Only show tabs that actually have something behind them.
+  //
+  // Blog, Thread, Captions and Voice-over come from cli.py, which the UI no
+  // longer offers, so on a clips-only run they could never fill — an empty tab
+  // reads as a broken feature rather than an unused one. They still appear for
+  // older videos that do have that content, so nothing already generated
+  // becomes unreachable.
+  const shown = tabs.filter((t) => t.on);
+  const visible = shown.length ? shown : [tabs[0]];
+
+  if (!state.tab || !visible.some((t) => t.id === state.tab)) {
+    state.tab = visible[0].id;
   }
 
-  const tabBar = el("div", { className: "tabs" }, tabs.map((t) => {
+  const tabBar = el("div", { className: "tabs" }, visible.map((t) => {
     const b = el("button", { className: "tab" + (t.id === state.tab ? " active" : "") }, t.label);
-    if (!t.on) b.append(el("span", { className: "dot", title: "not generated" }));
     b.onclick = () => { state.tab = t.id; renderVideo(); };
     return b;
   }));
@@ -566,15 +587,10 @@ function renderTab(d, tab) {
                 s.style && el("span", { className: "chip" }, s.style),
                 copyBtn(() => s.quote || s.hook, "Copy")),
               s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
+              s.brief ? briefBlock(s) : null,
             ))))),
-      m.carousel.length ? card(`Quote carousel · ${m.carousel.length} slides`, null,
-        el("div", { className: "slides" }, m.carousel.map((rel, i) => {
-          const href = `/media/${rel}`;
-          const a = el("a", { href, target: "_blank", rel: "noopener" },
-            el("img", { src: href, alt: `Slide ${i + 1}`, loading: "lazy" }));
-          a.style.display = "block";
-          return el("div", { className: "slide" }, a);
-        }))) : null,
+      m.carousel ? card("Carousel copy", [copyBtn(() => m.carousel, "Copy all")],
+        el("pre", { className: "text-block", style: "white-space:pre-wrap" }, m.carousel)) : null,
     );
   }
 
@@ -652,6 +668,13 @@ function renderTab(d, tab) {
   }
 
   if (tab === "carousel") {
+    // Words, not pictures: the cards get designed by hand afterwards, so what
+    // is useful here is copy to paste rather than an image that gets replaced.
+    const mc = (d.motivational || {}).carousel;
+    if (mc) {
+      return card("Carousel copy", [copyBtn(() => mc, "Copy all")],
+        el("pre", { className: "text-block", style: "white-space:pre-wrap" }, mc));
+    }
     if (!d.carousel.images.length) return notGenerated("carousel");
     const slides = d.carousel.slides || [];
     return card(`${d.carousel.images.length} slides`,
@@ -664,21 +687,6 @@ function renderTab(d, tab) {
         return el("div", { className: "slide" }, a,
           el("div", { className: "cap" }, slides[i] ? slides[i].headline : name));
       })));
-  }
-
-  if (tab === "clip") {
-    if (!d.clip.video) return notGenerated("short-form clip");
-    const info = d.clip.info || {};
-    return el("div", {},
-      card("short_form_clip.mp4",
-        [linkBtn(media("short_form_clip.mp4") + "?download", "Download")],
-        el("video", { className: "clip", src: media("short_form_clip.mp4"), controls: true, preload: "metadata" })),
-      info.reason ? card("Why this clip", null,
-        el("dl", { className: "kv" },
-          el("dt", {}, "Window"),
-          el("dd", {}, `${fmtDuration(info.start_seconds)} → ${fmtDuration(info.end_seconds)} (${Math.round(info.duration_seconds || 0)}s)`),
-          el("dt", {}, "Reason"), el("dd", {}, info.reason))) : null,
-    );
   }
 
   if (tab === "voiceover") {

@@ -22,6 +22,7 @@ short on TikTok uses.
 from __future__ import annotations
 
 import os
+import threading
 import warnings
 from dataclasses import dataclass
 
@@ -49,20 +50,77 @@ class Word:
     end: float
 
 
-def transcribe_words(media_path: str, model_size: str = "base") -> list[Word]:
-    """Word-level timings for a short media file, using local Whisper."""
-    import whisper  # imported lazily: torch is a heavy import
+# Whisper transcription runs one clip at a time, even when the pipeline is
+# building several shorts in parallel.
+#
+# This is not caution: running three transcriptions concurrently silently
+# produced a clip with zero captions, while the same clip transcribed fine on
+# its own. Torch models are not safe to drive from several threads at once, and
+# the failure mode is the worst kind — no error, just a short that quietly ships
+# without captions.
+#
+# It costs little. Transcription is roughly four seconds of a thirty-second
+# clip, and everything around it (ffmpeg cutting, the GPU encode, the tag API
+# call) still overlaps freely.
+_WHISPER_LOCK = threading.Lock()
+_WHISPER_MODELS: dict[str, object] = {}
 
-    model = whisper.load_model(model_size)
-    result = model.transcribe(media_path, word_timestamps=True, fp16=False)
 
-    words: list[Word] = []
-    for segment in result.get("segments", []):
-        for w in segment.get("words", []):
-            text = w.get("word", "").strip()
-            if not text:
-                continue
-            words.append(Word(text=text, start=float(w["start"]), end=float(w["end"])))
+def transcribe_words(
+    media_path: str,
+    model_size: str = "base",
+    language: str = "en",
+) -> list[Word]:
+    """Word-level timings for a short media file.
+
+    Uses faster-whisper (CTranslate2) rather than openai-whisper. Two reasons,
+    and the first is what forced the change:
+
+    **It doesn't need numba.** openai-whisper imports numba for its alignment
+    code, and Windows Application Control blocked numba's `_box` extension on
+    this machine — which killed transcription outright, took the SRT with it,
+    and silently collapsed every clip to a single b-roll shot because the shot
+    planner had no word timings to cut on. faster-whisper has no such
+    dependency.
+
+    **It punctuates.** YouTube's auto-captions frequently arrive with no full
+    stops at all — one talk here had zero across 415 segments — which leaves
+    both this code and the model guessing where a sentence ends, and is why
+    clips were stopping mid-thought. These timings come with punctuation, so
+    sentence boundaries are visible again.
+
+    It is also several times faster than the original for the same model size.
+    """
+    from faster_whisper import WhisperModel
+
+    with _WHISPER_LOCK:
+        # Cached because the pipeline calls this once per short, and reloading
+        # the model each time is pure waste. int8 on CPU is the right trade
+        # here: the clips are short and the accuracy difference is not audible
+        # in a caption.
+        model = _WHISPER_MODELS.get(model_size)
+        if model is None:
+            model = WhisperModel(model_size, device="cpu", compute_type="int8")
+            _WHISPER_MODELS[model_size] = model
+        # Language is stated, not detected. Auto-detection runs on a short
+        # window and gets accented English wrong: on a clip of a German-based
+        # teacher speaking English it returned fluent Malay, correctly timed
+        # and completely useless. Every talk this pipeline handles is English,
+        # so guessing buys nothing and occasionally destroys a clip.
+        segments, _info = model.transcribe(
+            media_path, word_timestamps=True, language=language
+        )
+
+        words: list[Word] = []
+        # `segments` is a generator — the work happens as it is consumed, so it
+        # has to be drained inside the lock.
+        for segment in segments:
+            for w in (segment.words or []):
+                text = (w.word or "").strip()
+                if not text:
+                    continue
+                words.append(Word(text=text, start=float(w.start), end=float(w.end)))
+
     return words
 
 
@@ -149,6 +207,61 @@ def build_ass(
         os.makedirs(parent, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+    return out_path
+
+
+def _srt_time(seconds: float) -> str:
+    """SRT wants HH:MM:SS,mmm — a comma before the milliseconds, not a point."""
+    seconds = max(0.0, seconds)
+    hours, rem = divmod(int(seconds), 3600)
+    minutes, secs = divmod(rem, 60)
+    millis = int(round((seconds - int(seconds)) * 1000))
+    if millis == 1000:  # rounding can tip a whole second
+        millis, secs = 0, secs + 1
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
+
+
+def words_to_srt(words: list[Word], out_path: str, per_card: int = WORDS_PER_CARD) -> str:
+    """Write the same word timings as a subtitle file CapCut can import.
+
+    The alternative to burning captions into the picture. Editors re-cut these
+    clips — b-roll over the speech — and text baked into the frame fights that
+    edit. But throwing the timings away entirely means retyping every caption by
+    hand, which is the slowest part of assembling one of these videos.
+
+    An SRT keeps the timing and hands the styling to the editor: CapCut imports
+    it, matches the words to the audio, and the look is chosen there.
+
+    Grouped the same way as `build_ass` — a few words per card rather than one
+    long line — because that is what the format actually shows on screen.
+    """
+    lines: list[str] = []
+    index = 1
+
+    for i in range(0, len(words), per_card):
+        card = words[i : i + per_card]
+        if not card:
+            continue
+        start = card[0].start
+        end = max(card[-1].end, start + 0.08)
+
+        # Hold each card until the next one starts, so there is no flicker of
+        # empty screen between groups.
+        following = words[i + per_card : i + per_card + 1]
+        if following:
+            end = max(end, following[0].start)
+
+        lines.append(str(index))
+        lines.append(f"{_srt_time(start)} --> {_srt_time(end)}")
+        lines.append(" ".join(w.text for w in card))
+        lines.append("")
+        index += 1
+
+    parent = os.path.dirname(out_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
     return out_path
 
 

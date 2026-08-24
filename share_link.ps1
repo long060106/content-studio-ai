@@ -113,7 +113,10 @@ if (-not $url) {
     exit 1
 }
 
-$share = "$url/?k=$token"
+# /s/<key> rather than ?k=<key>: a path survives being shared. Query strings
+# get trimmed by some link previews, and a trailing ?k=... is easy to lose when
+# a long URL wraps onto two lines in a chat app.
+$share = "$url/s/$token"
 $share | Set-Content -Path (Join-Path $root "current_link.txt") -Encoding utf8
 
 Write-Host ""

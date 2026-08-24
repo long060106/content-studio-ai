@@ -46,17 +46,31 @@ dothework is right) or clean CamelCase with every word capitalised \
 - Avoid spam tags (#viral, #fyp, #foryou) unless genuinely fitting.
 - Abstractions are fine here: growthmindset, discipline, neuroplasticity.
 
-VISUAL QUERIES — for a stock image search. These are matched against \
-photographs, so they must describe things a camera can actually point at.
+VISUAL QUERIES — for a stock footage search. These are matched against real \
+video, so they must describe things a camera can point at.
+
+WORK FROM THE MEANING, NEVER FROM THE WORDS. This is the whole job.
+
+- **Metaphors are not search terms.** When a teacher says "you have the lock, \
+a teacher has the key", the key is not an object — it means guidance, or the \
+mentality you build. Searching for "key" returns a photograph of a door key \
+and ruins the shot. Ask what the speaker actually means, then film that: \
+someone training alone, a student watching closely, hands working at something \
+difficult.
+- **Name the feeling first, then find footage that carries it.** Decide what \
+the passage makes a viewer feel — peace, strain, resolve, isolation, clarity, \
+dread — and choose images that produce that feeling. If the register is peace: \
+still water at dawn, slow breath in cold air, an empty room with light coming \
+in. If it is struggle: a dark gym, sweat, someone going again after failing.
 - 4-6 queries, each 2-4 words.
 - Concrete subject plus a setting or action: "boxer in empty gym", "runner at \
 dawn", "hands gripping barbell", "empty chair at table".
-- NEVER abstractions. "success", "motivation", "determination", "growth", \
-"failure" are all unphotographable and return junk — if a query names a feeling \
-or a concept rather than a thing, rewrite it.
-- Vary them. Six queries that all return the same gym are worth one query.
-- Match the emotional register of the idea: a statement about grief should not \
-return a sunny beach.
+- NEVER abstractions as the query itself. "success", "motivation", \
+"determination" are unphotographable and return junk. The feeling decides \
+which concrete thing you search for; it is not the search.
+- Vary them. Six queries returning the same gym are worth one query.
+- Match the register exactly: a passage about grief must not return a sunny \
+beach, and one about stillness must not return a crowded street.
 
 Respond with ONLY valid JSON, no preamble, no markdown code fences."""
 
@@ -64,8 +78,17 @@ SCHEMA_DESCRIPTION = """
 Return a JSON object with exactly this shape:
 
 {
+  "means": string,                  // what the passage ACTUALLY says, in plain
+                                    // words, with any metaphor resolved.
+                                    // "you have the lock, a teacher has the key"
+                                    // -> "you need guidance to unlock what is
+                                    // already in you"
+  "feeling": string,                // what it makes a viewer feel: peace,
+                                    // strain, resolve, isolation, clarity
   "hashtags": [string, ...],        // 6-10, no # symbol
-  "visual_queries": [string, ...],  // 4-6 concrete, photographable search terms
+  "visual_queries": [string, ...],  // 4-6 concrete, filmable searches that
+                                    // carry `feeling` - derived from `means`,
+                                    // never from the literal nouns spoken
   "mood": string                    // 2-4 words describing the visual register,
                                     // e.g. "dark and still" or "bright, kinetic"
 }
@@ -77,6 +100,11 @@ class TopicTags:
     hashtags: list[str]
     visual_queries: list[str]
     mood: str = ""
+    # Written before the queries so the model has to resolve the metaphor and
+    # name the feeling first. Asking for footage straight from a hook produced
+    # a photograph of a door key for a line about mentorship.
+    means: str = ""
+    feeling: str = ""
 
     def hashtag_line(self) -> str:
         return " ".join(f"#{tag.lstrip('#')}" for tag in self.hashtags)
@@ -121,11 +149,19 @@ def generate(
     quote: str = "",
     theme: str = "",
     api_key: Optional[str] = None,
+    context: str = "",
 ) -> TopicTags:
     """Tags and image queries for one idea.
 
     `topic` is the headline idea (a hook, a statement, or just a subject).
     `quote` and `theme` sharpen it when available.
+
+    `context` says what world the idea comes from — the talk's title, the
+    speaker, the channel. It matters more than it looks. Without it a line
+    about consistency from a basketball player produced "athlete meal prep",
+    which returned stock footage of vegetables being chopped: a fair reading of
+    the words, and completely wrong for the video. Naming the domain keeps the
+    footage in the same world as the speaker.
     """
     client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
 
@@ -134,6 +170,14 @@ def generate(
         parts.append(f'Line from the source: "{quote}"')
     if theme:
         parts.append(f"Theme: {theme}")
+    if context:
+        parts.append(
+            f"This comes from: {context}. "
+            "Keep the visual queries inside this world. Footage from the wrong "
+            "domain reads as stock filler even when it matches the words — a "
+            "line about consistency from a basketball player wants basketball, "
+            "not a generic kitchen."
+        )
     parts.append(SCHEMA_DESCRIPTION)
 
     response = client.messages.create(
@@ -159,10 +203,12 @@ def generate(
         hashtags=[_normalise_tag(t) for t in data.get("hashtags", []) if _normalise_tag(t)],
         visual_queries=[_clean(q) for q in data.get("visual_queries", []) if _clean(q)],
         mood=_clean(data.get("mood")),
+        means=_clean(data.get("means")),
+        feeling=_clean(data.get("feeling")),
     )
 
 
-def for_moment(moment) -> TopicTags:
+def for_moment(moment, context: str = "") -> TopicTags:
     """Tags for a `moment_finder.Moment`, reusing the visuals it already has.
 
     The moment's own `visual_keywords` were written against the transcript, so
@@ -173,6 +219,7 @@ def for_moment(moment) -> TopicTags:
         topic=getattr(moment, "hook", "") or "",
         quote=getattr(moment, "quote", "") or "",
         theme=getattr(moment, "theme", "") or "",
+        context=context,
     )
     existing = list(getattr(moment, "visual_keywords", []) or [])
     seen = {q.lower() for q in existing}

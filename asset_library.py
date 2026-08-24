@@ -776,6 +776,141 @@ def fetch_stock(query: str, kind: str = "video", count: int = 3) -> list[Asset]:
     return []
 
 
+CURATED_DIR = os.path.join(ASSETS_DIR, "broll")
+
+
+def curated_broll(
+    queries: list[str],
+    count: int,
+    exclude: Optional[set] = None,
+    min_duration: float = 0.0,
+) -> list[Asset]:
+    """Hand-picked b-roll from `assets/broll/`, matched by filename.
+
+    This folder exists because stock footage has a ceiling. Pexels and Pixabay
+    are clean, bright and corporate; the accounts worth copying use footage
+    that is dark, slow and cinematic, and no amount of query tuning turns one
+    into the other. So anything dropped in here is preferred over anything
+    fetched, always.
+
+    Matching is by filename, deliberately: `night-run-silhouette_struggle.mp4`
+    matches "night", "run", "silhouette" and "struggle". No database, no
+    tagging step — renaming a file is the whole workflow, and the folder stays
+    readable to anyone who opens it.
+
+    Clips with no query match are still returned once the matches run out, so a
+    small library is never worse than an empty one.
+    """
+    if not os.path.isdir(CURATED_DIR):
+        return []
+
+    seen = set(exclude or ())
+    wanted = {w for q in queries for w in re.split(r"[^a-z0-9]+", q.lower()) if len(w) > 2}
+
+    scored: list[tuple[int, Asset]] = []
+    for root, _dirs, names in os.walk(CURATED_DIR):
+        for name in sorted(names):
+            full = os.path.join(root, name)
+            if not os.path.isfile(full) or _kind_for(full) != "video":
+                continue
+            rel = os.path.relpath(full, BASE_DIR).replace("\\", "/")
+            asset_id = f"curated:{os.path.relpath(full, CURATED_DIR)}"
+            if asset_id in seen:
+                continue
+
+            duration, width, height = probe(full)
+            if min_duration and duration and duration < min_duration:
+                continue
+
+            # Folder names are tags too, so `emotion/lost/road-fog.mp4` matches
+            # "lost" without it having to appear in the filename. Organising by
+            # dropping a file into the right folder is less work than naming it
+            # carefully, and survives being reorganised later.
+            folders = os.path.relpath(root, CURATED_DIR).replace("\\", "/")
+            tags = _tags_from_filename(name)
+            if folders != ".":
+                tags += [p for p in re.split(r"[^a-z0-9]+", folders.lower()) if len(p) > 2]
+
+            hits = len(wanted.intersection(tags))
+            scored.append((hits, Asset(
+                id=asset_id, kind="video", path=rel, tags=tags,
+                duration=duration, width=width, height=height,
+                source="curated", licence="local",
+            )))
+
+    # Best match first; unmatched clips still usable rather than discarded.
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+    return [asset for _hits, asset in scored[:count]]
+
+
+def fetch_broll_set(
+    queries: list[str],
+    count: int = 3,
+    min_duration: float = 0.0,
+    exclude: Optional[set] = None,
+) -> list[Asset]:
+    """A set of visually *different* b-roll clips for one moment.
+
+    One clip per query rather than several from a single query, and that is the
+    whole point of the function. Asking Pexels for three results on "empty gym"
+    returns three angles of the same gym — cut together they read as one shot
+    held too long, not as an edit. Asking three different queries returns three
+    different places.
+
+    `exclude` carries the asset ids already used elsewhere in the run, so two
+    clips cut from the same talk don't open on identical footage.
+
+    Returns fewer than `count` rather than padding with repeats: a short set of
+    distinct shots is more useful than a full set with duplicates, and the shot
+    list can simply reuse one.
+    """
+    chosen: list[Asset] = []
+    seen: set = set(exclude or ())
+    # How many results to pull from one query. A single query returns several
+    # genuinely different videos on the same theme, which is enough variety
+    # when they are separated by cuts back to the speaker — and it is the only
+    # way to reach eighteen distinct shots from five or six queries.
+    per_query = max(1, -(-count // max(1, len(queries))) + 1)
+
+    def take(candidates: list[Asset], limit: int) -> int:
+        """Claim up to `limit` unseen clips. Returns how many were taken."""
+        taken = 0
+        for asset in candidates:
+            if taken >= limit or len(chosen) >= count:
+                break
+            if asset.id in seen:
+                continue
+            # Duration 0 means it couldn't be probed; keep it rather than
+            # discard a usable clip over a missing measurement.
+            if min_duration and asset.duration and asset.duration < min_duration:
+                continue
+            seen.add(asset.id)
+            chosen.append(asset)
+            taken += 1
+        return taken
+
+    for query in queries:
+        if len(chosen) >= count:
+            break
+        try:
+            take(fetch_stock(query, kind="video", count=per_query + 2), per_query)
+        except Exception as e:
+            print(f"    · b-roll search failed for {query!r}: {e}")
+
+    # Not enough distinct queries produced a usable clip. Go back through them
+    # asking for more results each, rather than returning a half-empty set.
+    if len(chosen) < count:
+        for query in queries:
+            if len(chosen) >= count:
+                break
+            try:
+                take(fetch_stock(query, kind="video", count=20), count)
+            except Exception:
+                continue
+
+    return chosen
+
+
 # --------------------------------------------------------------------------
 # picking
 # --------------------------------------------------------------------------
