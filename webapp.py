@@ -97,6 +97,14 @@ MAX_LOG_LINES = 4000
 LINK_TOKEN = os.environ.get("CONTENT_STUDIO_LINK_TOKEN", "").strip()
 COOKIE_NAME = "cs_key"
 
+# Set by whatever exposes this server to the internet. When it is on, every
+# request is treated as coming from outside — so the key is required and guests
+# cannot delete — regardless of what headers the proxy in front happens to
+# send. See `_is_remote`.
+_PUBLIC_MODE = os.environ.get("CONTENT_STUDIO_PUBLIC", "").strip() in (
+    "1", "true", "yes",
+)
+
 
 def _download_name(path: str) -> str:
     """A filename worth saving, rather than the one on disk.
@@ -1033,9 +1041,29 @@ class Handler(BaseHTTPRequestHandler):
         could forge the header, but they have full access regardless. It exists
         to stop a guest deleting the owner's work.
         """
+        # Belt and braces, and the belt is the important half.
+        #
+        # Header sniffing is a guess about someone else's proxy. It was written
+        # for Cloudflare and is correct for Cloudflare; point the app at a
+        # different tunnel whose headers happen not to match and this returns
+        # False, `_how_authorised` returns OPEN, and the studio is answering the
+        # public internet with no key at all. The failure is silent and in the
+        # dangerous direction.
+        #
+        # So whatever opens a public tunnel sets CONTENT_STUDIO_PUBLIC=1, and
+        # that alone is enough to require the key. The headers below stay as a
+        # second signal for the case where the app was started by hand.
+        if _PUBLIC_MODE:
+            return True
         return any(
             self.headers.get(h)
-            for h in ("Cf-Ray", "Cf-Connecting-Ip", "X-Forwarded-For")
+            for h in (
+                # Cloudflare
+                "Cf-Ray", "Cf-Connecting-Ip",
+                # Tailscale Funnel / serve, and proxies generally
+                "Tailscale-User-Login", "Tailscale-User-Name",
+                "X-Forwarded-For", "X-Forwarded-Proto", "X-Real-Ip", "Forwarded",
+            )
         )
 
     def _may_delete(self) -> bool:
