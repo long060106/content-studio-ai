@@ -97,11 +97,18 @@ MAX_LOG_LINES = 4000
 LINK_TOKEN = os.environ.get("CONTENT_STUDIO_LINK_TOKEN", "").strip()
 COOKIE_NAME = "cs_key"
 
-# Set by whatever exposes this server to the internet. When it is on, every
-# request is treated as coming from outside — so the key is required and guests
-# cannot delete — regardless of what headers the proxy in front happens to
-# send. See `_is_remote`.
-_PUBLIC_MODE = os.environ.get("CONTENT_STUDIO_PUBLIC", "").strip() in (
+# An opt-in strict mode: treat *every* request as external, so the key is
+# always required and nobody can delete — even the owner at the keyboard.
+#
+# Off by default, because it is a blunt instrument. It exists for the case
+# where this is put behind some proxy whose headers are unknown; if you cannot
+# say for certain that the thing in front adds forwarding headers, turn this on
+# and lose the local convenience rather than gamble.
+#
+# It is deliberately *not* set by `static_link.ps1`. Tailscale Funnel was
+# measured — it sends X-Forwarded-For, X-Forwarded-Proto and Tailscale-User-*
+# — so `_is_remote` can tell a visitor from the owner on its own there.
+_STRICT_PUBLIC = os.environ.get("CONTENT_STUDIO_PUBLIC", "").strip() in (
     "1", "true", "yes",
 )
 
@@ -1041,28 +1048,26 @@ class Handler(BaseHTTPRequestHandler):
         could forge the header, but they have full access regardless. It exists
         to stop a guest deleting the owner's work.
         """
-        # Belt and braces, and the belt is the important half.
-        #
-        # Header sniffing is a guess about someone else's proxy. It was written
-        # for Cloudflare and is correct for Cloudflare; point the app at a
-        # different tunnel whose headers happen not to match and this returns
-        # False, `_how_authorised` returns OPEN, and the studio is answering the
-        # public internet with no key at all. The failure is silent and in the
-        # dangerous direction.
-        #
-        # So whatever opens a public tunnel sets CONTENT_STUDIO_PUBLIC=1, and
-        # that alone is enough to require the key. The headers below stay as a
-        # second signal for the case where the app was started by hand.
-        if _PUBLIC_MODE:
+        # The stakes are worth stating: when this returns False,
+        # `_how_authorised` returns OPEN — no key at all. Getting it wrong for a
+        # publicly reachable server means the studio answers the whole internet.
+        # So the header list below must cover whatever proxy is actually in
+        # front, and `_STRICT_PUBLIC` exists for when that cannot be verified.
+        if _STRICT_PUBLIC:
             return True
         return any(
             self.headers.get(h)
             for h in (
-                # Cloudflare
+                # Cloudflare quick tunnel (share_link.ps1)
                 "Cf-Ray", "Cf-Connecting-Ip",
-                # Tailscale Funnel / serve, and proxies generally
-                "Tailscale-User-Login", "Tailscale-User-Name",
-                "X-Forwarded-For", "X-Forwarded-Proto", "X-Real-Ip", "Forwarded",
+                # Tailscale Funnel (static_link.ps1). Confirmed by echoing a
+                # real request back: X-Forwarded-For and X-Forwarded-Proto
+                # arrive on every proxied request, and Tailscale-User-* as well
+                # when the visitor is signed in to the tailnet.
+                "Tailscale-Headers-Info", "Tailscale-User-Login",
+                # Common to proxies generally.
+                "X-Forwarded-For", "X-Forwarded-Proto", "X-Forwarded-Host",
+                "X-Real-Ip", "Forwarded",
             )
         )
 

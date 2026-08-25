@@ -13,11 +13,14 @@
 
         https://<machine>.<tailnet>.ts.net/s/<token>
 
-    Funnel exposes this machine to the public internet, so the server is
-    started with CONTENT_STUDIO_PUBLIC=1. That forces every request to be
-    treated as coming from outside: the key is required, and guests cannot
-    delete. Without it the app would decide by sniffing proxy headers, which
-    were chosen for Cloudflare and are not guaranteed to match Tailscale's.
+    Funnel exposes this machine to the public internet, so a visitor must
+    present the key and must not be able to delete anything. The app works that
+    out from the forwarding headers Tailscale adds - verified by echoing a real
+    proxied request back, which arrives carrying X-Forwarded-For,
+    X-Forwarded-Proto and Tailscale-User-*.
+
+    That is why the owner is still not asked to sign in on localhost: a request
+    made directly to 127.0.0.1 carries none of those headers.
 
 .PARAMETER Stop
     Take the funnel down and stop the studio.
@@ -94,9 +97,14 @@ Stop-Everything
 Start-Sleep -Seconds 2
 
 # --- the studio ----------------------------------------------------------
-# CONTENT_STUDIO_PUBLIC is the whole reason this is safe; see the notes above.
+# CONTENT_STUDIO_PUBLIC is deliberately NOT set here.
+#
+# It was, briefly, as insurance against Tailscale sending headers the app did
+# not recognise. It does not: a request proxied through Funnel was echoed back
+# and arrives with X-Forwarded-For, X-Forwarded-Proto and Tailscale-User-*, all
+# of which `_is_remote` knows. Forcing strict mode on top of that only meant
+# the owner had to type a password into their own laptop on localhost.
 $env:CONTENT_STUDIO_UI_NO_BROWSER = "1"
-$env:CONTENT_STUDIO_PUBLIC = "1"
 Start-Process -FilePath "$root\venv\Scripts\python.exe" `
               -ArgumentList "-u", "webapp.py" `
               -WorkingDirectory $root -WindowStyle Hidden `
