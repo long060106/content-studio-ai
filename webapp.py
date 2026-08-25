@@ -1084,8 +1084,30 @@ class Handler(BaseHTTPRequestHandler):
 
         ctype = mimetypes.guess_type(path)[0] or "application/octet-stream"
         size = os.path.getsize(path)
+        mtime = int(os.path.getmtime(path))
         start, end = 0, size - 1
         status = 200
+
+        # Everything here is served without cache headers otherwise, which
+        # means browsers cache it on a heuristic and keep doing so. That is how
+        # a UI change shipped and neither the laptop nor the phone showed it:
+        # the server was serving the new app.js and both browsers were still
+        # running the old one. It bites hardest on the phone, where there is no
+        # convenient hard-refresh.
+        #
+        # `no-cache` is not "do not cache" — it means revalidate before use, so
+        # an unchanged file still costs one small 304 rather than a re-download.
+        # That is what makes it safe to apply to the videos too, which matters
+        # because rebuilding a talk overwrites short.mp4 in place and a cached
+        # copy would quietly keep showing the previous cut.
+        etag = f'"{size:x}-{mtime:x}"'
+        if self.headers.get("If-None-Match") == etag:
+            self.send_response(304)
+            self._auth_cookie()
+            self.send_header("ETag", etag)
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            return
 
         # Range support so the <video>/<audio> players can seek.
         range_header = self.headers.get("Range", "")
@@ -1110,6 +1132,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(length))
         self.send_header("Accept-Ranges", "bytes")
+        self.send_header("ETag", etag)
+        self.send_header("Cache-Control", "no-cache")
         if status == 206:
             self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
         if download:
