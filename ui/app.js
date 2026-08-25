@@ -89,6 +89,84 @@ function copyBtn(getText, label = "Copy") {
   return b;
 }
 
+/* A filename she can recognise in Photos or Files.
+ *
+ * Named from the hook rather than the folder, because the hook is what she
+ * will remember the clip by. The server derives its own name for plain
+ * downloads; this one rides along with the share sheet, which takes the name
+ * from the File object instead.
+ */
+function clipFileName(s) {
+  const stem = (s.hook || s.theme || "short")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60) || "short";
+  return `${stem}.mp4`;
+}
+
+/* Save a clip to the phone (or disk).
+ *
+ * iOS is the reason this is not just an <a download>. Safari on iPhone
+ * frequently ignores the download attribute for video and opens the file in a
+ * player instead, which leaves you looking at the clip with no way to keep it.
+ * And even when it does save, it goes to Files — not Photos, which is where
+ * TikTok and Instagram look when you go to post.
+ *
+ * The share sheet solves both. navigator.share() with a File opens the native
+ * iOS sheet, which offers "Save Video" straight to the camera roll. That is the
+ * button she actually wants.
+ *
+ * Falling back matters as much: desktop browsers mostly cannot share files, so
+ * anything without support gets the ordinary download, which is correct there.
+ */
+function saveBtn(mediaPath, suggestedName) {
+  const b = el("button", { className: "btn-sm", textContent: "Save" });
+  const url = `/media/${mediaPath}`;
+
+  const plainDownload = () => {
+    const a = el("a", { href: `${url}?download` });
+    a.setAttribute("download", suggestedName);
+    document.body.append(a);
+    a.click();
+    a.remove();
+  };
+
+  b.onclick = async () => {
+    // Feature-detect with an actual File: canShare({files}) is the only
+    // reliable check, since navigator.share exists on browsers that cannot
+    // take files at all.
+    const probe = new File([new Blob()], suggestedName, { type: "video/mp4" });
+    if (!(navigator.canShare && navigator.canShare({ files: [probe] }))) {
+      plainDownload();
+      return;
+    }
+
+    const original = b.textContent;
+    b.disabled = true;
+    b.textContent = "Preparing…";
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const file = new File([blob], suggestedName, { type: "video/mp4" });
+      await navigator.share({ files: [file] });
+      toast("Choose “Save Video” to put it in Photos");
+    } catch (err) {
+      // AbortError just means she closed the sheet — not a failure, and
+      // absolutely not something to show an error for.
+      if (err && err.name === "AbortError") return;
+      // Anything else (including iOS revoking the user gesture while the
+      // clip downloaded) falls back rather than dead-ending.
+      plainDownload();
+    } finally {
+      b.disabled = false;
+      b.textContent = original;
+    }
+  };
+  return b;
+}
+
 function linkBtn(href, label) {
   const a = el("a", { href, className: "btn-sm", textContent: label });
   a.style.cssText =
@@ -585,7 +663,8 @@ function renderTab(d, tab) {
                   title: "where this moment starts in the original talk",
                 }, `from ${fmtDuration(s.start_seconds)}`),
                 s.style && el("span", { className: "chip" }, s.style),
-                copyBtn(() => s.quote || s.hook, "Copy")),
+                copyBtn(() => s.quote || s.hook, "Copy"),
+                saveBtn(s.media, clipFileName(s))),
               s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
               s.brief ? briefBlock(s) : null,
             ))))),

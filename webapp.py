@@ -97,6 +97,34 @@ MAX_LOG_LINES = 4000
 LINK_TOKEN = os.environ.get("CONTENT_STUDIO_LINK_TOKEN", "").strip()
 COOKIE_NAME = "cs_key"
 
+
+def _download_name(path: str) -> str:
+    """A filename worth saving, rather than the one on disk.
+
+    Every clip is stored as `short.mp4` inside a folder named for the moment,
+    so downloading a batch produced `short.mp4`, `short-2.mp4`, `short-3.mp4` —
+    eight files with nothing to tell them apart, on a phone, which is where
+    they are least easy to sort out.
+
+    The folder already carries the name (`03_growth_you_have_the_lock_you`), so
+    the download borrows it. Generic stems only: a file that is already named
+    something meaningful keeps its own name.
+    """
+    base = os.path.basename(path)
+    stem, ext = os.path.splitext(base)
+    if stem not in ("short", "clip_raw", "rough_cut", "speech"):
+        return base
+
+    folder = os.path.basename(os.path.dirname(path))
+    if not folder:
+        return base
+    # Strip the leading index so the name reads as a title, and keep it to a
+    # length a phone will actually display.
+    name = re.sub(r"^\d+[_-]", "", folder)[:60].strip("_-") or stem
+    if stem != "short":
+        name = f"{name}-{stem}"
+    return f"{name}{ext}"
+
 # Optional username/password, kept for anyone who prefers a real login box.
 # Empty by default; the link token is the normal way in.
 PASSWORD = os.environ.get("CONTENT_STUDIO_PASSWORD", "").strip()
@@ -1087,7 +1115,7 @@ class Handler(BaseHTTPRequestHandler):
         if download:
             self.send_header(
                 "Content-Disposition",
-                f'attachment; filename="{os.path.basename(path)}"',
+                f'attachment; filename="{_download_name(path)}"',
             )
         self.end_headers()
 
