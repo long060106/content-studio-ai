@@ -90,7 +90,31 @@ def transcribe_words(
     sentence boundaries are visible again.
 
     It is also several times faster than the original for the same model size.
+
+    **Both engines are kept, because this machine blocks them alternately.**
+    Windows Smart App Control judges native extensions by reputation, and that
+    verdict is not stable: openai-whisper was blocked first (numba's `_box`
+    extension), which is why faster-whisper was adopted — and later PyAV, which
+    faster-whisper imports, was blocked in turn, mid-session, with no change to
+    the code. Transcription is load-bearing here: without it there are no
+    captions, no shot plan and no ending refinement, so the run dies whole.
+
+    So the fast path is tried and the older engine catches it. Two engines that
+    fail for unrelated reasons are worth their weight when either one going
+    down stops everything.
     """
+    try:
+        return _transcribe_faster(media_path, model_size, language)
+    except Exception as fast_error:
+        try:
+            return _transcribe_openai(media_path, model_size, language)
+        except Exception:
+            # Report the first failure: it is the one describing the engine
+            # this project prefers, and the more useful of the two to read.
+            raise fast_error
+
+
+def _transcribe_faster(media_path: str, model_size: str, language: str) -> list[Word]:
     from faster_whisper import WhisperModel
 
     with _WHISPER_LOCK:
@@ -121,6 +145,38 @@ def transcribe_words(
                     continue
                 words.append(Word(text=text, start=float(w.start), end=float(w.end)))
 
+    return words
+
+
+def _transcribe_openai(media_path: str, model_size: str, language: str) -> list[Word]:
+    """The fallback engine: openai-whisper, via PyTorch instead of PyAV.
+
+    Slower and heavier, and it punctuates less consistently — but it depends on
+    an entirely different set of native extensions, which is the whole point of
+    keeping it. Measured on this project: five seconds for a thirty-second clip
+    once the model is loaded.
+    """
+    import whisper
+
+    key = f"openai:{model_size}"
+    with _WHISPER_LOCK:
+        model = _WHISPER_MODELS.get(key)
+        if model is None:
+            model = whisper.load_model(model_size)
+            _WHISPER_MODELS[key] = model
+        result = model.transcribe(
+            media_path, word_timestamps=True, language=language, fp16=False
+        )
+
+    words: list[Word] = []
+    for segment in result.get("segments", []):
+        for w in segment.get("words", []) or []:
+            text = str(w.get("word", "")).strip()
+            if not text:
+                continue
+            words.append(
+                Word(text=text, start=float(w["start"]), end=float(w["end"]))
+            )
     return words
 
 
