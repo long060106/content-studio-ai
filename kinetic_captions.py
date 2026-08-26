@@ -39,7 +39,10 @@ import os
 # install to the display faces these edits use. Ordered by preference; the
 # first that exists wins.
 FONT_CANDIDATES = [
+    r"C:\Windows\Fonts\seguisb.ttf",              # Segoe UI Semibold
+    r"C:\Windows\Fonts\Gadugib.ttf",              # Gadugi Bold
     r"C:\Windows\Fonts\bahnschrift.ttf",          # condensed, modern
+    r"C:\Windows\Fonts\corbelb.ttf",              # Corbel Bold
     r"C:\Windows\Fonts\seguibl.ttf",              # Segoe UI Black
     r"C:\Windows\Fonts\ariblk.ttf",               # Arial Black
     r"C:\Windows\Fonts\arialbd.ttf",
@@ -57,11 +60,24 @@ WORDS_PER_PHRASE = 3
 PHRASE_GAP = 0.55
 
 FONT_SIZE = 62
-LINE_HEIGHT = 78
+
+# Line spacing as a multiple of the largest word on that line, not a fixed
+# number of pixels.
+#
+# It was fixed at 78px, which quietly guaranteed overlap: the emphasised word
+# of each phrase is drawn at 1.28x, so a 62px base becomes 79px — taller than
+# the gap meant to hold it. Any constant here is wrong the moment a size varies,
+# and the sizes vary by design.
+LINE_SPACING = 1.34
+
 INDENT = 54          # how far each line steps right — the "pyramid" stagger
 
 # The last word of a phrase is the one that lands, so it gets to be bigger.
 EMPHASIS_SCALE = 1.28
+
+# Keep the block clear of the picture's edges, so a long word never runs into
+# the rounded corner or off the frame.
+EDGE_PAD = 48
 
 # Which blend to composite the words with, and the canvas colour each one needs
 # in order to leave everything except the words untouched.
@@ -80,6 +96,21 @@ CANVAS_FOR_MODE = {
 }
 
 CAPTION_BLEND = "screen"
+
+# How much of the blend result to keep, against the untouched picture.
+#
+# At 1.0 screening white onto anything gives pure white, and the words stop
+# looking blended at all — they read as flat stickers laid on the video, which
+# is exactly what this effect exists to avoid. Pulling it back lets the picture
+# come through the letters, so a word crossing a lit area is brighter than the
+# same word over shadow. That variation *is* the effect.
+#
+# Low enough to see the image, high enough to still read on dark footage.
+CAPTION_OPACITY = 0.62
+
+# Off-white rather than white. Pure white is the one value that cannot pick up
+# any colour from the image underneath, so it always looks pasted on.
+CAPTION_COLOUR = "0xF2EFE9"
 
 
 def find_font() -> str | None:
@@ -120,6 +151,37 @@ def _ff_text(text: str) -> str:
     all appear in the first ten seconds of the test clip.
     """
     return "'" + text.replace("'", "'\\''") + "'"
+
+
+def _measurer(font_path: str):
+    """A function giving the pixel width of a word at a given size.
+
+    Measured with the real font rather than estimated from character count.
+    Falls back to a rough estimate if Pillow cannot open the face, since a
+    slightly wrong margin is much better than no captions at all.
+    """
+    try:
+        from PIL import ImageFont
+    except ImportError:
+        return lambda text, size: int(len(text) * size * 0.55)
+
+    cache: dict[int, object] = {}
+
+    def width(text: str, size: int) -> int:
+        face = cache.get(size)
+        if face is None:
+            try:
+                face = ImageFont.truetype(font_path, size)
+            except OSError:
+                return int(len(text) * size * 0.55)
+            cache[size] = face
+        try:
+            box = face.getbbox(text)
+            return int(box[2] - box[0])
+        except Exception:
+            return int(len(text) * size * 0.55)
+
+    return width
 
 
 def group_phrases(words: list, per_phrase: int = WORDS_PER_PHRASE,
@@ -175,21 +237,53 @@ def build_filter(
 
     phrases = group_phrases(words)
     draws: list[str] = []
+    measure = _measurer(font)
 
-    for phrase in phrases:
-        # The phrase stays up until its last word has been said, then clears.
+    for p, phrase in enumerate(phrases):
+        # The phrase stays up until its last word has been said, then clears —
+        # but never past the moment the next phrase starts drawing.
+        #
+        # Without that cap the phrases overlap. Speech rarely leaves 0.28s
+        # between one clause and the next, so the outgoing phrase was still on
+        # screen when the incoming one appeared, and both were drawn at once:
+        # two stacks of words on top of each other, unreadable, and easy to
+        # mistake for a layout or spacing problem rather than a timing one.
         phrase_end = float(phrase[-1].end) + 0.28
-        # Vertically centre the block of lines inside the picture.
-        block_h = len(phrase) * LINE_HEIGHT
+        if p + 1 < len(phrases):
+            next_start = float(phrases[p + 1][0].start)
+            phrase_end = min(phrase_end, next_start - 0.02)
+        # A phrase whose words all land inside a hair of each other would
+        # otherwise get a negative window and never draw at all.
+        phrase_end = max(phrase_end, float(phrase[-1].end) + 0.05)
+
+        # Lay the block out first, measuring every word, then draw it. Sizes
+        # differ within a phrase, so spacing has to follow the actual glyphs
+        # rather than a constant that is only correct for one of them.
+        sizes = [
+            int(FONT_SIZE * (EMPHASIS_SCALE if i == len(phrase) - 1 else 1.0))
+            for i in range(len(phrase))
+        ]
+        heights = [int(s * LINE_SPACING) for s in sizes]
+        block_h = sum(heights)
         top = band_top + (band_height - block_h) // 2
+
+        offsets, running = [], 0
+        for h in heights:
+            offsets.append(running)
+            running += h
 
         for i, word in enumerate(phrase):
             text = _ff_text(word.text.strip())
             if not text:
                 continue
-            size = int(FONT_SIZE * (EMPHASIS_SCALE if i == len(phrase) - 1 else 1.0))
-            x = picture_left + 64 + i * INDENT
-            y = top + i * LINE_HEIGHT
+            size = sizes[i]
+            x = picture_left + EDGE_PAD + i * INDENT
+            # Pull a long word back so it cannot run past the picture's edge.
+            width = measure(word.text.strip(), size)
+            right_limit = picture_left + picture_width - EDGE_PAD
+            if x + width > right_limit:
+                x = max(picture_left + EDGE_PAD, right_limit - width)
+            y = top + offsets[i]
             # Each word appears when it is spoken and stays for the rest of the
             # phrase — that is what builds the stack rather than flashing one
             # word at a time.
@@ -198,7 +292,7 @@ def build_filter(
             enable = f"'between(t,{float(word.start):.3f},{phrase_end:.3f})'"
             draws.append(
                 f"drawtext=fontfile='{_ff_path(font)}':text={text}:"
-                f"fontcolor=white:fontsize={size}:x={x}:y={y}:"
+                f"fontcolor={CAPTION_COLOUR}:fontsize={size}:x={x}:y={y}:"
                 f"enable={enable}"
             )
 
@@ -222,7 +316,8 @@ def build_filter(
         f"{canvas}[cap_bg];"
         f"[cap_bg]{','.join(draws)},format=gbrp[cap_txt];"
         f"[{label_in}]format=gbrp[cap_base];"
-        f"[cap_base][cap_txt]blend=all_mode={mode}:shortest=1,"
+        f"[cap_base][cap_txt]blend=all_mode={mode}:"
+        f"all_opacity={CAPTION_OPACITY}:shortest=1,"
         f"format=yuv420p[{label_out}]"
     )
 

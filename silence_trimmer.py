@@ -28,10 +28,20 @@ import os
 import subprocess
 
 # Gaps at or under this are part of normal speech rhythm. Left alone.
-KEEP_UNDER = 0.32
+#
+# Raised from 0.32. At the old values the result was technically correct and
+# sounded wrong: every pause collapsed to about a quarter of a second, so one
+# statement began before the previous had landed and the whole thing read as
+# rushed and amateur. Removing dead air and removing the beat between thoughts
+# are not the same job, and the first was quietly doing the second.
+KEEP_UNDER = 0.55
 
 # What a longer gap is shortened to. Not zero — see the module docstring.
-TARGET_GAP = 0.26
+#
+# This is the beat a listener needs to register that a sentence finished. It is
+# the same reasoning `ending_finder` uses for the breath at the end of a clip,
+# applied to the joins in the middle.
+TARGET_GAP = 0.46
 
 # Below this saving, the re-encode is not worth it. A clip that loses a tenth
 # of a second is the same clip, and every re-encode costs quality.
