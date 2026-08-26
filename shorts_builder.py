@@ -136,7 +136,17 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
 #
 # The window belongs to the account, not to the footage. Whatever comes in gets
 # fitted to it.
-BAND_H = (VIDEO_W * 9 // 16) // 2 * 2  # 608
+# How much black sits to the left and right of the picture. 0 gives the
+# full-width band; a margin insets the picture on all four sides, which is what
+# gives the reference style its framed look.
+SIDE_MARGIN = 40
+
+# The picture's width, and from it the band's height. Derived rather than
+# fixed: the picture has to be scaled to the hole in the matte, not merely
+# hidden underneath it, or the margin would be cropping the sides off every
+# shot instead of framing them.
+PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
+BAND_H = (PICTURE_W * 9 // 16) // 2 * 2
 
 # Where to take the crop from when a source is taller than the band.
 #
@@ -194,6 +204,62 @@ CINEMATIC_GRADE = "film"
 CLICKS_ON_CUTS = False
 
 
+# The window's shape.
+#
+# The reference style's signature is a rounded rectangle of picture sitting on
+# black, with a margin on all four sides — described in the tutorial as "a
+# unique black border that you don't usually see on Instagram". It is the
+# cheapest identity a page can have: one shape, repeated, recognisable in a
+# feed before the viewer has read a word.
+#
+# SIDE_MARGIN of 0 gives the full-width band this project used before; a
+# non-zero margin insets the picture horizontally as well.
+SIDE_MARGIN = 40
+CORNER_RADIUS = 44
+
+
+def _frame_matte(width: int, height: int, band_h: int,
+                 margin: int, radius: int) -> str | None:
+    """A black PNG with a rounded rectangle punched out of it, cached on disk.
+
+    The rounded corners are done as an overlay rather than by masking the video
+    itself. A mask would need a per-pixel alpha expression evaluated on every
+    frame; this is one static image composited over the top, which costs
+    effectively nothing no matter how long the clip runs.
+
+    Cached by its dimensions, so it is generated once and reused by every
+    render afterwards.
+    """
+    if radius <= 0 and margin <= 0:
+        return None
+
+    name = f"matte_{width}x{height}_b{band_h}_m{margin}_r{radius}.png"
+    path = os.path.join(tempfile.gettempdir(), name)
+    if os.path.isfile(path):
+        return path
+
+    try:
+        from PIL import Image, ImageDraw
+    except ImportError:
+        return None
+
+    top = (height - band_h) // 2
+    box = (margin, top, width - margin - 1, top + band_h - 1)
+
+    matte = Image.new("RGBA", (width, height), (0, 0, 0, 255))
+    hole = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(hole).rounded_rectangle(box, radius=radius, fill=255)
+    # Where the hole is opaque white, the matte becomes fully transparent, so
+    # the video shows through; everywhere else stays solid black.
+    matte.putalpha(Image.eval(hole, lambda v: 255 - v))
+
+    try:
+        matte.save(path)
+    except OSError:
+        return None
+    return path
+
+
 def _grade_chain() -> str:
     """The grade as a filter fragment, ready to splice into a chain."""
     chain = GRADE_PRESETS.get(CINEMATIC_GRADE, "")
@@ -212,10 +278,10 @@ def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") ->
     b-roll grade and slow-down.
     """
     return (
-        f"[{label_in}]scale={VIDEO_W}:{BAND_H}:force_original_aspect_ratio=increase,"
-        f"crop={VIDEO_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
+        f"[{label_in}]scale={PICTURE_W}:{BAND_H}:force_original_aspect_ratio=increase,"
+        f"crop={PICTURE_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
         f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
-        f"pad={VIDEO_W}:{VIDEO_H}:0:{(VIDEO_H - BAND_H) // 2}:black,"
+        f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{(VIDEO_H - BAND_H) // 2}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
 
@@ -514,7 +580,24 @@ def build_rough_cut(
                 extra=f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,{BROLL_GRADE},",
             ))
     streams = "".join(f"[v{i}]" for i in range(len(shots)))
-    parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
+
+    # Round the window's corners by laying a pre-rendered black matte over the
+    # finished picture. One static overlay, applied after the concat, so the
+    # shape is identical on every shot and costs the same whether the clip runs
+    # ten seconds or fifty.
+    # Inputs are numbered in the order ffmpeg receives them, so anything added
+    # from here on has to take the next free index rather than assume one.
+    next_input = speech_index + 1
+
+    matte = _frame_matte(VIDEO_W, VIDEO_H, BAND_H, SIDE_MARGIN, CORNER_RADIUS)
+    if matte:
+        matte_index = next_input
+        next_input += 1
+        inputs += ["-loop", "1", "-i", os.path.abspath(matte)]
+        parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vcat]")
+        parts.append(f"[vcat][{matte_index}:v]overlay=0:0:shortest=1,format=yuv420p[v]")
+    else:
+        parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
 
     # A click on every cut. The shot plan already says where the cuts are, so
     # the track is rendered from it rather than detected — see sound_design.
@@ -537,7 +620,8 @@ def build_rough_cut(
         f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11"
     )
     if click_track:
-        click_index = speech_index + 1
+        click_index = next_input
+        next_input += 1
         inputs += ["-i", os.path.abspath(click_track)]
         # normalize=0 so mixing does not halve the speech — the clicks are
         # already scaled in the track itself. The limiter afterwards catches

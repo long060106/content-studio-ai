@@ -62,6 +62,14 @@ from shorts_builder import (
 # speed. Override with --workers.
 DEFAULT_WORKERS = 3
 
+# Squeeze the long silences out of each cut before rendering.
+#
+# On the test talk this took a 37.7s clip to 27.8s, and almost all of it came
+# from three holes — 4.9s, 2.4s and 1.5s — rather than from the speaker's
+# natural rhythm. Short pauses are left alone deliberately, and the breath at
+# the end that `ending_finder` works to create is never touched.
+TIGHTEN_SILENCE = True
+
 
 def _slug(text: str, limit: int = 28) -> str:
     out = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
@@ -798,6 +806,34 @@ def make_shorts(
             from caption_timing import build_ass, transcribe_words, words_to_srt
 
             words = transcribe_words(raw_clip, model_size=model_size)
+
+            # Squeeze out the dead air before anything else uses these timings.
+            #
+            # It has to happen here, between transcribing and everything
+            # downstream: the SRT, the shot plan and the render all read these
+            # word times, and they must all describe the same file. The word
+            # timings are remapped arithmetically rather than by transcribing
+            # the tightened clip again, which would cost a second Whisper pass
+            # to rediscover something already known exactly.
+            if TIGHTEN_SILENCE:
+                try:
+                    from silence_trimmer import plan_keep_ranges, remap_words, tighten
+                    from shorts_builder import video_encoder_args
+
+                    ranges = plan_keep_ranges(words, render_duration)
+                    tight_path = os.path.join(folder, "clip_tight.mp4")
+                    used, saved = tighten(
+                        raw_clip, words, render_duration, tight_path,
+                        encoder_args=video_encoder_args(),
+                    )
+                    if saved > 0:
+                        raw_clip = used
+                        words = remap_words(words, ranges)
+                        render_duration = max(0.5, render_duration - saved)
+                        say(f"  ✓ Tightened {saved:.1f}s of dead air → {render_duration:.1f}s")
+                except Exception as e:
+                    say(f"  ⚠ Couldn't tighten silences ({str(e)[:60]}) — using the full cut")
+
             words_to_srt(words, os.path.join(folder, "captions.srt"))
             say(f"  ✓ {len(words)} words timed → captions.srt")
             if captions:
