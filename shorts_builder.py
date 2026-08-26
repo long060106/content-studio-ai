@@ -136,6 +136,7 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
 #
 # The window belongs to the account, not to the footage. Whatever comes in gets
 # fitted to it.
+
 # How much black sits to the left and right of the picture. 0 gives the
 # full-width band; a margin insets the picture on all four sides, which is what
 # gives the reference style its framed look.
@@ -216,6 +217,11 @@ CINEMATIC_GRADE = "vivid"
 # instead of punctuating the edit. `sound_design.py` still works and can be
 # turned on per clip where the material actually calls for it.
 CLICKS_ON_CUTS = False
+
+# Word-by-word captions burned into the picture, appearing as each word is
+# said. See kinetic_captions for the blend and why the words sit on the picture
+# rather than in the black bars.
+KINETIC_CAPTIONS = True
 
 
 # The window's shape.
@@ -504,6 +510,7 @@ def build_rough_cut(
     shots: list[tuple[str, float, float]],
     out_path: str,
     duration: float,
+    words: list | None = None,
 ) -> str:
     """Cut between the speaker and b-roll over one continuous speech track.
 
@@ -609,9 +616,39 @@ def build_rough_cut(
         next_input += 1
         inputs += ["-loop", "1", "-i", os.path.abspath(matte)]
         parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vcat]")
-        parts.append(f"[vcat][{matte_index}:v]overlay=0:0:shortest=1,format=yuv420p[v]")
+        parts.append(f"[vcat][{matte_index}:v]overlay=0:0:shortest=1,format=yuv420p[vframed]")
     else:
-        parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
+        parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vframed]")
+
+    # Word-by-word captions, blended into the picture.
+    #
+    # Burned in, which is a departure: captions were deliberately left out of
+    # the render before, on the grounds that the SRT beside the file is the
+    # deliverable and baked-in text fights whoever edits afterwards. That
+    # reasoning holds for a rough cut meant to be finished by hand. It does not
+    # hold here — placing sixty words one at a time is precisely the manual
+    # work this is meant to remove, and the SRT is still written either way.
+    caption_chain = None
+    if KINETIC_CAPTIONS and words:
+        try:
+            from kinetic_captions import build_filter
+
+            caption_chain = build_filter(
+                words,
+                band_top=(VIDEO_H - BAND_H) // 2,
+                band_height=BAND_H,
+                picture_left=SIDE_MARGIN,
+                picture_width=PICTURE_W,
+                label_in="vframed",
+                label_out="v",
+            )
+        except Exception:
+            caption_chain = None
+
+    if caption_chain:
+        parts.append(caption_chain)
+    else:
+        parts.append("[vframed]null[v]")
 
     # A click on every cut. The shot plan already says where the cuts are, so
     # the track is rendered from it rather than detected — see sound_design.

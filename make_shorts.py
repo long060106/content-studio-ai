@@ -1015,7 +1015,8 @@ def make_shorts(
         try:
             if broll_local:
                 shots = [(path, src, dur) for path, src, dur, _kind in plan]
-                build_rough_cut(raw_clip, shots, out_path, render_duration)
+                build_rough_cut(raw_clip, shots, out_path, render_duration,
+                                words=words)
                 say(f"  ✓ {out_path} (speaker, cutting to b-roll and back)")
             else:
                 # No footage available — fall back to the speaker's own picture
