@@ -178,9 +178,20 @@ GRADE_PRESETS = {
 
 CINEMATIC_GRADE = "film"
 
-# A short click under every cut. Cheap, and the single biggest reason a hard
-# cut reads as a decision rather than as the video changing shots.
-CLICKS_ON_CUTS = True
+# A short click under every cut. Off, and deliberately so.
+#
+# It was built from a Premiere Pro tutorial that treats a click per cut as the
+# house default, and it works on that style — fast military montages cut to a
+# beat. It is wrong for this one. Rejected on the grounds that a click "only
+# use in specific case": firing an effect on every edit because the code knows
+# where the edits are makes the result read as a template, and the accounts
+# worth copying do not look templated.
+#
+# The direction for sound here is ambient audio matched to what is on screen —
+# waves under ocean footage, wind under a forest — which describes the scene
+# instead of punctuating the edit. `sound_design.py` still works and can be
+# turned on per clip where the material actually calls for it.
+CLICKS_ON_CUTS = False
 
 
 def _grade_chain() -> str:
