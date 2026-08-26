@@ -38,13 +38,20 @@ import os
 # Modern, clean, slightly condensed — the closest thing on a stock Windows
 # install to the display faces these edits use. Ordered by preference; the
 # first that exists wins.
+# Heavy weights first. The earlier list led with semibold faces, which read as
+# thin and administrative at caption size — the words have to hold their own
+# against a moving picture behind them, and a medium weight does not.
+#
+# A downloaded display face (Poppins, Anton, Bebas Neue) would be better still;
+# these are the heaviest faces a stock Windows install actually has.
 FONT_CANDIDATES = [
-    r"C:\Windows\Fonts\seguisb.ttf",              # Segoe UI Semibold
-    r"C:\Windows\Fonts\Gadugib.ttf",              # Gadugi Bold
-    r"C:\Windows\Fonts\bahnschrift.ttf",          # condensed, modern
-    r"C:\Windows\Fonts\corbelb.ttf",              # Corbel Bold
+    r"C:\Windows\Fonts\Poppins-Bold.ttf",         # if ever installed
+    r"C:\Windows\Fonts\Anton-Regular.ttf",
+    r"C:\Windows\Fonts\Montserrat-Bold.ttf",
     r"C:\Windows\Fonts\seguibl.ttf",              # Segoe UI Black
     r"C:\Windows\Fonts\ariblk.ttf",               # Arial Black
+    r"C:\Windows\Fonts\impact.ttf",               # Impact
+    r"C:\Windows\Fonts\seguisb.ttf",              # Segoe UI Semibold
     r"C:\Windows\Fonts\arialbd.ttf",
     "/System/Library/Fonts/Supplemental/Arial Black.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -73,7 +80,11 @@ LINE_SPACING = 1.34
 INDENT = 54          # how far each line steps right — the "pyramid" stagger
 
 # The last word of a phrase is the one that lands, so it gets to be bigger.
-EMPHASIS_SCALE = 1.28
+#
+# 1.28x was too timid to read as emphasis — it looked like inconsistent sizing
+# rather than a deliberate accent. The gap has to be obvious enough that the
+# eye goes to the payoff word without being told.
+EMPHASIS_SCALE = 1.75
 
 # Keep the block clear of the picture's edges, so a long word never runs into
 # the rounded corner or off the frame.
