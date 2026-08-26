@@ -44,8 +44,23 @@ import os
 #
 # A downloaded display face (Poppins, Anton, Bebas Neue) would be better still;
 # these are the heaviest faces a stock Windows install actually has.
+BUNDLED_FONT_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", "fonts"
+)
+
 FONT_CANDIDATES = [
-    r"C:\Windows\Fonts\Poppins-Bold.ttf",         # if ever installed
+    # Anton, shipped with the project. It is the heavy condensed face these
+    # edits actually use, and it is a real step up from anything Windows
+    # includes — the stock faces are all either too light or too wide.
+    #
+    # Bundled rather than assumed: a caption that silently falls back to a
+    # different face changes the look of every clip, and nothing about the
+    # output would say why. Licensed under the SIL Open Font License, which
+    # permits redistribution; OFL.txt sits beside it as that licence requires.
+    os.path.join(BUNDLED_FONT_DIR, "Anton-Regular.ttf"),
+    os.path.join(BUNDLED_FONT_DIR, "Poppins-Bold.ttf"),
+    os.path.join(BUNDLED_FONT_DIR, "BebasNeue-Regular.ttf"),
+    r"C:\Windows\Fonts\Poppins-Bold.ttf",
     r"C:\Windows\Fonts\Anton-Regular.ttf",
     r"C:\Windows\Fonts\Montserrat-Bold.ttf",
     r"C:\Windows\Fonts\seguibl.ttf",              # Segoe UI Black
