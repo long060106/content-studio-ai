@@ -182,11 +182,25 @@ GRADE_PRESETS = {
         "eq=saturation=0.42:contrast=1.10:gamma=0.98,"
         "noise=alls=10:allf=t,vignette=PI/4.5,rgbashift=rh=1:bh=-1"
     ),
-    # Full black and white, which is what the reference edit actually uses.
+    # Full black and white. The Premiere Pro reference uses this; the CapCut
+    # one explicitly does not.
     "mono": "hue=s=0,eq=contrast=1.14:gamma=0.97,noise=alls=12:allf=t,vignette=PI/4.5",
+    # Colour pushed up rather than stripped out, which is what the CapCut
+    # reference actually does — "some pages are black and white, some of them
+    # are super vivid... for us in this video we use this vivid one".
+    #
+    # `vibrance` rather than a flat saturation lift: it leaves already-saturated
+    # areas alone and pulls up the muted ones, so skin does not go orange while
+    # the background comes alive. A light unsharp adds the "sharp" quality the
+    # same tutorial mentions. No grain and no vignette — both are the dirty,
+    # filmic register, and this preset is the opposite of that.
+    "vivid": (
+        "eq=saturation=1.18:contrast=1.10:gamma=1.03,"
+        "vibrance=intensity=0.35,unsharp=5:5:0.6:5:5:0.0"
+    ),
 }
 
-CINEMATIC_GRADE = "film"
+CINEMATIC_GRADE = "vivid"
 
 # A short click under every cut. Off, and deliberately so.
 #
@@ -672,12 +686,19 @@ BROLL_SPEED = 0.7
 # closed completely without crushing the footage into mud, and it should not
 # be: some lift on the cutaway is what makes it a cutaway.
 #
+# Eased off once the overall grade became `vivid`. The original -0.10 was set
+# while the cinematic grade was desaturating and darkening *everything*, so the
+# b-roll only had to match a dimmed speaker. Vivid does the opposite, and the
+# old value left genuinely dark clips — a night corridor, a candle — as good as
+# invisible. Two grades stacking is easy to miss precisely because each one is
+# defensible on its own.
+#
 # **Per shot, not over the finished video.** An earlier version graded the
 # concatenated result, which meant the speaker got darkened too — and the
 # speaker is the one thing already near black — while saturation was pushed
 # *up*, the opposite of what the mismatch needs. A grade meant for one kind of
 # footage has to be applied to that footage, not to everything.
-BROLL_GRADE = "eq=brightness=-0.10:saturation=0.80:contrast=1.05"
+BROLL_GRADE = "eq=brightness=-0.04:saturation=0.94:contrast=1.03"
 
 
 _DURATION_RE = re.compile(r"Duration:\s*(\d+):(\d\d):(\d\d(?:\.\d+)?)")
