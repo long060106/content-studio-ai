@@ -145,6 +145,49 @@ BAND_H = (VIDEO_W * 9 // 16) // 2 * 2  # 608
 # the chest and loses the eyes. Biasing upward keeps the face.
 CROP_BIAS = 0.35
 
+# The cinematic look, as a set of named presets rather than one hardcoded
+# chain — this is a taste decision, and taste decisions in this project get
+# rendered and looked at rather than argued about.
+#
+# What the reference edits actually do: strip most of the colour, lift
+# contrast, add grain, and darken the edges. That combination is what makes
+# stock footage and a filmed interview look like they came from the same roll
+# of film, which is the entire job.
+#
+# Applied to the band's picture and not to the finished 1080x1920 frame. Grain
+# and a vignette over the black bars would put visible noise on what is meant
+# to be pure black, and the bars are where the caption goes.
+#
+# The reference does its blur, grain and colour-fringing masked to the frame
+# edges only, using a feathered elliptical mask. That is genuinely heavier —
+# ffmpeg needs a per-pixel alpha ramp for it — so this approximates the mood
+# with a vignette and an overall grain. If the edge treatment turns out to
+# matter, it is a separate change, not a tweak to these numbers.
+GRADE_PRESETS = {
+    "off": "",
+    # Colour kept, just pulled back and dirtied. Safest on bright footage.
+    "subtle": "eq=saturation=0.72:contrast=1.06,noise=alls=6:allf=t,vignette=PI/5",
+    # The default: most of the colour gone, clearly graded, still not mono.
+    "film": (
+        "eq=saturation=0.42:contrast=1.10:gamma=0.98,"
+        "noise=alls=10:allf=t,vignette=PI/4.5,rgbashift=rh=1:bh=-1"
+    ),
+    # Full black and white, which is what the reference edit actually uses.
+    "mono": "hue=s=0,eq=contrast=1.14:gamma=0.97,noise=alls=12:allf=t,vignette=PI/4.5",
+}
+
+CINEMATIC_GRADE = "film"
+
+# A short click under every cut. Cheap, and the single biggest reason a hard
+# cut reads as a decision rather than as the video changing shots.
+CLICKS_ON_CUTS = True
+
+
+def _grade_chain() -> str:
+    """The grade as a filter fragment, ready to splice into a chain."""
+    chain = GRADE_PRESETS.get(CINEMATIC_GRADE, "")
+    return f"{chain}," if chain else ""
+
 
 def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") -> str:
     """Fit any source into the band: full width, cropped to height if taller.
@@ -160,7 +203,7 @@ def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") ->
     return (
         f"[{label_in}]scale={VIDEO_W}:{BAND_H}:force_original_aspect_ratio=increase,"
         f"crop={VIDEO_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
-        f"setsar=1,fps={FPS},{extra}"
+        f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
         f"pad={VIDEO_W}:{VIDEO_H}:0:{(VIDEO_H - BAND_H) // 2}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
@@ -461,10 +504,41 @@ def build_rough_cut(
             ))
     streams = "".join(f"[v{i}]" for i in range(len(shots)))
     parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[v]")
-    parts.append(
+
+    # A click on every cut. The shot plan already says where the cuts are, so
+    # the track is rendered from it rather than detected — see sound_design.
+    click_track = None
+    if CLICKS_ON_CUTS:
+        try:
+            from sound_design import build_click_track, cut_times_from_shots
+
+            click_track = build_click_track(
+                cut_times_from_shots(shots),
+                duration,
+                os.path.join(tempfile.gettempdir(), f"clicks_{os.getpid()}_{id(shots)}.wav"),
+            )
+        except Exception:
+            # Sound design is a garnish. Losing it must never cost the render.
+            click_track = None
+
+    speech = (
         f"[{speech_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
-        f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11[a]"
+        f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11"
     )
+    if click_track:
+        click_index = speech_index + 1
+        inputs += ["-i", os.path.abspath(click_track)]
+        # normalize=0 so mixing does not halve the speech — the clicks are
+        # already scaled in the track itself. The limiter afterwards catches
+        # the rare case of a click landing on a peak in the voice.
+        parts.append(f"{speech}[sp]")
+        parts.append(f"[{click_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS[ck]")
+        parts.append(
+            "[sp][ck]amix=inputs=2:duration=first:normalize=0,"
+            "alimiter=limit=0.97[a]"
+        )
+    else:
+        parts.append(f"{speech}[a]")
 
     cmd = (
         ["ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error"]
