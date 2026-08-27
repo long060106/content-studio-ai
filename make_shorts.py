@@ -983,6 +983,23 @@ def make_shorts(
 
                 broll_dir = os.path.join(folder, "broll")
                 os.makedirs(broll_dir, exist_ok=True)
+
+                # Clear what a previous run left behind.
+                #
+                # Selection changes between runs — the library gets pruned, the
+                # tags change, the model picks differently — so the old files
+                # are not merely redundant, they are footage this edit does not
+                # use. Left in place they accumulate: eighty-one stale clips
+                # across one batch, so a folder opened in CapCut showed
+                # thirty-four options when eleven were used. That folder is
+                # meant to be the shot list made physical.
+                for old in os.listdir(broll_dir):
+                    if os.path.splitext(old)[1].lower() in asset_library.VIDEO_EXTS:
+                        try:
+                            os.remove(os.path.join(broll_dir, old))
+                        except OSError:
+                            pass
+
                 for n, asset in enumerate(picked, 1):
                     target = os.path.join(
                         broll_dir, f"{n:02d}_{os.path.basename(asset.path)}"
