@@ -181,10 +181,75 @@ def extract(path: str, out_dir: str, count: int, prefix: str,
     return written
 
 
+FILM_EXTS = {".mkv", ".mp4", ".avi", ".mov", ".m4v", ".webm"}
+
+# Films already processed, so a folder can be re-scanned cheaply as new ones
+# arrive. Keyed by name and size rather than by path: a film that moves is the
+# same film, and re-extracting it would only duplicate the library.
+LEDGER = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                      "assets", "broll", ".films.json")
+
+
+def _ledger() -> dict:
+    import json
+    try:
+        with open(LEDGER, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _remember(key: str, info: dict) -> None:
+    import json
+    data = _ledger()
+    data[key] = info
+    os.makedirs(os.path.dirname(LEDGER), exist_ok=True)
+    with open(LEDGER, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=1)
+
+
+def _film_key(path: str) -> str:
+    return f"{os.path.basename(path)}::{os.path.getsize(path)}"
+
+
+def scan_folder(folder: str, category: str, count: int,
+                threshold: float, dry_run: bool) -> None:
+    """Extract from every film in a folder that has not been done already.
+
+    Built for the standing arrangement rather than a one-off: films arrive in
+    a downloads folder over time, and this can be run again whenever without
+    re-cutting what it already holds.
+    """
+    films = [
+        os.path.join(folder, n) for n in sorted(os.listdir(folder))
+        if os.path.splitext(n)[1].lower() in FILM_EXTS
+        and os.path.getsize(os.path.join(folder, n)) > 200 * 1024 * 1024
+    ]
+    if not films:
+        print(f"No films over 200 MB in {folder}")
+        return
+
+    done = _ledger()
+    fresh = [f for f in films if _film_key(f) not in done]
+    print(f"{len(films)} film(s) found, {len(films) - len(fresh)} already done, "
+          f"{len(fresh)} to process\n")
+
+    for path in fresh:
+        stem = re.sub(r"[^a-z0-9]+", "-", os.path.splitext(os.path.basename(path))[0].lower())
+        # Release names are long and full of noise; the first few words carry
+        # the title, which is all the filename needs.
+        prefix = "-".join(stem.strip("-").split("-")[:3])[:32]
+        out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "assets", "broll", "film", category)
+        n = extract(path, out_dir, count, prefix, threshold=threshold, dry_run=dry_run)
+        if n and not dry_run:
+            _remember(_film_key(path), {"clips": n, "prefix": prefix, "category": category})
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Cut a film into shots and keep the best as b-roll.")
-    parser.add_argument("movie", help="path to the film file")
+    parser.add_argument("movie", help="a film file, or a folder of them")
     parser.add_argument("--category", default="epic",
                         help="library folder to file under (default: epic)")
     parser.add_argument("--count", type=int, default=25,
@@ -195,6 +260,11 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true",
                         help="report what it would keep without writing")
     args = parser.parse_args()
+
+    if os.path.isdir(args.movie):
+        scan_folder(args.movie, args.category, args.count,
+                    args.threshold, args.dry_run)
+        return
 
     if not os.path.isfile(args.movie):
         raise SystemExit(f"No such file: {args.movie}")
