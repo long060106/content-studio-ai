@@ -686,20 +686,46 @@ def build_rough_cut(
     else:
         parts.append(f"{speech}[a]")
 
-    cmd = (
-        ["ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error"]
-        + inputs
-        + [
-            "-filter_complex", ";".join(parts),
-            "-map", "[v]", "-map", "[a]",
-            "-t", f"{duration:.3f}",
-            *video_encoder_args(),
-            "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-            "-movflags", "+faststart",
-            os.path.abspath(out_path),
-        ]
-    )
-    _run(cmd)
+    # The filtergraph goes in a file, not on the command line.
+    #
+    # Windows caps a command line at about 32,000 characters, and this graph
+    # passes it easily on a long clip: one drawtext per spoken word, each
+    # carrying the full font path, on top of a filter per shot and twenty-odd
+    # input paths. Two shorts in a batch of eight died with "WinError 206 — the
+    # filename or extension is too long", which names the wrong thing entirely
+    # and is why it took a while to place.
+    #
+    # It fails only on the longest clips, so it looks intermittent: the batch
+    # reports success, six files appear where eight were listed, and nothing
+    # says which two are missing unless the log is read.
+    graph = ";".join(parts)
+    handle, graph_path = tempfile.mkstemp(suffix=".txt", prefix="filtergraph_")
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as f:
+            f.write(graph)
+
+        cmd = (
+            ["ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error"]
+            + inputs
+            + [
+                # `-/filter_complex <file>` is ffmpeg 7+ syntax; the older
+                # name for it, `-filter_complex_script`, was removed. The
+                # leading slash is what marks the value as a file to read.
+                "-/filter_complex", graph_path,
+                "-map", "[v]", "-map", "[a]",
+                "-t", f"{duration:.3f}",
+                *video_encoder_args(),
+                "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+                "-movflags", "+faststart",
+                os.path.abspath(out_path),
+            ]
+        )
+        _run(cmd)
+    finally:
+        try:
+            os.remove(graph_path)
+        except OSError:
+            pass
     return out_path
 
 
