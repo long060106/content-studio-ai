@@ -39,24 +39,47 @@ import asset_library
 # nothing usable, "hands open warm light" returns the thing that *feels*
 # grateful.
 LIBRARY: dict[str, list[str]] = {
-    # The general mood shots — dark, slow, cinematic-adjacent.
-    "general/night": ["empty street night wide", "city skyline night", "headlights road night"],
-    "general/rain": ["rain windshield wide", "storm clouds moving", "wet road reflections"],
-    "general/training": ["dark gym wide shot", "boxer profile shadow", "running track dawn"],
-    "general/nature": ["misty valley wide", "forest path tracking", "mountain ridge sunrise"],
-    "general/solitude": ["empty road horizon", "figure walking away wide", "long empty corridor"],
-
-    # Emotional register. The pipeline names a feeling before it picks
-    # footage, so these map straight onto what it asks for.
-    "emotion/angry": ["storm sea waves wide", "boxer profile hitting bag", "fire burning close"],
-    "emotion/depressed": ["man sitting dark room wide", "grey rain street", "empty apartment window light"],
-    "emotion/lost": ["fog road wide", "empty crossroads aerial", "figure small in landscape"],
+    # --- the emotional register ------------------------------------------
+    #
+    # These folder names are the vocabulary the pipeline actually speaks:
+    # `topic_tags` names a feeling for each clip before any footage is chosen,
+    # and the match is made against these names and the filenames inside them.
+    # Adding a folder here adds a feeling the selector can ask for.
     "emotion/sad": ["rain running down glass", "empty park bench wide", "face profile window light"],
     "emotion/happy": ["friends laughing golden hour", "sunrise field wide", "running through field"],
+    "emotion/inspire": ["mountain summit sunrise wide", "vast landscape figure small", "light through cathedral window"],
+    "emotion/motivation": ["running stairs profile", "walking into storm wide", "rowing sunrise wide"],
+    "emotion/kindness": ["hands helping up", "two people embrace warm light", "sharing food table warm"],
+    "emotion/growth": ["seedling breaking soil", "time lapse plant growing", "path through forest opening"],
+    "emotion/depressed": ["man sitting dark room wide", "grey rain street", "empty apartment window light"],
+    "emotion/passion": ["hands playing piano close", "painter working canvas", "dancer rehearsing alone"],
+    "emotion/angry": ["storm sea waves wide", "boxer profile hitting bag", "fire burning close"],
+    "emotion/lost": ["fog road wide", "empty crossroads aerial", "figure small in landscape"],
     "emotion/grateful": ["hands open warm light", "sunrise mountains wide", "candle flame dark"],
     "emotion/accepted": ["still lake horizon", "calm sea sunrise wide", "sitting by window profile"],
     "emotion/numb": ["grey ocean horizon", "empty room grey light", "blank window stare profile"],
-    "emotion/resolve": ["running stairs profile", "walking into storm wide", "rowing sunrise wide"],
+
+    # --- the cinematic register -------------------------------------------
+    #
+    # Drawn from the reference board rather than invented. What those clips
+    # have in common is not action: it is intimacy and warm light — faces
+    # thinking, people alone in rooms, rain on glass, painterly landscapes.
+    # That is the register to match, and it is largely reachable with stock.
+    "cinematic/intimate": ["face lit by window thinking", "hands close warm lamplight", "person alone room warm light"],
+    "cinematic/rain": ["rain on window slow warm", "wet street reflections night", "rain falling lit backlight"],
+    "cinematic/light": ["god rays through dust", "sunlight through curtain slow", "silhouette against bright window"],
+
+    # The Kingdom of Heaven register, sourced legitimately.
+    #
+    # Its look is well documented: sweeping desert landscapes under brutally
+    # harsh sun, burnt-ochre sand against deep blacks, dust in the air, and the
+    # cold steely blue of the northern scenes against all that gold. None of
+    # that needs the film itself — it needs the same light and the same
+    # subjects, which stock libraries have.
+    "cinematic/epic": [
+        "desert dunes wind wide", "sandstorm dust light", "horizon heat haze desert",
+        "stone fortress walls", "torch flame stone wall", "horse riding desert wide",
+    ],
 }
 
 # Left for the user to fill; see the module docstring.
