@@ -27,6 +27,11 @@ assets/music/
 # searches. The folder structure is what carries the meaning, not the files.
 assets/broll/
 
+# Footage pruned out of the library. Kept on disk rather than deleted so a
+# wrong call can be undone without re-downloading, but it is still footage and
+# has no business in a repository.
+assets/_pruned/
+
 # Live share link - contains the access key. Never publish.
 current_link.txt
 cookies.txt
