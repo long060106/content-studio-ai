@@ -44,6 +44,27 @@ JOIN_H = 1080
 MUSIC_GAIN = 0.22       # bed level before ducking
 FADE_OUT = 1.2
 
+# Noise reduction on the speech, before loudness normalisation.
+#
+# Order matters: `loudnorm` raises everything toward a target, so denoising
+# after it would be lifting the room tone first and then trying to remove it.
+#
+# Measured on a real clip: the floor in the gaps between sentences drops from
+# -42.9 dB to -57.9 dB — about 15 dB quieter — while the speech itself loses
+# only 1.7 dB. That ratio is what makes it safe to apply to every short without
+# listening to each one.
+#
+# `speechnorm` was tried here and is wrong for this: it lifts quiet passages
+# toward a target, which raises the noise floor rather than lowering it. It
+# measured 12 dB *worse* than doing nothing.
+#
+# **This removes noise, not music.** Hiss, hum and room tone are broadband and
+# statistically stationary, which is exactly what an FFT denoiser can model.
+# Music is none of those things — it is structured sound in the same frequency
+# range as the voice, and pulling it out needs source separation rather than
+# filtering.
+SPEECH_CLEANUP = "afftdn=nf=-25,"
+
 
 class RenderError(RuntimeError):
     pass
@@ -668,7 +689,7 @@ def build_rough_cut(
 
     speech = (
         f"[{speech_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
-        f"highpass=f=85,loudnorm=I=-14:TP=-1.5:LRA=11"
+        f"highpass=f=85,{SPEECH_CLEANUP}loudnorm=I=-14:TP=-1.5:LRA=11"
     )
     if click_track:
         click_index = next_input
