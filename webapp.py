@@ -945,6 +945,22 @@ def asset_status() -> dict:
     counts = {kind: sum(1 for a in assets if a.get("kind") == kind)
               for kind in ("video", "image", "music")}
 
+    # The manifest covers assets/image, assets/video and assets/music — it has
+    # never covered assets/broll, which `curated_broll` walks directly. That
+    # went unnoticed while the stock cache existed and padded the video count.
+    # With the cache deleted the count read zero next to a library of nearly
+    # two hundred clips, which is worse than no number at all: it says the
+    # pipeline has nothing to cut to, while every cutaway in the last run came
+    # from exactly that folder.
+    broll_dir = os.path.join(BASE_DIR, "assets", "broll")
+    if os.path.isdir(broll_dir):
+        counts["video"] += sum(
+            1
+            for _root, _dirs, files in os.walk(broll_dir)
+            for f in files
+            if f.lower().endswith((".mp4", ".mov", ".m4v", ".webm"))
+        )
+
     keys = {"PEXELS_API_KEY": False, "PIXABAY_API_KEY": False}
     env_text = _read_text(os.path.join(BASE_DIR, ".env")) or ""
     for name in keys:
