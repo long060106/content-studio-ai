@@ -127,7 +127,12 @@ def _download_name(path: str) -> str:
     """
     base = os.path.basename(path)
     stem, ext = os.path.splitext(base)
-    if stem not in ("short", "clip_raw", "rough_cut", "speech"):
+    # `short_plain` belongs here as much as `short` does, and leaving it out
+    # reintroduced the exact problem this function was written to solve: every
+    # plain version downloaded as `short_plain.mp4`, so saving three gave
+    # `short_plain (1)`, `(2)`, `(3)` — three files with nothing to tell them
+    # apart, and nothing to say which short each belonged to.
+    if stem not in ("short", "short_plain", "clip_raw", "rough_cut", "speech"):
         return base
 
     folder = os.path.basename(os.path.dirname(path))
@@ -136,7 +141,11 @@ def _download_name(path: str) -> str:
     # Strip the leading index so the name reads as a title, and keep it to a
     # length a phone will actually display.
     name = re.sub(r"^\d+[_-]", "", folder)[:60].strip("_-") or stem
-    if stem != "short":
+    if stem == "short_plain":
+        # "-plain" rather than "-short_plain": the suffix has to say which of
+        # the two renders this is, and repeating "short" says nothing.
+        name = f"{name}-plain"
+    elif stem != "short":
         name = f"{name}-{stem}"
     return f"{name}{ext}"
 
