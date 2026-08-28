@@ -292,9 +292,16 @@ CINEMATIC_GRADE = "vivid"
 CLICKS_ON_CUTS = False
 
 # Word-by-word captions burned into the picture, appearing as each word is
-# said. See kinetic_captions for the blend and why the words sit on the picture
-# rather than in the black bars.
-KINETIC_CAPTIONS = True
+# said.
+#
+# Off. Burned-in text is a decision that cannot be undone downstream — it is in
+# the pixels, and a clip that arrives with the wrong words on it has to be
+# rendered again rather than edited. The word timings are still written to
+# captions.srt beside every short, which is the same information in a form that
+# can be restyled, retimed or dropped in CapCut. Nothing is lost by leaving the
+# picture clean; the caption work in kinetic_captions.py stays and can be
+# switched back on here.
+KINETIC_CAPTIONS = False
 
 # Length of the black end card. Long enough to read three words and register
 # the handle, short enough that nobody swipes away before it lands.
