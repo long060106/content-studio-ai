@@ -168,59 +168,7 @@ SIDE_MARGIN = 40
 # hidden underneath it, or the margin would be cropping the sides off every
 # shot instead of framing them.
 PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
-
-# The window's shape, chosen per run rather than fixed.
-#
-# Two are offered, and they are good at opposite things:
-#
-#   wide    A 16:9 strip. The whole width of the source survives, so a
-#           landscape composition arrives intact and nothing is thrown away.
-#           Against a person it is weak — it crops a standing figure to a
-#           chest-up sliver.
-#   square  Holds the character, which is what these edits are usually about,
-#           and leaves a deep block of black above and below. The cost is
-#           arithmetic and unavoidable: filling a square from 1920x1080 keeps
-#           56% of the width and discards the rest.
-#
-# Everything else — the grade, the margin, the corner radius, the captions —
-# is identical between them. The frame is the only variable, which is what
-# makes it safe to offer as a choice rather than as two pipelines.
-FRAMES = {
-    "square": PICTURE_W,
-    "wide": (PICTURE_W * 9 // 16) // 2 * 2,   # 562
-}
-FRAME = "square"
-BAND_H = FRAMES[FRAME]
-
-
-def set_frame(name: str) -> str:
-    """Choose the window shape for this run. Returns the name actually used.
-
-    The geometry is read from these globals at filtergraph-build time rather
-    than captured at import, so setting them here reaches every stage — the
-    matte, the fitting, and the caption placement — without threading a
-    parameter through each one.
-    """
-    global FRAME, BAND_H
-    FRAME = name if name in FRAMES else "square"
-    BAND_H = FRAMES[FRAME]
-    return FRAME
-
-# How much of the square's height the picture fills.
-#
-# This is the zoom dial, and it exists because two things that both sound
-# reasonable cannot both be had. A square window filled edge to edge from
-# 1920x1080 footage keeps 56% of the frame's width — everything outside the
-# middle is gone, which is what "zoomed in too far" means. Showing more width
-# means a shorter picture, and a shorter picture does not fill the square.
-#
-#   1.00  fills the square; keeps 56% of the width
-#   0.80  keeps 70%; a 200px black strip inside the square, above and below
-#   0.5625  the whole 16:9 frame, which is the old letterbox with more black
-#
-# The matte's hole stays square whatever this is set to, so the frame does not
-# change shape between clips — only how much picture sits inside it.
-PICTURE_FILL = 1.00
+BAND_H = (PICTURE_W * 9 // 16) // 2 * 2
 
 # Where to take the crop from when a source is taller than the band.
 #
@@ -292,24 +240,13 @@ CINEMATIC_GRADE = "vivid"
 CLICKS_ON_CUTS = False
 
 # Word-by-word captions burned into the picture, appearing as each word is
-# said.
-#
-# Off. Burned-in text is a decision that cannot be undone downstream — it is in
-# the pixels, and a clip that arrives with the wrong words on it has to be
-# rendered again rather than edited. The word timings are still written to
-# captions.srt beside every short, which is the same information in a form that
-# can be restyled, retimed or dropped in CapCut. Nothing is lost by leaving the
-# picture clean; the caption work in kinetic_captions.py stays and can be
-# switched back on here.
-KINETIC_CAPTIONS = False
+# said. See kinetic_captions for the blend and why the words sit on the picture
+# rather than in the black bars.
+KINETIC_CAPTIONS = True
 
 # Length of the black end card. Long enough to read three words and register
 # the handle, short enough that nobody swipes away before it lands.
-# The black end card is off. It was built to hold a closing statement and the
-# handle, and was dropped as clutter: the short should end on the speaker's
-# last line, not on a title card asking for a follow.
-END_CARD_SECONDS = 0.0
-END_CARD = False
+END_CARD_SECONDS = 2.4
 
 
 # The window's shape.
@@ -375,24 +312,21 @@ def _grade_chain() -> str:
 
 
 def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") -> str:
-    """Fit any source into the square window, cropping the sides to do it.
+    """Fit any source into the band: full width, cropped to height if taller.
 
-    The docstring here used to say a 16:9 source landed on the band with
-    nothing cropped. That was true of the old 16:9 band and is not true of the
-    square one, and the difference is the whole of what `PICTURE_FILL` exists
-    to control: a square window filled from 1920x1080 footage keeps 56% of the
-    width and discards the rest.
+    A 16:9 source lands exactly on the band with nothing cropped, which is the
+    common case and unchanged from before. Anything taller — 4:3, 4:5, a
+    vertical phone recording — is cropped rather than given a taller band, so
+    the window stays the same size no matter what came in.
 
     `extra` carries filters that belong to one kind of shot only, such as the
     b-roll grade and slow-down.
     """
-    inner_h = max(2, int(BAND_H * PICTURE_FILL) // 2 * 2)
-    top = (VIDEO_H - BAND_H) // 2 + (BAND_H - inner_h) // 2
     return (
-        f"[{label_in}]scale={PICTURE_W}:{inner_h}:force_original_aspect_ratio=increase,"
-        f"crop={PICTURE_W}:{inner_h}:(iw-{PICTURE_W})/2:(ih-{inner_h})*{CROP_BIAS},"
+        f"[{label_in}]scale={PICTURE_W}:{BAND_H}:force_original_aspect_ratio=increase,"
+        f"crop={PICTURE_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
         f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
-        f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{top}:black,"
+        f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{(VIDEO_H - BAND_H) // 2}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
 
@@ -734,8 +668,6 @@ def build_rough_cut(
                 picture_width=PICTURE_W,
                 label_in="vframed",
                 label_out="v",
-                shots=shots,
-                frame_height=VIDEO_H,
             )
         except Exception:
             caption_chain = None
@@ -752,7 +684,7 @@ def build_rough_cut(
     # extended: without the silence the audio track ends first and ffmpeg
     # trims the card back off, which looks like the card silently failing.
     end_card_chain = None
-    if END_CARD and (end_statement or handle):
+    if end_statement or handle:
         try:
             from end_card import build_filter as build_end_card
 

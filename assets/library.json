@@ -1,6 +1,57 @@
 {
   "assets": [
     {
+      "id": "pexels:7593903",
+      "kind": "video",
+      "path": "assets/video/pexels-alarm-clock-bedside-7593903.mp4",
+      "tags": [
+        "alarm",
+        "bedside",
+        "clock"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-turning-off-her-alarm-clock-7593903/",
+      "credit": "Miriam Alonso",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7593905",
+      "kind": "video",
+      "path": "assets/video/pexels-alarm-clock-bedside-7593905.mp4",
+      "tags": [
+        "alarm",
+        "bedside",
+        "clock"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-sleeping-on-bed-7593905/",
+      "credit": "Miriam Alonso",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7597961",
+      "kind": "video",
+      "path": "assets/video/pexels-alarm-clock-bedside-7597961.mp4",
+      "tags": [
+        "alarm",
+        "bedside",
+        "clock"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-shot-of-a-classic-alarm-clock-7597961/",
+      "credit": "Miriam Alonso",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7034348",
       "kind": "video",
       "path": "assets/video/pexels-alarm-clock-in-dark-room-7034348.mp4",
@@ -16,6 +67,24 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/clock-is-ticking-7034348/",
       "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7055543",
+      "kind": "video",
+      "path": "assets/video/pexels-alarm-clock-in-dark-room-7055543.mp4",
+      "tags": [
+        "alarm",
+        "clock",
+        "dark",
+        "room"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-moving-clock-7055543/",
+      "credit": "Kindel Media",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -55,6 +124,42 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:13721415",
+      "kind": "video",
+      "path": "assets/video/pexels-ancient-manuscript-being-turned-13721415.mp4",
+      "tags": [
+        "ancient",
+        "being",
+        "manuscript",
+        "turned"
+      ],
+      "duration": 2.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/turning-pages-in-book-13721415/",
+      "credit": "Lina Kanaan",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:27613481",
+      "kind": "video",
+      "path": "assets/video/pexels-ancient-manuscript-being-turned-27613481.mp4",
+      "tags": [
+        "ancient",
+        "being",
+        "manuscript",
+        "turned"
+      ],
+      "duration": 5.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-room-with-many-papers-hanging-from-the-ceiling-27613481/",
+      "credit": "Şeyma  Gül",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:27378939",
       "kind": "video",
       "path": "assets/video/pexels-ancient-manuscript-open-on-table-27378939.mp4",
@@ -70,6 +175,24 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-woman-sitting-on-a-picnic-table-with-a-laptop-and-a-book-27378939/",
       "credit": "Furkan Elveren",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31486382",
+      "kind": "video",
+      "path": "assets/video/pexels-ancient-manuscript-open-on-table-31486382.mp4",
+      "tags": [
+        "ancient",
+        "manuscript",
+        "open",
+        "table"
+      ],
+      "duration": 3.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/young-boy-holding-historical-script-in-traditional-setting-31486382/",
+      "credit": "KAMAL IG",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -91,6 +214,23 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:11276523",
+      "kind": "video",
+      "path": "assets/video/pexels-ancient-stone-inscription-11276523.mp4",
+      "tags": [
+        "ancient",
+        "inscription",
+        "stone"
+      ],
+      "duration": 4.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-on-egyptian-hieroglyphs-11276523/",
+      "credit": "Артём Старшинов",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:38952093",
       "kind": "video",
       "path": "assets/video/pexels-ancient-stone-inscription-38952093.mp4",
@@ -105,6 +245,448 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/ancient-egyptian-obelisk-in-istanbul-38952093/",
       "credit": "İbrahim KARASU",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6577541",
+      "kind": "video",
+      "path": "assets/video/pexels-ancient-stone-inscription-6577541.mp4",
+      "tags": [
+        "ancient",
+        "inscription",
+        "stone"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1872,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-touching-a-sculptured-wall-6577541/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34780655",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-gritting-teeth-34780655.mp4",
+      "tags": [
+        "athlete",
+        "gritting",
+        "teeth"
+      ],
+      "duration": 5.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/focused-female-athlete-gazing-upward-in-gym-34780655/",
+      "credit": "Michael",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:39058444",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-gritting-teeth-39058444.mp4",
+      "tags": [
+        "athlete",
+        "gritting",
+        "teeth"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-bench-press-workout-at-gym-39058444/",
+      "credit": "Bennit Antony",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7187467",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-gritting-teeth-7187467.mp4",
+      "tags": [
+        "athlete",
+        "gritting",
+        "teeth"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-using-dumbbells-7187467/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36398123",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prep-36398123.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prep"
+      ],
+      "duration": 19.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/chopping-red-peppers-for-homemade-meal-prep-36398123/",
+      "credit": "Mehmet Levent",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6247891",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prep-6247891.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prep"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-cutting-tomatoes-in-pieces-6247891/",
+      "credit": "Gary  Barnes",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6595463",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prep-6595463.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prep"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/cutting-a-cucumber-6595463/",
+      "credit": "Anna Shvets",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7126072",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prep-7126072.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prep"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-eating-a-meal-on-a-wooden-table-7126072/",
+      "credit": "Michael Burrows",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4252298",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prepping-4252298.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prepping"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/vegetables-hands-chef-kitchen-4252298/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6595450",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prepping-6595450.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prepping"
+      ],
+      "duration": 21.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-cutting-a-cucumber-6595450/",
+      "credit": "Anna Shvets",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9474977",
+      "kind": "video",
+      "path": "assets/video/pexels-athlete-meal-prepping-9474977.mp4",
+      "tags": [
+        "athlete",
+        "meal",
+        "prepping"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-slicing-tomatoes-9474977/",
+      "credit": "Greta Hoffman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10341431",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-10341431.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-in-tank-top-playing-basketball-10341431/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:20521157",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-20521157.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 22.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-playing-basketball-on-a-court-20521157/",
+      "credit": "Gerardo Rendón",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:20522220",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-20522220.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 19.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-standing-on-a-basketball-court-with-a-ball-20522220/",
+      "credit": "Gerardo Rendón",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:26971440",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-26971440.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 37.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/basketball-video-26971440/",
+      "credit": "Leotrim Canaj",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:32067754",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-32067754.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-outdoor-basketball-game-highlights-32067754/",
+      "credit": "Airam Dato-on",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5274572",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-boxing-out-5274572.mp4",
+      "tags": [
+        "basketball",
+        "boxing",
+        "out",
+        "player"
+      ],
+      "duration": 4.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-spinning-a-basketball-on-his-index-finger-5274572/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5390042",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-morning-routine-5390042.mp4",
+      "tags": [
+        "basketball",
+        "morning",
+        "player",
+        "routine"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-young-guy-playing-basketball-5390042/",
+      "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6292478",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-morning-routine-6292478.mp4",
+      "tags": [
+        "basketball",
+        "morning",
+        "player",
+        "routine"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-shooting-a-ball-6292478/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8337181",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-morning-routine-8337181.mp4",
+      "tags": [
+        "basketball",
+        "morning",
+        "player",
+        "routine"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/young-man-dribbling-a-ball-8337181/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8694175",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-morning-routine-8694175.mp4",
+      "tags": [
+        "basketball",
+        "morning",
+        "player",
+        "routine"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-teaching-a-woman-how-to-dribble-8694175/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8694179",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-morning-routine-8694179.mp4",
+      "tags": [
+        "basketball",
+        "morning",
+        "player",
+        "routine"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-stepping-on-a-basketball-8694179/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34354826",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-postgame-interview-mic-34354826.mp4",
+      "tags": [
+        "basketball",
+        "interview",
+        "mic",
+        "player",
+        "postgame"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/dramatic-basketball-intro-with-team-huddle-34354826/",
+      "credit": "Barış İpekçi",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5586534",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-postgame-interview-mic-5586534.mp4",
+      "tags": [
+        "basketball",
+        "interview",
+        "mic",
+        "player",
+        "postgame"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-dribbling-a-ball-5586534/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7006048",
+      "kind": "video",
+      "path": "assets/video/pexels-basketball-player-postgame-interview-mic-7006048.mp4",
+      "tags": [
+        "basketball",
+        "interview",
+        "mic",
+        "player",
+        "postgame"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-with-a-medal-holding-a-basketball-7006048/",
+      "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -176,6 +758,358 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:4806561",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-4806561.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 7.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-using-his-elbows-to-hit-the-heavy-bags-4806561/",
+      "credit": "Ketut Subiyanto",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6637263",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-6637263.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-male-boxer-training-with-his-coach-6637263/",
+      "credit": "Gustavo Fring",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478073",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-8478073.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-hitting-a-punching-bag-8478073/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478081",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-8478081.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 18.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-hitting-a-punching-bag-8478081/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9945079",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-hitting-bag-9945079.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "hitting",
+        "profile"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-hitting-the-punching-bag-9945079/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7187405",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-7187405.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-shadow-boxing-7187405/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8473160",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-8473160.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 51.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/boxer-punching-a-bag-8473160/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478320",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-8478320.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 24.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-training-at-the-boxing-gym-8478320/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9943810",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-9943810.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 18.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-throwing-and-catching-a-ball-9943810/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9944847",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-profile-shadow-9944847.mp4",
+      "tags": [
+        "boxer",
+        "profile",
+        "shadow"
+      ],
+      "duration": 10.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-boxer-training-9944847/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5752370",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-punching-bag-dark-5752370.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "dark",
+        "punching"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-punching-the-punching-bag-5752370/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8478660",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-punching-bag-dark-8478660.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "dark",
+        "punching"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-wearing-sportswear-training-at-the-boxing-gym-8478660/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8745115",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-punching-bag-dark-8745115.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "dark",
+        "punching"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-hitting-punching-bag-8745115/",
+      "credit": "Ron Lach",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8809979",
+      "kind": "video",
+      "path": "assets/video/pexels-boxer-punching-bag-dark-8809979.mp4",
+      "tags": [
+        "bag",
+        "boxer",
+        "dark",
+        "punching"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-punching-a-heavy-bag-8809979/",
+      "credit": "Los Muertos Crew",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19798266",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-pages-turning-19798266.mp4",
+      "tags": [
+        "calendar",
+        "pages",
+        "turning"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-flipping-a-page-of-a-2024-planner-19798266/",
+      "credit": "Ali  Alcántara",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35332817",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-pages-turning-35332817.mp4",
+      "tags": [
+        "calendar",
+        "pages",
+        "turning"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/flipping-calendar-pages-in-motion-35332817/",
+      "credit": "Cis14_04 09",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36864123",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-pages-turning-36864123.mp4",
+      "tags": [
+        "calendar",
+        "pages",
+        "turning"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-flipping-book-pages-36864123/",
+      "credit": "Canan İldeniz",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7250670",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-with-handwritten-goals-7250670.mp4",
+      "tags": [
+        "calendar",
+        "goals",
+        "handwritten",
+        "with"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-product-on-a-bottle-7250670/",
+      "credit": "Sarah  Chai",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7467020",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-with-handwritten-goals-7467020.mp4",
+      "tags": [
+        "calendar",
+        "goals",
+        "handwritten",
+        "with"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1620,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/marking-dates-in-a-calendar-7467020/",
+      "credit": "Nadezhda Moryak",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9903485",
+      "kind": "video",
+      "path": "assets/video/pexels-calendar-with-handwritten-goals-9903485.mp4",
+      "tags": [
+        "calendar",
+        "goals",
+        "handwritten",
+        "with"
+      ],
+      "duration": 20.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-writing-on-a-paper-9903485/",
+      "credit": "Ron Lach",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:35928408",
       "kind": "video",
       "path": "assets/video/pexels-calligrapher-practising-single-stroke-35928408.mp4",
@@ -209,6 +1143,182 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/master-calligrapher-creating-art-outdoors-37457884/",
       "credit": "Ahmet Yüksek ✪",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9478316",
+      "kind": "video",
+      "path": "assets/video/pexels-calligrapher-practising-single-stroke-9478316.mp4",
+      "tags": [
+        "calligrapher",
+        "practising",
+        "single",
+        "stroke"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-using-paint-brush-9478316/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6189263",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-breathing-meditation-6189263.mp4",
+      "tags": [
+        "breathing",
+        "calm",
+        "meditation"
+      ],
+      "duration": 6.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-doing-meditation-6189263/",
+      "credit": "Anna Tarazevich",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6438224",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-breathing-meditation-6438224.mp4",
+      "tags": [
+        "breathing",
+        "calm",
+        "meditation"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-doing-yoga-6438224/",
+      "credit": "Ivan S",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6438227",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-breathing-meditation-6438227.mp4",
+      "tags": [
+        "breathing",
+        "calm",
+        "meditation"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/people-doing-exercise-6438227/",
+      "credit": "Ivan S",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7415212",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-breathing-meditation-7415212.mp4",
+      "tags": [
+        "breathing",
+        "calm",
+        "meditation"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-sitting-on-cushion-holding-an-incense-7415212/",
+      "credit": "Kampus Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:2989890",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-2989890.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 22.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-scenic-view-of-sea-under-a-line-of-clouds-formation-in-the-sky-2989890/",
+      "credit": "Ronald Hayward",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34754858",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-34754858.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 19.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/stunning-ocean-sunset-with-vibrant-colors-34754858/",
+      "credit": "Mike Tyurin",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35684418",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-35684418.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-ocean-horizon-at-sunrise-35684418/",
+      "credit": "Marianna Sigov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4600703",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-4600703.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-aerial-footage-of-the-golden-sun-4600703/",
+      "credit": "ArtHouse Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7358099",
+      "kind": "video",
+      "path": "assets/video/pexels-calm-sea-sunrise-wide-7358099.mp4",
+      "tags": [
+        "calm",
+        "sea",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-calm-sea-and-a-golden-sky-7358099/",
+      "credit": "Atlantic Ambience",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -470,6 +1580,23 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:13271341",
+      "kind": "video",
+      "path": "assets/video/pexels-city-street-timelapse-13271341.mp4",
+      "tags": [
+        "city",
+        "street",
+        "timelapse"
+      ],
+      "duration": 32.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/traffic-on-street-in-city-13271341/",
+      "credit": "Cheng",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:13567267",
       "kind": "video",
       "path": "assets/video/pexels-city-street-timelapse-13567267.mp4",
@@ -504,6 +1631,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:5801269",
+      "kind": "video",
+      "path": "assets/video/pexels-closed-wooden-door-swinging-open-5801269.mp4",
+      "tags": [
+        "closed",
+        "door",
+        "open",
+        "swinging",
+        "wooden"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-picking-up-a-ticket-on-floor-5801269/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7119450",
       "kind": "video",
       "path": "assets/video/pexels-closed-wooden-door-swinging-open-7119450.mp4",
@@ -523,6 +1669,42 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8103304",
+      "kind": "video",
+      "path": "assets/video/pexels-closed-wooden-door-swinging-open-8103304.mp4",
+      "tags": [
+        "closed",
+        "door",
+        "open",
+        "swinging",
+        "wooden"
+      ],
+      "duration": 22.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-going-out-of-the-house-while-carrying-a-guitar-8103304/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11120675",
+      "kind": "video",
+      "path": "assets/video/pexels-cold-breath-winter-11120675.mp4",
+      "tags": [
+        "breath",
+        "cold",
+        "winter"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/frozen-man-face-in-winter-11120675/",
+      "credit": "Евгений Шухман",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:15296461",
       "kind": "video",
       "path": "assets/video/pexels-cold-breath-winter-15296461.mp4",
@@ -537,6 +1719,40 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/video-of-snowfall-15296461/",
       "credit": "Shan Ali",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30894351",
+      "kind": "video",
+      "path": "assets/video/pexels-cold-breath-winter-30894351.mp4",
+      "tags": [
+        "breath",
+        "cold",
+        "winter"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/happy-woman-enjoying-snowfall-outdoors-30894351/",
+      "credit": "Şeyhmus Kino",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7037868",
+      "kind": "video",
+      "path": "assets/video/pexels-cold-breath-winter-7037868.mp4",
+      "tags": [
+        "breath",
+        "cold",
+        "winter"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-standing-behind-a-transparent-panel-7037868/",
+      "credit": "cottonbro studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -559,6 +1775,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:35680286",
+      "kind": "video",
+      "path": "assets/video/pexels-crowd-following-a-single-figure-on-hillt-35680286.mp4",
+      "tags": [
+        "crowd",
+        "figure",
+        "following",
+        "hillt",
+        "single"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/solitary-figure-on-rocky-mountain-summit-35680286/",
+      "credit": "Kontraa Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:37630306",
       "kind": "video",
       "path": "assets/video/pexels-crowd-following-a-single-figure-on-hillt-37630306.mp4",
@@ -575,6 +1810,168 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/silhouetted-city-crowd-at-sunset-37630306/",
       "credit": "Polat Eyyüp Albayrak",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:29546708",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-single-light-29546708.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "light",
+        "single"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/focused-bench-press-workout-in-dim-gym-29546708/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30075429",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-single-light-30075429.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "light",
+        "single"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-fitness-workout-at-night-gym-30075429/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34708329",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-single-light-34708329.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "light",
+        "single"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-indoor-pull-up-workout-in-blue-hue-34708329/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38753022",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-single-light-38753022.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "light",
+        "single"
+      ],
+      "duration": 5.0,
+      "width": 1440,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/boxer-standing-in-ring-with-raised-gloves-38753022/",
+      "credit": "Belén Montero",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30193707",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-30193707.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 3.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/nighttime-basketball-hoop-with-spinning-ball-30193707/",
+      "credit": "Content Factory",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36623800",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-36623800.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 19.0,
+      "width": 3840,
+      "height": 2160,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-gym-workout-in-dimly-lit-setting-36623800/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296581",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296581.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 21.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-putting-on-his-boxing-gloves-6296581/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296636",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296636.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 25.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-putting-on-his-boxing-gloves-6296636/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296692",
+      "kind": "video",
+      "path": "assets/video/pexels-dark-gym-wide-shot-6296692.mp4",
+      "tags": [
+        "dark",
+        "gym",
+        "shot",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 2560,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-boxing-gloves-6296692/",
+      "credit": "Pavel Danilyuk",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -668,6 +2065,40 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:30562535",
+      "kind": "video",
+      "path": "assets/video/pexels-disciple-bowing-in-courtyard-30562535.mp4",
+      "tags": [
+        "bowing",
+        "courtyard",
+        "disciple"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-in-traditional-vietnamese-dress-outdoors-30562535/",
+      "credit": "TBD Tuyên",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34220859",
+      "kind": "video",
+      "path": "assets/video/pexels-disciple-bowing-in-courtyard-34220859.mp4",
+      "tags": [
+        "bowing",
+        "courtyard",
+        "disciple"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/historical-courtyard-with-stone-arches-overview-34220859/",
+      "credit": "Shuttercraftsman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:36103649",
       "kind": "video",
       "path": "assets/video/pexels-disciple-bowing-in-courtyard-36103649.mp4",
@@ -682,6 +2113,23 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/man-walking-in-historic-stone-courtyard-36103649/",
       "credit": "Ebahir",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:29513615",
+      "kind": "video",
+      "path": "assets/video/pexels-door-opening-to-light-29513615.mp4",
+      "tags": [
+        "door",
+        "light",
+        "opening"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/cozy-sunlit-interior-with-wooden-floors-29513615/",
+      "credit": "Lydia Griva",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -757,6 +2205,44 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:37594012",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-ceramic-bowl-on-stone-floor-37594012.mp4",
+      "tags": [
+        "bowl",
+        "ceramic",
+        "empty",
+        "floor",
+        "stone"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/pouring-penne-pasta-into-white-bowl-37594012/",
+      "credit": "Thanaa Rabbaa",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:25724645",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-ceramic-cup-on-wooden-table-25724645.mp4",
+      "tags": [
+        "ceramic",
+        "cup",
+        "empty",
+        "table",
+        "wooden"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-wooden-table-with-a-pillow-on-top-25724645/",
+      "credit": "Esra Afşar",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:6747718",
       "kind": "video",
       "path": "assets/video/pexels-empty-ceramic-cup-on-wooden-table-6747718.mp4",
@@ -827,6 +2313,22 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:18402215",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-18402215.mp4",
+      "tags": [
+        "crossroads",
+        "empty"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-aerial-view-of-a-road-with-a-crosswalk-18402215/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:34110766",
       "kind": "video",
       "path": "assets/video/pexels-empty-crossroads-34110766.mp4",
@@ -860,6 +2362,40 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:30840340",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-30840340.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 28.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-empty-highway-intersections-30840340/",
+      "credit": "Toàn BDS",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31137808",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-31137808.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-urban-intersection-in-sunny-weather-31137808/",
+      "credit": "Toàn BDS",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:34731008",
       "kind": "video",
       "path": "assets/video/pexels-empty-crossroads-aerial-34731008.mp4",
@@ -874,6 +2410,74 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/aerial-view-of-motorcycle-journey-on-rural-road-34731008/",
       "credit": "Tom Jurman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6180145",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-crossroads-aerial-6180145.mp4",
+      "tags": [
+        "aerial",
+        "crossroads",
+        "empty"
+      ],
+      "duration": 17.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/empty-road-intersection-6180145/",
+      "credit": "Braeson Holland",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:18941350",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-gym-at-dawn-18941350.mp4",
+      "tags": [
+        "dawn",
+        "empty",
+        "gym"
+      ],
+      "duration": 6.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/gym-creative-shot-18941350/",
+      "credit": "Siddharth Kashyap",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:20662157",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-gym-at-dawn-20662157.mp4",
+      "tags": [
+        "dawn",
+        "empty",
+        "gym"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-long-empty-road-with-a-sunrise-in-the-distance-20662157/",
+      "credit": "Serg Alesenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36014879",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-gym-at-dawn-36014879.mp4",
+      "tags": [
+        "dawn",
+        "empty",
+        "gym"
+      ],
+      "duration": 28.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/nighttime-gym-workout-scene-with-relaxed-vibe-36014879/",
+      "credit": "JULLIAN PRODUCTION",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -908,6 +2512,40 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-bench-in-the-middle-of-a-street-19588352/",
       "credit": "Hafize  Balcı",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:28213822",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-28213822.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park"
+      ],
+      "duration": 6.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/two-people-standing-on-a-pier-looking-at-the-water-28213822/",
+      "credit": "Hafize  Balcı",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5873380",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-5873380.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-footage-of-an-empty-bench-5873380/",
+      "credit": "Marta Wave",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -947,6 +2585,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7261383",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-park-bench-wide-7261383.mp4",
+      "tags": [
+        "bench",
+        "empty",
+        "park",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/raindrops-on-a-picnic-table-7261383/",
+      "credit": "Be The Observer",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8301731",
       "kind": "video",
       "path": "assets/video/pexels-empty-park-bench-wide-8301731.mp4",
@@ -980,6 +2636,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/empty-bench-in-a-park-854575/",
       "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11276661",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-11276661.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 6.0,
+      "width": 2732,
+      "height": 1148,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/clouds-over-empty-road-11276661/",
+      "credit": "Артём Старшинов",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:25753515",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-25753515.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-road-with-grass-and-clouds-in-the-distance-25753515/",
+      "credit": "Zacchaeus Rains",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35028944",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-35028944.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/long-deserted-road-under-overcast-sky-35028944/",
+      "credit": "Николай Викторович Ульяненко",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6497572",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-6497572.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 36.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/wide-angle-shot-of-a-road-6497572/",
+      "credit": "Neugiernase",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8630305",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-road-horizon-8630305.mp4",
+      "tags": [
+        "empty",
+        "horizon",
+        "road"
+      ],
+      "duration": 12.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-video-footage-of-a-road-8630305/",
+      "credit": "Kampus Production",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1048,6 +2789,168 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/black-and-white-video-of-the-road-5614724/",
       "credit": "Esmanur  Ekşi",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10639201",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-10639201.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/rear-view-on-man-walking-and-turning-head-10639201/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10639202",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-10639202.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 17.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/rear-view-on-man-walking-through-door-10639202/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10639959",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-10639959.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-lying-down-and-moving-on-floor-10639959/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19217895",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-19217895.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-dark-hallway-with-a-light-on-the-floor-19217895/",
+      "credit": "Nino Souza",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19217898",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-19217898.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-dark-hallway-with-a-light-on-the-ceiling-19217898/",
+      "credit": "Nino Souza",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5742363",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-5742363.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/graffiti-painted-on-wall-in-abandoned-building-5742363/",
+      "credit": "Luis Quintero",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6076828",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-6076828.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 25.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/3d-rendering-of-a-concrete-building-6076828/",
+      "credit": "TREEDEO.ST",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6376506",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-6376506.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 27.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/frame-mockup-6376506/",
+      "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6486442",
+      "kind": "video",
+      "path": "assets/video/pexels-empty-room-grey-light-6486442.mp4",
+      "tags": [
+        "empty",
+        "grey",
+        "light",
+        "room"
+      ],
+      "duration": 23.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/female-hand-holding-blank-gray-card-6486442/",
+      "credit": "Monstera Production",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1141,6 +3044,74 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7477917",
+      "kind": "video",
+      "path": "assets/video/pexels-eyes-opening-close-up-7477917.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "opening"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-a-woman-s-face-7477917/",
+      "credit": "Angela Roma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8724364",
+      "kind": "video",
+      "path": "assets/video/pexels-eyes-opening-close-up-8724364.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "opening"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-a-bald-man-8724364/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8875677",
+      "kind": "video",
+      "path": "assets/video/pexels-eyes-opening-close-up-8875677.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "opening"
+      ],
+      "duration": 45.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-examining-a-man-s-eyes-8875677/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5805600",
+      "kind": "video",
+      "path": "assets/video/pexels-eyes-opening-in-close-up-5805600.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "opening"
+      ],
+      "duration": 1.0,
+      "width": 720,
+      "height": 1144,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/girl-with-make-up-5805600/",
+      "credit": "Konstantin Mishchenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7299417",
       "kind": "video",
       "path": "assets/video/pexels-eyes-opening-in-close-up-7299417.mp4",
@@ -1154,6 +3125,23 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/extreme-close-up-of-a-man-s-face-7299417/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7299471",
+      "kind": "video",
+      "path": "assets/video/pexels-eyes-opening-in-close-up-7299471.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "opening"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/extreme-close-up-shot-of-a-person-s-eye-7299471/",
       "credit": "Kindel Media",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -1173,6 +3161,24 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/contemplative-close-up-of-man-in-shadowy-lighting-34725793/",
       "credit": "Özgür Sürmeli",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4980620",
+      "kind": "video",
+      "path": "assets/video/pexels-face-lit-by-window-thinking-4980620.mp4",
+      "tags": [
+        "face",
+        "lit",
+        "thinking",
+        "window"
+      ],
+      "duration": 74.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-with-curly-hair-looking-out-the-window-4980620/",
+      "credit": "cottonbro studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1296,6 +3302,60 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/person-walking-under-clouds-on-sky-12967968/",
       "credit": "Mohammad Husaini",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:28870899",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-28870899.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/couple-silhouette-at-sunset-in-scenic-mountains-28870899/",
+      "credit": "Khanh Hoang Minh 2",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6466848",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-6466848.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-walking-on-the-snow-6466848/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7038135",
+      "kind": "video",
+      "path": "assets/video/pexels-figure-walking-away-wide-7038135.mp4",
+      "tags": [
+        "away",
+        "figure",
+        "walking",
+        "wide"
+      ],
+      "duration": 17.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-a-man-walking-away-7038135/",
+      "credit": "cottonbro studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1627,6 +3687,168 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:34781502",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-34781502.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 24.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-sunset-at-the-beach-with-friends-34781502/",
+      "credit": "el jusuf",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38895297",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-38895297.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sunset-beach-volleyball-at-playa-benijo-38895297/",
+      "credit": "Atlantic Ambience",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147256",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147256.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 15.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/two-women-having-a-conversation-and-laughing-at-the-shore-7147256/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147260",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147260.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-sitting-at-the-lifeguard-tower-7147260/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147268",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147268.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-enjoying-sunset-by-the-beach-7147268/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147374",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147374.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-walking-by-the-shore-7147374/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7147375",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-7147375.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 14.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/group-of-friends-walking-by-the-shore-7147375/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8695010",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-8695010.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouettes-of-young-people-enjoying-sunset-at-the-beach-8695010/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9187875",
+      "kind": "video",
+      "path": "assets/video/pexels-friends-laughing-golden-hour-9187875.mp4",
+      "tags": [
+        "friends",
+        "golden",
+        "hour",
+        "laughing"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/women-laughing-together-9187875/",
+      "credit": "Darina Belonogova",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:31073785",
       "kind": "video",
       "path": "assets/video/pexels-god-rays-through-dust-31073785.mp4",
@@ -1714,6 +3936,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/sun-glare-from-trees-856325/",
       "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11415810",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-11415810.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 16.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sea-and-clouds-11415810/",
+      "credit": "Salva F. Ayala",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31456820",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-31456820.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-ocean-scene-with-seagulls-31456820/",
+      "credit": "Ahmed ؜",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35978507",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-35978507.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/overcast-view-of-the-bosphorus-strait-35978507/",
+      "credit": "Sururi Ballıdağ Director",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37097532",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-37097532.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-misty-seascape-with-calm-waters-37097532/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3987780",
+      "kind": "video",
+      "path": "assets/video/pexels-grey-ocean-horizon-3987780.mp4",
+      "tags": [
+        "grey",
+        "horizon",
+        "ocean"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-body-of-water-3987780/",
+      "credit": "K",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1871,6 +4178,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:27898184",
+      "kind": "video",
+      "path": "assets/video/pexels-hand-placing-stone-on-path-27898184.mp4",
+      "tags": [
+        "hand",
+        "path",
+        "placing",
+        "stone"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-view-of-a-park-with-a-fountain-and-people-walking-27898184/",
+      "credit": "Ivan Georgiev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:37403348",
       "kind": "video",
       "path": "assets/video/pexels-hand-placing-stone-on-path-37403348.mp4",
@@ -1886,6 +4211,131 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/adventurous-hike-on-narrow-waterway-37403348/",
       "credit": "Alejandro De Roa",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11409779",
+      "kind": "video",
+      "path": "assets/video/pexels-hand-reaching-for-door-handle-11409779.mp4",
+      "tags": [
+        "door",
+        "for",
+        "hand",
+        "handle",
+        "reaching"
+      ],
+      "duration": 4.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-grabbing-door-knob-11409779/",
+      "credit": "Deeana Arts 🇵🇷",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:12183252",
+      "kind": "video",
+      "path": "assets/video/pexels-hand-reaching-for-door-handle-12183252.mp4",
+      "tags": [
+        "door",
+        "for",
+        "hand",
+        "handle",
+        "reaching"
+      ],
+      "duration": 29.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/returning-home-from-hospital-12183252/",
+      "credit": "utopia 36",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7986204",
+      "kind": "video",
+      "path": "assets/video/pexels-hand-reaching-for-door-handle-7986204.mp4",
+      "tags": [
+        "door",
+        "for",
+        "hand",
+        "handle",
+        "reaching"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-holding-keys-7986204/",
+      "credit": "SHVETS production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4761417",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-chalk-closeup-4761417.mp4",
+      "tags": [
+        "chalk",
+        "closeup",
+        "hands"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-s-hand-covered-with-grip-powder-4761417/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8726723",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-chalk-closeup-8726723.mp4",
+      "tags": [
+        "chalk",
+        "closeup",
+        "hands"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-putting-chalk-on-his-hands-8726723/",
+      "credit": "Katya Wolf",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8726726",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-chalk-closeup-8726726.mp4",
+      "tags": [
+        "chalk",
+        "closeup",
+        "hands"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-chalk-bag-8726726/",
+      "credit": "Katya Wolf",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8727846",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-chalk-closeup-8727846.mp4",
+      "tags": [
+        "chalk",
+        "closeup",
+        "hands"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-rubbing-hands-with-powder-8727846/",
+      "credit": "Katya Wolf",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -1961,6 +4411,43 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8208977",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-close-warm-lamplight-8208977.mp4",
+      "tags": [
+        "close",
+        "hands",
+        "lamplight",
+        "warm"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/bug-on-a-person-s-hand-8208977/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30353173",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-giving-coin-to-outstretched-hand-30353173.mp4",
+      "tags": [
+        "coin",
+        "giving",
+        "hand",
+        "hands",
+        "outstretched"
+      ],
+      "duration": 6.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hands-exchanging-euro-banknote-on-red-background-30353173/",
+      "credit": "Cemrecan Yurtman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8816953",
       "kind": "video",
       "path": "assets/video/pexels-hands-giving-coin-to-outstretched-hand-8816953.mp4",
@@ -1976,6 +4463,25 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/animated-hand-flipping-a-coin-8816953/",
+      "credit": "cottonbro CG studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8817010",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-giving-coin-to-outstretched-hand-8817010.mp4",
+      "tags": [
+        "coin",
+        "giving",
+        "hand",
+        "hands",
+        "outstretched"
+      ],
+      "duration": 5.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/animated-video-of-a-hand-tossing-coin-8817010/",
       "credit": "cottonbro CG studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -2034,6 +4540,284 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:13669151",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-gripping-training-bar-13669151.mp4",
+      "tags": [
+        "bar",
+        "gripping",
+        "hands",
+        "training"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-holding-handle-over-hair-13669151/",
+      "credit": "Emirhan Emiroğlu",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:33059398",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-gripping-training-bar-33059398.mp4",
+      "tags": [
+        "bar",
+        "gripping",
+        "hands",
+        "training"
+      ],
+      "duration": 50.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-outdoor-monkey-bars-workout-routine-33059398/",
+      "credit": "Sport O'Scope",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4761423",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-gripping-training-bar-4761423.mp4",
+      "tags": [
+        "bar",
+        "gripping",
+        "hands",
+        "training"
+      ],
+      "duration": 23.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-s-hand-filled-with-white-talc-powder-4761423/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5837739",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-gripping-training-bar-5837739.mp4",
+      "tags": [
+        "bar",
+        "gripping",
+        "hands",
+        "training"
+      ],
+      "duration": 19.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-wearing-gymnastic-grips-5837739/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6572683",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-gripping-training-bar-6572683.mp4",
+      "tags": [
+        "bar",
+        "gripping",
+        "hands",
+        "training"
+      ],
+      "duration": 23.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-swinging-at-the-parallel-bar-6572683/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5267492",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-helping-up-5267492.mp4",
+      "tags": [
+        "hands",
+        "helping"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/people-holding-hands-5267492/",
+      "credit": "Luis C. Tavera",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6257867",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-helping-up-6257867.mp4",
+      "tags": [
+        "hands",
+        "helping"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-touching-hands-6257867/",
+      "credit": "ArtHouse Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6646702",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-helping-up-6646702.mp4",
+      "tags": [
+        "hands",
+        "helping"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/volunteer-holding-hands-with-elderly-man-6646702/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6646707",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-helping-up-6646707.mp4",
+      "tags": [
+        "hands",
+        "helping"
+      ],
+      "duration": 7.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-and-woman-holding-each-others-hand-6646707/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7517701",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-helping-up-7517701.mp4",
+      "tags": [
+        "hands",
+        "helping"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/faceless-man-receiving-medicines-7517701/",
+      "credit": "Kampus Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:17384275",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-17384275.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-rolling-pin-and-rolling-out-a-dough-17384275/",
+      "credit": "Numan Gilgil",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:29980691",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-29980691.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 38.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/artisan-bread-dough-kneading-in-kitchen-29980691/",
+      "credit": "khezez  | خزاز",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37149154",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-37149154.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hands-kneading-dough-on-floured-surface-37149154/",
+      "credit": "Vero Lova",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5694305",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-5694305.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-kneading-dough-5694305/",
+      "credit": "KATRIN  BOLOVTSOVA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5952083",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-5952083.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-kneading-dough-5952083/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6139593",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-kneading-dough-in-rhythm-6139593.mp4",
+      "tags": [
+        "dough",
+        "hands",
+        "kneading",
+        "rhythm"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-kneading-the-dough-6139593/",
+      "credit": "Nicole Michalou",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:10140736",
       "kind": "video",
       "path": "assets/video/pexels-hands-open-facing-sky-10140736.mp4",
@@ -2049,6 +4833,204 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/blind-woman-touching-braille-lights-10140736/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36405149",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-facing-sky-36405149.mp4",
+      "tags": [
+        "facing",
+        "hands",
+        "open",
+        "sky"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-holding-daisy-in-scenic-landscape-36405149/",
+      "credit": "azra melek",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9168193",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-facing-sky-9168193.mp4",
+      "tags": [
+        "facing",
+        "hands",
+        "open",
+        "sky"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-lemon-9168193/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:15249167",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-15249167.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-a-person-holding-a-twig-at-sunset-15249167/",
+      "credit": "Henrique Feiten",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:19150699",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-19150699.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-light-in-their-hand-19150699/",
+      "credit": "Beyzanur K.",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30479384",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-30479384.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 3.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouette-hand-shadow-on-wall-at-sunset-30479384/",
+      "credit": "Maria M.",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5155181",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-5155181.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-open-arm-stretches-for-a-dance-form-5155181/",
+      "credit": "ArtHouse Studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6650586",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-6650586.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/people-making-heart-shape-sign-with-their-fingers-6650586/",
+      "credit": "Anna Shvets",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6666523",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-6666523.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 10.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-spinning-the-bottle-cap-6666523/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6815174",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-6815174.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 14.0,
+      "width": 2048,
+      "height": 988,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-covering-her-face-6815174/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7477542",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-7477542.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/female-s-hands-covering-her-body-7477542/",
+      "credit": "Angela Roma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8116553",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-open-warm-light-8116553.mp4",
+      "tags": [
+        "hands",
+        "light",
+        "open",
+        "warm"
+      ],
+      "duration": 14.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-a-woman-s-hand-8116553/",
+      "credit": "https://kaboompics.com/",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2103,6 +5085,60 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8544158",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-planting-seedling-in-soil-8544158.mp4",
+      "tags": [
+        "hands",
+        "planting",
+        "seedling",
+        "soil"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-planting-8544158/",
+      "credit": "Mikhail Nilov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9323302",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-planting-seedling-in-soil-9323302.mp4",
+      "tags": [
+        "hands",
+        "planting",
+        "seedling",
+        "soil"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-in-gloves-holding-a-plant-in-dirt-9323302/",
+      "credit": "Lara Jameson",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9411417",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-planting-seedling-in-soil-9411417.mp4",
+      "tags": [
+        "hands",
+        "planting",
+        "seedling",
+        "soil"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-is-planting-a-plant-in-a-pot-9411417/",
+      "credit": "Sasha  Kim",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:10251782",
       "kind": "video",
       "path": "assets/video/pexels-hands-playing-piano-close-10251782.mp4",
@@ -2118,6 +5154,24 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-person-playing-the-piano-10251782/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:10565772",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-playing-piano-close-10565772.mp4",
+      "tags": [
+        "close",
+        "hands",
+        "piano",
+        "playing"
+      ],
+      "duration": 11.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/child-hands-on-toy-piano-10565772/",
+      "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2171,6 +5225,282 @@
       "height": 1080,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-child-learning-to-play-the-piano-8798797/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11237083",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-11237083.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 3.0,
+      "width": 720,
+      "height": 1280,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-touching-desert-sand-11237083/",
+      "credit": "Jezzy  Lex",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:12095619",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-12095619.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-scooping-sand-12095619/",
+      "credit": "Musa Ortaç",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:13434290",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-13434290.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 30.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/hand-with-sand-on-beach-13434290/",
+      "credit": "Boyan Minchev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:17230362",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-17230362.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-s-hand-is-in-the-air-with-sand-17230362/",
+      "credit": "Alice Trinh",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35594917",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-35594917.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/turtle-hatchling-journey-across-beach-at-dusk-35594917/",
+      "credit": "정규송 Nui MALAMA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7624037",
+      "kind": "video",
+      "path": "assets/video/pexels-hands-releasing-sand-7624037.mp4",
+      "tags": [
+        "hands",
+        "releasing",
+        "sand"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sand-falling-from-hands-7624037/",
+      "credit": "Kindel Media",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:20191069",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-20191069.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 36.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/happy-friday-everyone-20191069/",
+      "credit": "Roman Chernov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4665242",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-4665242.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-in-a-bathtub-in-a-leaning-position-4665242/",
+      "credit": "KATRIN  BOLOVTSOVA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6801309",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-6801309.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-taking-a-bath-6801309/",
+      "credit": "Michelle Leman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6845748",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-6845748.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 29.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-touching-the-water-on-a-bathtub-6845748/",
+      "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6845753",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-6845753.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 23.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-washing-his-body-with-soap-6845753/",
+      "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6845762",
+      "kind": "video",
+      "path": "assets/video/pexels-ice-bath-recovery-6845762.mp4",
+      "tags": [
+        "bath",
+        "ice",
+        "recovery"
+      ],
+      "duration": 27.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-bathing-on-a-bathtub-6845762/",
+      "credit": "Monstera Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:29546694",
+      "kind": "video",
+      "path": "assets/video/pexels-lifting-heavy-weight-strain-29546694.mp4",
+      "tags": [
+        "heavy",
+        "lifting",
+        "strain",
+        "weight"
+      ],
+      "duration": 21.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/intense-weight-training-session-bench-press-29546694/",
+      "credit": "JULLIAN PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30311697",
+      "kind": "video",
+      "path": "assets/video/pexels-lifting-heavy-weight-strain-30311697.mp4",
+      "tags": [
+        "heavy",
+        "lifting",
+        "strain",
+        "weight"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-barbell-weights-in-gym-setting-30311697/",
+      "credit": "Azhaan Bashmil",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5320419",
+      "kind": "video",
+      "path": "assets/video/pexels-lifting-heavy-weight-strain-5320419.mp4",
+      "tags": [
+        "heavy",
+        "lifting",
+        "strain",
+        "weight"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-holding-dumbbells-5320419/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5837737",
+      "kind": "video",
+      "path": "assets/video/pexels-lifting-heavy-weight-strain-5837737.mp4",
+      "tags": [
+        "heavy",
+        "lifting",
+        "strain",
+        "weight"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-lifting-a-barbell-5837737/",
       "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -2561,6 +5891,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:6253395",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-eyes-closed-stillness-6253395.mp4",
+      "tags": [
+        "artist",
+        "closed",
+        "eyes",
+        "martial",
+        "stillness"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-fixing-his-gi-6253395/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7958056",
       "kind": "video",
       "path": "assets/video/pexels-martial-artist-eyes-closed-stillness-7958056.mp4",
@@ -2596,6 +5945,25 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/man-doing-deep-breath-8040862/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6253411",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-eyes-open-at-dawn-6253411.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "eyes",
+        "martial",
+        "open"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-wearing-gi-6253411/",
+      "credit": "Artem Podrez",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2656,6 +6024,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7045333",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-kick-at-dawn-7045333.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "kick",
+        "martial",
+        "repeating"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-girl-practicing-her-kicks-7045333/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7990809",
       "kind": "video",
       "path": "assets/video/pexels-martial-artist-repeating-kick-at-dawn-7990809.mp4",
@@ -2672,6 +6059,65 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/elderly-man-practicing-martial-arts-7990809/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8038154",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-kick-at-dawn-8038154.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "kick",
+        "martial",
+        "repeating"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouette-of-a-kicking-kid-8038154/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6005331",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-same-kick-hundr-6005331.mp4",
+      "tags": [
+        "artist",
+        "hundr",
+        "kick",
+        "martial",
+        "repeating",
+        "same"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/girl-doing-a-taekwondo-6005331/",
+      "credit": "olia danilevich",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7045280",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-same-kick-hundr-7045280.mp4",
+      "tags": [
+        "artist",
+        "hundr",
+        "kick",
+        "martial",
+        "repeating",
+        "same"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/men-practicing-martial-arts-7045280/",
+      "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2714,6 +6160,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:6005323",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-same-kick-in-tr-6005323.mp4",
+      "tags": [
+        "artist",
+        "kick",
+        "martial",
+        "repeating",
+        "same"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-girl-practicing-martial-arts-6005323/",
+      "credit": "olia danilevich",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7990132",
       "kind": "video",
       "path": "assets/video/pexels-martial-artist-repeating-same-kick-in-tr-7990132.mp4",
@@ -2733,6 +6198,44 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:6005322",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-same-stance-6005322.mp4",
+      "tags": [
+        "artist",
+        "martial",
+        "repeating",
+        "same",
+        "stance"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/girl-doing-taekwondo-6005322/",
+      "credit": "olia danilevich",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6005329",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-repeating-same-stance-6005329.mp4",
+      "tags": [
+        "artist",
+        "martial",
+        "repeating",
+        "same",
+        "stance"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/girl-doing-taekwondo-6005329/",
+      "credit": "olia danilevich",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7045201",
       "kind": "video",
       "path": "assets/video/pexels-martial-artist-repeating-same-stance-7045201.mp4",
@@ -2748,6 +6251,44 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-kid-doing-martial-arts-7045201/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6253396",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-slow-movement-dawn-6253396.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "martial",
+        "movement",
+        "slow"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-practicing-martial-arts-6253396/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7045275",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-slow-movement-dawn-7045275.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "martial",
+        "movement",
+        "slow"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/people-practicing-martial-arts-7045275/",
       "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -2771,6 +6312,44 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7045189",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-solo-practice-dawn-7045189.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "martial",
+        "practice",
+        "solo"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-practicing-martial-arts-7045189/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7045191",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-solo-practice-dawn-7045191.mp4",
+      "tags": [
+        "artist",
+        "dawn",
+        "martial",
+        "practice",
+        "solo"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-showing-his-wushu-skills-7045191/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7045273",
       "kind": "video",
       "path": "assets/video/pexels-martial-artist-solo-practice-dawn-7045273.mp4",
@@ -2787,6 +6366,139 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-girl-practicing-martial-arts-7045273/",
       "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296162",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-6296162.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/men-doing-wrestling-6296162/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296290",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-6296290.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 18.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-punching-a-sparring-dummy-6296290/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6296375",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-6296375.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/fighter-training-with-fighting-dummy-6296375/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7045274",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-7045274.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-boy-practicing-martial-arts-7045274/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8042124",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-8042124.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 34.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-boy-breaking-a-board-with-a-karate-chop-8042124/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8042125",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-striking-wooden-dummy-8042125.mp4",
+      "tags": [
+        "artist",
+        "dummy",
+        "martial",
+        "striking",
+        "wooden"
+      ],
+      "duration": 24.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-breaking-a-piece-of-wood-by-his-hand-8042125/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6253413",
+      "kind": "video",
+      "path": "assets/video/pexels-martial-artist-watching-opponent-in-sile-6253413.mp4",
+      "tags": [
+        "artist",
+        "martial",
+        "opponent",
+        "sile",
+        "watching"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-fixing-his-martial-arts-uniform-6253413/",
+      "credit": "Artem Podrez",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2863,6 +6575,46 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-man-and-a-boy-doing-a-karate-pose-8042132/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:24801122",
+      "kind": "video",
+      "path": "assets/video/pexels-mentor-and-student-walking-forest-path-24801122.mp4",
+      "tags": [
+        "and",
+        "forest",
+        "mentor",
+        "path",
+        "student",
+        "walking"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-walking-down-a-trail-in-the-woods-24801122/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35061135",
+      "kind": "video",
+      "path": "assets/video/pexels-mentor-and-student-walking-forest-path-35061135.mp4",
+      "tags": [
+        "and",
+        "forest",
+        "mentor",
+        "path",
+        "student",
+        "walking"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/autumn-walk-in-forest-with-falling-leaves-35061135/",
+      "credit": "Anna Chip",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -2946,6 +6698,40 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:16162306",
+      "kind": "video",
+      "path": "assets/video/pexels-metronome-on-wooden-table-16162306.mp4",
+      "tags": [
+        "metronome",
+        "table",
+        "wooden"
+      ],
+      "duration": 27.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-drink-on-a-table-with-the-ocean-in-the-background-16162306/",
+      "credit": "Ali  Alcántara",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:25692386",
+      "kind": "video",
+      "path": "assets/video/pexels-metronome-on-wooden-table-25692386.mp4",
+      "tags": [
+        "metronome",
+        "table",
+        "wooden"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-drink-with-a-straw-25692386/",
+      "credit": "Esra Afşar",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:34566225",
       "kind": "video",
       "path": "assets/video/pexels-metronome-on-wooden-table-34566225.mp4",
@@ -2977,6 +6763,23 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/elegant-woman-grabbing-champagne-glasses-6270078/",
       "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7574549",
+      "kind": "video",
+      "path": "assets/video/pexels-metronome-on-wooden-table-7574549.mp4",
+      "tags": [
+        "metronome",
+        "table",
+        "wooden"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-ukelele-and-chord-sheets-on-the-floor-7574549/",
+      "credit": "Mikhail Nilov",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -3244,6 +7047,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8710957",
+      "kind": "video",
+      "path": "assets/video/pexels-monk-eyes-open-in-meditation-8710957.mp4",
+      "tags": [
+        "eyes",
+        "meditation",
+        "monk",
+        "open"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/monks-praying-8710957/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:5418501",
       "kind": "video",
       "path": "assets/video/pexels-monk-holding-iron-key-5418501.mp4",
@@ -3294,6 +7115,38 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/people-meditating-while-holding-a-prayer-beads-and-tibetan-singing-bowl-8711384/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:34951684",
+      "kind": "video",
+      "path": "assets/video/pexels-monk-in-meditation-34951684.mp4",
+      "tags": [
+        "meditation",
+        "monk"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/elderly-monk-praying-with-mala-beads-outdoors-34951684/",
+      "credit": "Anil  Sharma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8710956",
+      "kind": "video",
+      "path": "assets/video/pexels-monk-in-meditation-8710956.mp4",
+      "tags": [
+        "meditation",
+        "monk"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-footage-of-head-buddha-figurine-on-a-table-8710956/",
       "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -3935,6 +7788,25 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:26586646",
+      "kind": "video",
+      "path": "assets/video/pexels-old-iron-key-turning-in-lock-26586646.mp4",
+      "tags": [
+        "iron",
+        "key",
+        "lock",
+        "old",
+        "turning"
+      ],
+      "duration": 29.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-bunch-of-padlocks-on-a-fence-with-a-blue-sky-26586646/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8053942",
       "kind": "video",
       "path": "assets/video/pexels-old-iron-key-turning-in-lock-8053942.mp4",
@@ -3951,6 +7823,25 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/person-opening-a-sports-locker-8053942/",
       "credit": "SHVETS production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:26586643",
+      "kind": "video",
+      "path": "assets/video/pexels-old-key-turning-in-iron-lock-26586643.mp4",
+      "tags": [
+        "iron",
+        "key",
+        "lock",
+        "old",
+        "turning"
+      ],
+      "duration": 26.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-large-number-of-padlocks-are-hanging-from-a-fence-26586643/",
+      "credit": "Matthias Groeneveld",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -4115,6 +8006,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:5899344",
+      "kind": "video",
+      "path": "assets/video/pexels-open-palm-offering-object-5899344.mp4",
+      "tags": [
+        "object",
+        "offering",
+        "open",
+        "palm"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-of-a-person-holding-a-beetroot-pkhali-5899344/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8751125",
       "kind": "video",
       "path": "assets/video/pexels-open-palm-offering-object-8751125.mp4",
@@ -4133,6 +8042,40 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:15537741",
+      "kind": "video",
+      "path": "assets/video/pexels-open-road-at-dawn-15537741.mp4",
+      "tags": [
+        "dawn",
+        "open",
+        "road"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-car-driving-down-a-road-with-a-blue-sky-15537741/",
+      "credit": "Yauheni Anhaliuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:15674227",
+      "kind": "video",
+      "path": "assets/video/pexels-open-road-at-dawn-15674227.mp4",
+      "tags": [
+        "dawn",
+        "open",
+        "road"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-highway-with-trees-and-fog-on-the-side-15674227/",
+      "credit": "Yauheni Anhaliuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:15960280",
       "kind": "video",
       "path": "assets/video/pexels-open-road-at-dawn-15960280.mp4",
@@ -4147,6 +8090,57 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/travel-15960280/",
       "credit": "Siddhi Miraje",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5224038",
+      "kind": "video",
+      "path": "assets/video/pexels-painter-working-canvas-5224038.mp4",
+      "tags": [
+        "canvas",
+        "painter",
+        "working"
+      ],
+      "duration": 24.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-painting-on-a-canvas-5224038/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6214512",
+      "kind": "video",
+      "path": "assets/video/pexels-painter-working-canvas-6214512.mp4",
+      "tags": [
+        "canvas",
+        "painter",
+        "working"
+      ],
+      "duration": 28.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-painting-on-a-canvass-while-sitting-6214512/",
+      "credit": "Taryn Elliott",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6731481",
+      "kind": "video",
+      "path": "assets/video/pexels-painter-working-canvas-6731481.mp4",
+      "tags": [
+        "canvas",
+        "painter",
+        "working"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-working-in-a-painting-6731481/",
+      "credit": "Thirdman",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -4218,6 +8212,130 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:36977301",
+      "kind": "video",
+      "path": "assets/video/pexels-person-noticing-sunrise-36977301.mp4",
+      "tags": [
+        "noticing",
+        "person",
+        "sunrise"
+      ],
+      "duration": 22.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouette-at-sunset-over-tranquil-waters-36977301/",
+      "credit": "Gürsu Yaman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:39020806",
+      "kind": "video",
+      "path": "assets/video/pexels-person-noticing-sunrise-39020806.mp4",
+      "tags": [
+        "noticing",
+        "person",
+        "sunrise"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-winter-sunrise-with-person-silhouette-39020806/",
+      "credit": "Adit Syahfiar",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9188284",
+      "kind": "video",
+      "path": "assets/video/pexels-person-noticing-sunrise-9188284.mp4",
+      "tags": [
+        "noticing",
+        "person",
+        "sunrise"
+      ],
+      "duration": 3.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-walking-in-the-forest-9188284/",
+      "credit": "Zakhar Vozhdaienko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:12279909",
+      "kind": "video",
+      "path": "assets/video/pexels-person-opening-eyes-at-dawn-12279909.mp4",
+      "tags": [
+        "dawn",
+        "eyes",
+        "opening",
+        "person"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sun-over-cloud-formation-12279909/",
+      "credit": "Altaf Shah",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8724210",
+      "kind": "video",
+      "path": "assets/video/pexels-person-opening-eyes-at-dawn-8724210.mp4",
+      "tags": [
+        "dawn",
+        "eyes",
+        "opening",
+        "person"
+      ],
+      "duration": 31.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-a-woman-screaming-8724210/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9756613",
+      "kind": "video",
+      "path": "assets/video/pexels-person-opening-eyes-at-dawn-9756613.mp4",
+      "tags": [
+        "dawn",
+        "eyes",
+        "opening",
+        "person"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/an-extreme-close-up-of-a-woman-s-face-9756613/",
+      "credit": "KoolShooters",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37574479",
+      "kind": "video",
+      "path": "assets/video/pexels-person-pausing-mid-stride-looking-up-37574479.mp4",
+      "tags": [
+        "looking",
+        "mid",
+        "pausing",
+        "person",
+        "stride"
+      ],
+      "duration": 21.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/adventure-hiking-in-tbilisi-s-scenic-mountains-37574479/",
+      "credit": "Sajjad Hossen",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7876920",
       "kind": "video",
       "path": "assets/video/pexels-person-pausing-mid-stride-looking-up-7876920.mp4",
@@ -4237,6 +8355,133 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8993957",
+      "kind": "video",
+      "path": "assets/video/pexels-person-pausing-mid-stride-looking-up-8993957.mp4",
+      "tags": [
+        "looking",
+        "mid",
+        "pausing",
+        "person",
+        "stride"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-wearing-green-long-sleeve-shirt-8993957/",
+      "credit": "Alena Darmel",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6963395",
+      "kind": "video",
+      "path": "assets/video/pexels-person-planting-sapling-6963395.mp4",
+      "tags": [
+        "person",
+        "planting",
+        "sapling"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-a-eucalyptus-plant-with-soil-6963395/",
+      "credit": "Cup of  Couple",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7654879",
+      "kind": "video",
+      "path": "assets/video/pexels-person-planting-sapling-7654879.mp4",
+      "tags": [
+        "person",
+        "planting",
+        "sapling"
+      ],
+      "duration": 20.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-holding-plant-7654879/",
+      "credit": "Thirdman",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8544160",
+      "kind": "video",
+      "path": "assets/video/pexels-person-planting-sapling-8544160.mp4",
+      "tags": [
+        "person",
+        "planting",
+        "sapling"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-young-man-planting-in-a-garden-8544160/",
+      "credit": "Mikhail Nilov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:11052885",
+      "kind": "video",
+      "path": "assets/video/pexels-person-standing-at-cliff-edge-at-sunrise-11052885.mp4",
+      "tags": [
+        "cliff",
+        "edge",
+        "person",
+        "standing",
+        "sunrise"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-standing-on-a-cliff-edge-in-a-mountain-landscape-11052885/",
+      "credit": "Lesya Kikh",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5992467",
+      "kind": "video",
+      "path": "assets/video/pexels-person-standing-at-cliff-edge-at-sunrise-5992467.mp4",
+      "tags": [
+        "cliff",
+        "edge",
+        "person",
+        "standing",
+        "sunrise"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-standing-on-cliffside-5992467/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8644064",
+      "kind": "video",
+      "path": "assets/video/pexels-person-standing-at-cliff-edge-at-sunrise-8644064.mp4",
+      "tags": [
+        "cliff",
+        "edge",
+        "person",
+        "standing",
+        "sunrise"
+      ],
+      "duration": 18.0,
+      "width": 1080,
+      "height": 1934,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-man-standing-still-on-a-cliff-edge-8644064/",
+      "credit": "Mikita Yo",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:6646623",
       "kind": "video",
       "path": "assets/video/pexels-person-volunteering-handing-food-to-crow-6646623.mp4",
@@ -4252,6 +8497,25 @@
       "height": 1920,
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/volunteers-carrying-boxes-of-food-and-medicine-6646623/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6646624",
+      "kind": "video",
+      "path": "assets/video/pexels-person-volunteering-handing-food-to-crow-6646624.mp4",
+      "tags": [
+        "crow",
+        "food",
+        "handing",
+        "person",
+        "volunteering"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/female-volunteer-carrying-box-of-food-6646624/",
       "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
@@ -4290,6 +8554,96 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/close-up-of-handwriting-in-a-notebook-36641402/",
       "credit": "Santiago Peña Bossano",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7316372",
+      "kind": "video",
+      "path": "assets/video/pexels-person-writing-in-journal-at-desk-7316372.mp4",
+      "tags": [
+        "desk",
+        "journal",
+        "person",
+        "writing"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-holding-a-fountain-pen-7316372/",
+      "credit": "Angela Roma",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7597168",
+      "kind": "video",
+      "path": "assets/video/pexels-person-writing-in-journal-at-desk-7597168.mp4",
+      "tags": [
+        "desk",
+        "journal",
+        "person",
+        "writing"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-writing-a-to-do-list-7597168/",
+      "credit": "Miriam Alonso",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6781906",
+      "kind": "video",
+      "path": "assets/video/pexels-person-writing-in-planner-at-desk-6781906.mp4",
+      "tags": [
+        "desk",
+        "person",
+        "planner",
+        "writing"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-writing-on-notepad-6781906/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6781988",
+      "kind": "video",
+      "path": "assets/video/pexels-person-writing-in-planner-at-desk-6781988.mp4",
+      "tags": [
+        "desk",
+        "person",
+        "planner",
+        "writing"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-writing-on-notebook-6781988/",
+      "credit": "Artem Podrez",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7596670",
+      "kind": "video",
+      "path": "assets/video/pexels-person-writing-in-planner-at-desk-7596670.mp4",
+      "tags": [
+        "desk",
+        "person",
+        "planner",
+        "writing"
+      ],
+      "duration": 18.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/person-writing-on-a-content-planner-sheet-7596670/",
+      "credit": "cottonbro studio",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -4794,6 +9148,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:7876570",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-lacing-shoes-at-sunrise-7876570.mp4",
+      "tags": [
+        "lacing",
+        "runner",
+        "shoes",
+        "sunrise"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-tying-her-shoelace-7876570/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:7883997",
       "kind": "video",
       "path": "assets/video/pexels-runner-lacing-shoes-at-sunrise-7883997.mp4",
@@ -4809,6 +9181,78 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/person-tying-shoes-7883997/",
       "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8834368",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-lacing-shoes-at-sunrise-8834368.mp4",
+      "tags": [
+        "lacing",
+        "runner",
+        "shoes",
+        "sunrise"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-tying-her-shoelaces-8834368/",
+      "credit": "Gustavo Fring",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31229029",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-leaving-starting-block-31229029.mp4",
+      "tags": [
+        "block",
+        "leaving",
+        "runner",
+        "starting"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/athletes-in-action-on-sunny-track-day-31229029/",
+      "credit": "Mharee Lynn Eulanda Guillena",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:32067871",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-leaving-starting-block-32067871.mp4",
+      "tags": [
+        "block",
+        "leaving",
+        "runner",
+        "starting"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/athlete-preparing-for-sprint-on-outdoor-track-32067871/",
+      "credit": "Airam Dato-on",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8459964",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-leaving-starting-block-8459964.mp4",
+      "tags": [
+        "block",
+        "leaving",
+        "runner",
+        "starting"
+      ],
+      "duration": 17.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/female-athlete-getting-ready-for-a-run-8459964/",
+      "credit": "Mikhail Nilov",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -4866,6 +9310,171 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:31229035",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-on-track-same-corner-repeated-31229035.mp4",
+      "tags": [
+        "corner",
+        "repeated",
+        "runner",
+        "same",
+        "track"
+      ],
+      "duration": 23.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/dynamic-sprint-on-outdoor-track-field-31229035/",
+      "credit": "Mharee Lynn Eulanda Guillena",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37612707",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-on-track-same-corner-repeated-37612707.mp4",
+      "tags": [
+        "corner",
+        "repeated",
+        "runner",
+        "same",
+        "track"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-shot-of-runner-on-track-with-mountain-view-37612707/",
+      "credit": "Allan González",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8484855",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-on-track-same-corner-repeated-8484855.mp4",
+      "tags": [
+        "corner",
+        "repeated",
+        "runner",
+        "same",
+        "track"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/women-jogging-on-the-track-8484855/",
+      "credit": "Liliana Drew",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:32240945",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-sprinting-through-morning-mist-32240945.mp4",
+      "tags": [
+        "mist",
+        "morning",
+        "runner",
+        "sprinting",
+        "through"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/runner-on-outdoor-track-during-daytime-32240945/",
+      "credit": "umar muazu",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37264421",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-sprinting-through-morning-mist-37264421.mp4",
+      "tags": [
+        "mist",
+        "morning",
+        "runner",
+        "sprinting",
+        "through"
+      ],
+      "duration": 5.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/athlete-sprinting-on-outdoor-track-37264421/",
+      "credit": "Official Amit",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8380510",
+      "kind": "video",
+      "path": "assets/video/pexels-runner-sprinting-through-morning-mist-8380510.mp4",
+      "tags": [
+        "mist",
+        "morning",
+        "runner",
+        "sprinting",
+        "through"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-running-on-a-wooden-bridge-8380510/",
+      "credit": "Kampus Production",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7877141",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-dawn-7877141.mp4",
+      "tags": [
+        "dawn",
+        "running",
+        "stairs"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-jogging-up-the-stairs-7877141/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7877145",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-dawn-7877145.mp4",
+      "tags": [
+        "dawn",
+        "running",
+        "stairs"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-jogging-upstairs-7877145/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7877150",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-dawn-7877150.mp4",
+      "tags": [
+        "dawn",
+        "running",
+        "stairs"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-running-up-stairs-7877150/",
+      "credit": "MART  PRODUCTION",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:8402087",
       "kind": "video",
       "path": "assets/video/pexels-running-stairs-dawn-8402087.mp4",
@@ -4880,6 +9489,23 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-woman-running-on-the-stairs-8402087/",
       "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3048199",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-3048199.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 6.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-running-through-the-stairs-3048199/",
+      "credit": "fauxels",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -4900,6 +9526,23 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:3191898",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-3191898.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/three-women-exercising-by-running-up-the-stairs-3191898/",
+      "credit": "Pressmaster",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:3191915",
       "kind": "video",
       "path": "assets/video/pexels-running-stairs-profile-3191915.mp4",
@@ -4914,6 +9557,23 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/three-women-jogging-down-on-a-stairs-3191915/",
       "credit": "Pressmaster",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7876573",
+      "kind": "video",
+      "path": "assets/video/pexels-running-stairs-profile-7876573.mp4",
+      "tags": [
+        "profile",
+        "running",
+        "stairs"
+      ],
+      "duration": 14.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/man-running-up-the-stairs-7876573/",
+      "credit": "MART  PRODUCTION",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -5087,6 +9747,142 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:6100896",
+      "kind": "video",
+      "path": "assets/video/pexels-scales-slowly-balancing-6100896.mp4",
+      "tags": [
+        "balancing",
+        "scales",
+        "slowly"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-holding-justice-balance-scale-6100896/",
+      "credit": "KATRIN  BOLOVTSOVA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8431826",
+      "kind": "video",
+      "path": "assets/video/pexels-scales-slowly-balancing-8431826.mp4",
+      "tags": [
+        "balancing",
+        "scales",
+        "slowly"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-chess-piece-on-a-scale-8431826/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8431828",
+      "kind": "video",
+      "path": "assets/video/pexels-scales-slowly-balancing-8431828.mp4",
+      "tags": [
+        "balancing",
+        "scales",
+        "slowly"
+      ],
+      "duration": 15.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/chess-pieces-on-a-scale-8431828/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:4238310",
+      "kind": "video",
+      "path": "assets/video/pexels-seedling-breaking-soil-4238310.mp4",
+      "tags": [
+        "breaking",
+        "seedling",
+        "soil"
+      ],
+      "duration": 16.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-person-planting-4238310/",
+      "credit": "https://kaboompics.com/",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8459700",
+      "kind": "video",
+      "path": "assets/video/pexels-seedling-breaking-soil-8459700.mp4",
+      "tags": [
+        "breaking",
+        "seedling",
+        "soil"
+      ],
+      "duration": 11.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-a-plants-8459700/",
+      "credit": "FRANK MERIÑO",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8459701",
+      "kind": "video",
+      "path": "assets/video/pexels-seedling-breaking-soil-8459701.mp4",
+      "tags": [
+        "breaking",
+        "seedling",
+        "soil"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-a-plants-8459701/",
+      "credit": "FRANK MERIÑO",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9737847",
+      "kind": "video",
+      "path": "assets/video/pexels-seedling-breaking-soil-9737847.mp4",
+      "tags": [
+        "breaking",
+        "seedling",
+        "soil"
+      ],
+      "duration": 28.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-planting-a-seeds-9737847/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:9737856",
+      "kind": "video",
+      "path": "assets/video/pexels-seedling-breaking-soil-9737856.mp4",
+      "tags": [
+        "breaking",
+        "seedling",
+        "soil"
+      ],
+      "duration": 23.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/two-women-planting-seedlings-at-farm-9737856/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:35220832",
       "kind": "video",
       "path": "assets/video/pexels-shaolin-monk-bowing-in-temple-35220832.mp4",
@@ -5102,6 +9898,42 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/spinning-buddhist-prayer-wheels-in-tay-ninh-35220832/",
       "credit": "Hoàng Thanh Hòa",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5385963",
+      "kind": "video",
+      "path": "assets/video/pexels-shaolin-monk-in-courtyard-meditation-5385963.mp4",
+      "tags": [
+        "courtyard",
+        "meditation",
+        "monk",
+        "shaolin"
+      ],
+      "duration": 21.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-monk-meditating-outdoors-5385963/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8711383",
+      "kind": "video",
+      "path": "assets/video/pexels-shaolin-monk-in-courtyard-meditation-8711383.mp4",
+      "tags": [
+        "courtyard",
+        "meditation",
+        "monk",
+        "shaolin"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-monk-praying-while-holding-a-prayer-beads-8711383/",
+      "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -5738,6 +10570,159 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:28510326",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-28510326.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 51.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/calm-water-at-misty-lake-28510326/",
+      "credit": "TJ",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3151454",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-3151454.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 22.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/swan-birds-floating-motionless-on-a-lake-surface-3151454/",
+      "credit": "K",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:37473337",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-37473337.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 11.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-lakeside-view-on-a-clear-blue-day-37473337/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38131278",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-38131278.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-paddleboarding-on-tranquil-lake-38131278/",
+      "credit": "Efrem  Efre",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:5819728",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-horizon-5819728.mp4",
+      "tags": [
+        "horizon",
+        "lake",
+        "still"
+      ],
+      "duration": 26.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/video-of-a-calm-lake-5819728/",
+      "credit": "KATRIN  BOLOVTSOVA",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:12595945",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-sunrise-12595945.mp4",
+      "tags": [
+        "lake",
+        "still",
+        "sunrise"
+      ],
+      "duration": 59.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/time-lapse-of-fog-over-a-lake-at-sunrise-12595945/",
+      "credit": "Alexey Chudin",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:18089052",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-sunrise-18089052.mp4",
+      "tags": [
+        "lake",
+        "still",
+        "sunrise"
+      ],
+      "duration": 52.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-sunrise-over-a-lake-with-a-boat-in-the-water-18089052/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:18286405",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-sunrise-18286405.mp4",
+      "tags": [
+        "lake",
+        "still",
+        "sunrise"
+      ],
+      "duration": 6.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/bc-mountain-lake-18286405/",
+      "credit": "Spencer Shellborn",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8745485",
+      "kind": "video",
+      "path": "assets/video/pexels-still-lake-sunrise-8745485.mp4",
+      "tags": [
+        "lake",
+        "still",
+        "sunrise"
+      ],
+      "duration": 13.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-foggy-lake-8745485/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:26626663",
       "kind": "video",
       "path": "assets/video/pexels-still-water-reflecting-light-26626663.mp4",
@@ -5792,6 +10777,24 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:34757917",
+      "kind": "video",
+      "path": "assets/video/pexels-still-water-reflecting-light-34757917.mp4",
+      "tags": [
+        "light",
+        "reflecting",
+        "still",
+        "water"
+      ],
+      "duration": 11.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-sunlit-ocean-ripples-34757917/",
+      "credit": "Kate  R",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:34941931",
       "kind": "video",
       "path": "assets/video/pexels-still-water-reflecting-light-34941931.mp4",
@@ -5807,6 +10810,60 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/leaves-floating-in-reflective-water-surface-34941931/",
       "credit": "Danilo",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:29144082",
+      "kind": "video",
+      "path": "assets/video/pexels-stone-inscription-weathered-by-time-29144082.mp4",
+      "tags": [
+        "inscription",
+        "stone",
+        "time",
+        "weathered"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/ancient-khmer-statue-in-siem-reap-ruins-29144082/",
+      "credit": "LayG Traveller",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30768967",
+      "kind": "video",
+      "path": "assets/video/pexels-stone-inscription-weathered-by-time-30768967.mp4",
+      "tags": [
+        "inscription",
+        "stone",
+        "time",
+        "weathered"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-view-of-ancient-roman-amphitheater-ruins-30768967/",
+      "credit": "Samir Smier",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:7830751",
+      "kind": "video",
+      "path": "assets/video/pexels-stone-inscription-weathered-by-time-7830751.mp4",
+      "tags": [
+        "inscription",
+        "stone",
+        "time",
+        "weathered"
+      ],
+      "duration": 28.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-video-of-a-rock-7830751/",
+      "credit": "Monstera Production",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6057,6 +11114,42 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:29719718",
+      "kind": "video",
+      "path": "assets/video/pexels-sunlight-breaking-through-clouds-29719718.mp4",
+      "tags": [
+        "breaking",
+        "clouds",
+        "sunlight",
+        "through"
+      ],
+      "duration": 12.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-blue-sky-with-fluffy-clouds-timelapse-29719718/",
+      "credit": "Sibgha Noor",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:38036672",
+      "kind": "video",
+      "path": "assets/video/pexels-sunlight-breaking-through-clouds-38036672.mp4",
+      "tags": [
+        "breaking",
+        "clouds",
+        "sunlight",
+        "through"
+      ],
+      "duration": 8.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/serene-blue-sky-with-dynamic-clouds-38036672/",
+      "credit": "kokokara",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:39024911",
       "kind": "video",
       "path": "assets/video/pexels-sunlight-breaking-through-clouds-39024911.mp4",
@@ -6093,6 +11186,60 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:8090954",
+      "kind": "video",
+      "path": "assets/video/pexels-sunlight-through-curtain-slow-8090954.mp4",
+      "tags": [
+        "curtain",
+        "slow",
+        "sunlight",
+        "through"
+      ],
+      "duration": 19.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-beautiful-woman-by-the-window-8090954/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8334801",
+      "kind": "video",
+      "path": "assets/video/pexels-sunlight-through-curtain-slow-8334801.mp4",
+      "tags": [
+        "curtain",
+        "slow",
+        "sunlight",
+        "through"
+      ],
+      "duration": 28.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/tattooed-woman-behind-a-see-through-curtain-8334801/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8334938",
+      "kind": "video",
+      "path": "assets/video/pexels-sunlight-through-curtain-slow-8334938.mp4",
+      "tags": [
+        "curtain",
+        "slow",
+        "sunlight",
+        "through"
+      ],
+      "duration": 17.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-woman-touching-her-face-behind-a-veil-8334938/",
+      "credit": "ROMAN ODINTSOV",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:9902178",
       "kind": "video",
       "path": "assets/video/pexels-sunlight-through-curtain-slow-9902178.mp4",
@@ -6108,6 +11255,91 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/tv-and-man-looking-through-window-9902178/",
       "credit": "Ron Lach",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:14118684",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-14118684.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 51.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/drone-footage-of-foggy-grass-fields-14118684/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:27665959",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-27665959.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 46.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-sunrise-over-a-foggy-field-with-trees-27665959/",
+      "credit": "Tom Fisk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3121393",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-3121393.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 4.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/the-bright-light-of-the-morning-sun-over-a-vast-land-of-wilderness-3121393/",
+      "credit": "Matthias Groeneveld",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:31282160",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-31282160.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-view-of-expansive-rural-landscape-at-sunrise-31282160/",
+      "credit": "Piotr Wojnowski",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6035709",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-field-wide-6035709.mp4",
+      "tags": [
+        "field",
+        "sunrise",
+        "wide"
+      ],
+      "duration": 8.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/aerial-footage-of-field-6035709/",
+      "credit": "Mario Sharma",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6264,6 +11496,215 @@
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
+      "id": "pexels:29405853",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-silhouette-jumping-29405853.mp4",
+      "tags": [
+        "jumping",
+        "silhouette",
+        "sunrise"
+      ],
+      "duration": 4.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/cliff-jumping-at-zanzibar-during-sunset-29405853/",
+      "credit": "Qarim Zam",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:30183953",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-silhouette-jumping-30183953.mp4",
+      "tags": [
+        "jumping",
+        "silhouette",
+        "sunrise"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouette-of-woman-enjoying-beach-sunset-30183953/",
+      "credit": "Jean Paul  Montanaro",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:35799013",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-silhouette-jumping-35799013.mp4",
+      "tags": [
+        "jumping",
+        "silhouette",
+        "sunrise"
+      ],
+      "duration": 35.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/silhouette-of-person-at-sunrise-desert-scene-35799013/",
+      "credit": "Themba Mtegha",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6173759",
+      "kind": "video",
+      "path": "assets/video/pexels-sunrise-silhouette-jumping-6173759.mp4",
+      "tags": [
+        "jumping",
+        "silhouette",
+        "sunrise"
+      ],
+      "duration": 21.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-silhouette-of-a-person-during-sunset-6173759/",
+      "credit": "Kassam Ashraf",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6077724",
+      "kind": "video",
+      "path": "assets/video/pexels-team-huddle-timeout-6077724.mp4",
+      "tags": [
+        "huddle",
+        "team",
+        "timeout"
+      ],
+      "duration": 16.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/football-players-hugging-each-other-6077724/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6217385",
+      "kind": "video",
+      "path": "assets/video/pexels-team-huddle-timeout-6217385.mp4",
+      "tags": [
+        "huddle",
+        "team",
+        "timeout"
+      ],
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/people-playing-volleyball-6217385/",
+      "credit": "Pavel Danilyuk",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6767070",
+      "kind": "video",
+      "path": "assets/video/pexels-team-huddle-timeout-6767070.mp4",
+      "tags": [
+        "huddle",
+        "team",
+        "timeout"
+      ],
+      "duration": 30.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/women-basketball-players-with-their-coach-6767070/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:18356706",
+      "kind": "video",
+      "path": "assets/video/pexels-time-lapse-plant-growing-18356706.mp4",
+      "tags": [
+        "growing",
+        "lapse",
+        "plant",
+        "time"
+      ],
+      "duration": 10.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/plant-tl-2-18356706/",
+      "credit": "Tony Flanagan",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6175654",
+      "kind": "video",
+      "path": "assets/video/pexels-time-lapse-plant-growing-6175654.mp4",
+      "tags": [
+        "growing",
+        "lapse",
+        "plant",
+        "time"
+      ],
+      "duration": 39.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-time-lapse-of-a-plant-6175654/",
+      "credit": "Super Lunar",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6508756",
+      "kind": "video",
+      "path": "assets/video/pexels-time-lapse-plant-growing-6508756.mp4",
+      "tags": [
+        "growing",
+        "lapse",
+        "plant",
+        "time"
+      ],
+      "duration": 9.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/panning-shot-of-seedlings-6508756/",
+      "credit": "Tima Miroshnichenko",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8522207",
+      "kind": "video",
+      "path": "assets/video/pexels-time-lapse-plant-growing-8522207.mp4",
+      "tags": [
+        "growing",
+        "lapse",
+        "plant",
+        "time"
+      ],
+      "duration": 13.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/time-lapse-of-seedlings-8522207/",
+      "credit": "David Roberts",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:856994",
+      "kind": "video",
+      "path": "assets/video/pexels-time-lapse-plant-growing-856994.mp4",
+      "tags": [
+        "growing",
+        "lapse",
+        "plant",
+        "time"
+      ],
+      "duration": 20.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/sprouted-carrot-856994/",
+      "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
       "id": "pexels:19525956",
       "kind": "video",
       "path": "assets/video/pexels-torch-being-passed-between-hands-19525956.mp4",
@@ -6318,6 +11759,101 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/close-up-of-people-rubbing-soap-on-their-hands-9165944/",
       "credit": "Ron Lach",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:3125101",
+      "kind": "video",
+      "path": "assets/video/pexels-two-people-embrace-warm-light-3125101.mp4",
+      "tags": [
+        "embrace",
+        "light",
+        "people",
+        "two",
+        "warm"
+      ],
+      "duration": 11.0,
+      "width": 1920,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-couple-embracing-each-other-outdoor-in-the-snow-3125101/",
+      "credit": "Pressmaster",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6800047",
+      "kind": "video",
+      "path": "assets/video/pexels-two-people-embrace-warm-light-6800047.mp4",
+      "tags": [
+        "embrace",
+        "light",
+        "people",
+        "two",
+        "warm"
+      ],
+      "duration": 36.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-view-of-a-couple-dancing-romantically-6800047/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8090715",
+      "kind": "video",
+      "path": "assets/video/pexels-two-people-embrace-warm-light-8090715.mp4",
+      "tags": [
+        "embrace",
+        "light",
+        "people",
+        "two",
+        "warm"
+      ],
+      "duration": 27.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/couple-dancing-in-the-room-8090715/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8091362",
+      "kind": "video",
+      "path": "assets/video/pexels-two-people-embrace-warm-light-8091362.mp4",
+      "tags": [
+        "embrace",
+        "light",
+        "people",
+        "two",
+        "warm"
+      ],
+      "duration": 19.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-lovely-couple-dancing-while-hugging-each-other-8091362/",
+      "credit": "Yaroslav Shuraev",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:8889190",
+      "kind": "video",
+      "path": "assets/video/pexels-two-people-embrace-warm-light-8889190.mp4",
+      "tags": [
+        "embrace",
+        "light",
+        "people",
+        "two",
+        "warm"
+      ],
+      "duration": 21.0,
+      "width": 2048,
+      "height": 1080,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/couple-hugging-each-other-8889190/",
+      "credit": "MART  PRODUCTION",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6408,6 +11944,63 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/a-person-on-top-of-the-mountain-8950671/",
       "credit": "Ivan Babydov",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6590948",
+      "kind": "video",
+      "path": "assets/video/pexels-volunteer-handing-food-to-person-in-need-6590948.mp4",
+      "tags": [
+        "food",
+        "handing",
+        "need",
+        "person",
+        "volunteer"
+      ],
+      "duration": 14.0,
+      "width": 1080,
+      "height": 2048,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/woman-holding-foods-6590948/",
+      "credit": "cottonbro studio",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6646611",
+      "kind": "video",
+      "path": "assets/video/pexels-volunteer-handing-food-to-person-in-need-6646611.mp4",
+      "tags": [
+        "food",
+        "handing",
+        "need",
+        "person",
+        "volunteer"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/volunteers-talking-and-laughing-6646611/",
+      "credit": "RDNE Stock project",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:6646665",
+      "kind": "video",
+      "path": "assets/video/pexels-volunteer-handing-food-to-person-in-need-6646665.mp4",
+      "tags": [
+        "food",
+        "handing",
+        "need",
+        "person",
+        "volunteer"
+      ],
+      "duration": 7.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/a-person-putting-down-a-box-6646665/",
+      "credit": "RDNE Stock project",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {
@@ -6678,6 +12271,23 @@
       "source": "pexels",
       "source_url": "https://www.pexels.com/video/video-of-people-waiting-for-a-taxi-on-a-rainy-night-855432/",
       "credit": "Pixabay",
+      "licence": "Pexels licence - free for commercial use, no attribution required"
+    },
+    {
+      "id": "pexels:36171729",
+      "kind": "video",
+      "path": "assets/video/pexels-wide-eyes-in-close-up-36171729.mp4",
+      "tags": [
+        "close",
+        "eyes",
+        "wide"
+      ],
+      "duration": 10.0,
+      "width": 1080,
+      "height": 1920,
+      "source": "pexels",
+      "source_url": "https://www.pexels.com/video/close-up-eye-movement-with-detailed-focus-36171729/",
+      "credit": "Fotoarte en mérida",
       "licence": "Pexels licence - free for commercial use, no attribution required"
     },
     {

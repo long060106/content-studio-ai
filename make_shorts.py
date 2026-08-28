@@ -82,17 +82,6 @@ ISOLATE_VOICE = True
 # it lives here rather than being passed in each time.
 HANDLE = "@wentbackforthis1"
 
-# Which footage a run may cut to. Set from --broll-source before the pipeline
-# starts; see asset_library.BROLL_SOURCES for what each name draws from.
-#
-#   recommended  the curated library this project builds and prunes
-#   mine         only what has been uploaded, and nothing else
-#   both         uploads first, the library behind them
-#
-# Stock is still the last resort under every setting — it fills whatever the
-# chosen source could not, rather than competing with it.
-BROLL_SOURCE = "recommended"
-
 
 def _slug(text: str, limit: int = 28) -> str:
     out = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
@@ -1035,8 +1024,7 @@ def make_shorts(
                     # it leaves, so the library gets better every time you add
                     # to assets/broll/ without anything else changing.
                     picked = asset_library.curated_broll(
-                        queries, count=wanted, exclude=used_broll,
-                        source=BROLL_SOURCE,
+                        queries, count=wanted, exclude=used_broll
                     )
                     # The library is finite. Once earlier shorts have claimed
                     # most of it, insisting on unused clips pushes the rest of
@@ -1048,8 +1036,7 @@ def make_shorts(
                     if len(picked) < wanted:
                         already = {a.id for a in picked}
                         picked += asset_library.curated_broll(
-                            queries, count=wanted - len(picked), exclude=already,
-                            source=BROLL_SOURCE,
+                            queries, count=wanted - len(picked), exclude=already
                         )
                     if len(picked) < wanted:
                         for asset in picked:
@@ -1062,15 +1049,9 @@ def make_shorts(
             except Exception as e:
                 say(f"  ⚠ B-roll fetch failed: {e}")
 
-            mine = sum(1 for a in picked if a.source == "upload")
             curated_count = sum(1 for a in picked if a.source == "curated")
-            if mine or curated_count:
-                parts = ([f"{mine} yours"] if mine else []) + \
-                        ([f"{curated_count} curated"] if curated_count else [])
-                stock = len(picked) - mine - curated_count
-                if stock:
-                    parts.append(f"{stock} stock")
-                say("  ✓ " + " + ".join(parts))
+            if curated_count:
+                say(f"  ✓ {curated_count} curated + {len(picked) - curated_count} stock")
 
             if picked:
                 import shutil as _shutil
@@ -1257,13 +1238,6 @@ def main() -> None:
                              "one per replay peak worth cutting, up to 8")
     parser.add_argument("--style", default="broll", choices=["broll", "speaker", "split"],
                         help="broll: stock footage; speaker: the talk's own video; split: both")
-    parser.add_argument("--broll-source", default="recommended",
-                        choices=["recommended", "mine", "both"],
-                        help="recommended: the curated library; mine: only "
-                             "uploaded footage; both: uploads first")
-    parser.add_argument("--frame", default="square", choices=["square", "wide"],
-                        help="square: holds the character, crops the sides; "
-                             "wide: the whole 16:9 width, a thinner picture")
     parser.add_argument("--output-dir", default="output")
     parser.add_argument("--whisper-model", default="base",
                         help="tiny/base/small — larger is more accurate, slower")
@@ -1303,26 +1277,6 @@ def main() -> None:
     if args.source_file and not os.path.isfile(args.source_file):
         print(f"✗ Source file not found: {args.source_file}")
         sys.exit(1)
-
-    # Set before anything builds a filtergraph. The frame is a module-level
-    # geometry read at build time by the matte, the fitting and the caption
-    # placement alike, so one call here reaches all three.
-    import shorts_builder
-
-    print(f"→ frame: {shorts_builder.set_frame(args.frame)}")
-
-    global BROLL_SOURCE
-    BROLL_SOURCE = args.broll_source
-
-    # "Only my footage" with nothing uploaded would silently fall all the way
-    # through to stock — the exact opposite of what was asked for, and invisible
-    # until the clips came out looking like adverts. Say so instead.
-    uploads = asset_library.UPLOADS_DIR
-    have = sum(len(files) for _r, _d, files in os.walk(uploads)) if os.path.isdir(uploads) else 0
-    print(f"→ b-roll: {BROLL_SOURCE} ({have} uploaded clip(s))")
-    if BROLL_SOURCE == "mine" and not have:
-        print("⚠ No uploaded footage — every cutaway would come from stock. "
-              "Upload clips, or choose 'recommended'.")
 
     make_shorts(
         args.url,

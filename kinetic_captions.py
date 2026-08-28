@@ -1,31 +1,39 @@
 """
 kinetic_captions.py
 
-Word-by-word captions that appear as they are spoken, drawn onto the picture.
+Word-by-word captions that appear as they are spoken, blended into the picture.
 
 The reference style does this by hand in CapCut: split the auto-caption into
 individual words, place each one, size it, and drag it back to the frame where
-that word is actually said. For a forty-second clip that is sixty words placed
-by hand, and the word timings needed to do it automatically are already
-computed here for the SRT.
+that word is actually said — then set the whole text layer to `soft light` so
+it sits *in* the image instead of on top of it. For a forty-second clip that is
+sixty words placed by hand. The word timings needed to do it automatically are
+already computed here for the SRT.
 
-**The text is opaque, not blended.** An earlier version composited the words on
-a separate canvas and blended them into the frame, so each word picked up the
-image behind it. That is what the reference does and it was rejected here: on
-dark footage the words came out faint, and raising the opacity to fix that
-removed the exact quality that made it a blend. A caption exists to be read at
-a glance. Solid white does that; a clever one does not.
+**Why the text goes over the picture and not in the black bars.**
 
-Words are laid out by measuring the real font rather than counting characters.
-Anton is condensed, so "WILL" and "iiii" are both four characters and nothing
-like the same width.
+Soft light is not a style choice that can be moved anywhere; it is arithmetic.
+Blending white onto a mid-grey canvas leaves the canvas untouched, which is
+what makes the effect invisible everywhere except where a word is. But soft
+light onto *black* is also almost no change — measured here, white text over a
+dark picture lifts it by 126 levels, and the same text over pure black lifts it
+by 22, which reads as nothing at all.
+
+So blended captions have to sit on the picture. The black bars stay what they
+were: room for a separate, opaque caption if one is ever wanted. Both cannot be
+the same layer.
+
+**How the effect is built.** A grey canvas with white words drawn on it, blended
+over the video in `softlight` mode. Mid-grey is the identity value for soft
+light — every pixel that is not part of a word leaves the frame exactly as it
+was — so no mask, no alpha channel, and no per-pixel expression is needed. The
+words take on the brightness and colour of whatever is behind them, which is
+the entire point of the look.
 """
 
 from __future__ import annotations
 
-import math
 import os
-import subprocess
 
 # Modern, clean, slightly condensed — the closest thing on a stock Windows
 # install to the display faces these edits use. Ordered by preference; the
@@ -64,56 +72,71 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
 ]
 
-# Words held on screen together. The reference keeps these very short — two
-# words is a glance, and a viewer who is reading has stopped listening. Three
-# was tried and reads as a subtitle rather than a caption; the text stops
-# tracking the voice and becomes something to be read at your own pace.
-WORDS_PER_PHRASE = 2
+# Words held on screen together. The reference keeps these short — three words
+# is a glance, seven is reading, and a viewer who is reading has stopped
+# listening.
+WORDS_PER_PHRASE = 3
 
 # A phrase breaks early when the speaker pauses this long, so the text follows
 # the sense of the sentence rather than an arbitrary count.
 PHRASE_GAP = 0.55
 
-# Large. The reference puts one short phrase across most of the frame's width,
-# which is what makes it readable at a glance on a phone.
-FONT_SIZE = 104
+FONT_SIZE = 62
 
-# The caption sits inside the square, low in it.
+# Line spacing as a multiple of the largest word on that line, not a fixed
+# number of pixels.
 #
-# Two placements were tried before this one. Measuring the picture for its
-# quietest band moved the text around from cut to cut, which reads as unstable
-# — a caption is furniture, and furniture that wanders is noticed. Putting it
-# in the black below the picture was steady and completely clear of the
-# subject, but it also put the words outside the frame the design is built
-# around.
-#
-# Low inside the square is the position the reference edits use. It is the
-# furthest point from the face, which is the part of a person that must not be
-# covered — a caption across the chest is a caption, a caption across the mouth
-# is a mistake. Being on the picture is also what makes the colour rule matter:
-# there is something behind the text to contrast against.
-CAPTION_ROW = 5          # of ROWS, counting from the top
-ROWS = 6
+# It was fixed at 78px, which quietly guaranteed overlap: the emphasised word
+# of each phrase is drawn at 1.28x, so a 62px base becomes 79px — taller than
+# the gap meant to hold it. Any constant here is wrong the moment a size varies,
+# and the sizes vary by design.
+LINE_SPACING = 1.34
 
-# Gap between words, as a fraction of the font size.
-WORD_GAP = 0.26
+INDENT = 54          # how far each line steps right — the "pyramid" stagger
 
-# Every word is the same size.
+# The last word of a phrase is the one that lands, so it gets to be bigger.
 #
-# Sizing the last word of each phrase up was tried and dropped. It was built to
-# mark where the sense lands, and at two words a phrase the "payoff word" is
-# half the caption, so the effect was not emphasis — it was two sizes of text
-# alternating, which reads as a mistake rather than an accent.
+# 1.28x was too timid to read as emphasis — it looked like inconsistent sizing
+# rather than a deliberate accent. The gap has to be obvious enough that the
+# eye goes to the payoff word without being told.
+EMPHASIS_SCALE = 1.75
 
 # Keep the block clear of the picture's edges, so a long word never runs into
 # the rounded corner or off the frame.
 EDGE_PAD = 48
 
+# Which blend to composite the words with, and the canvas colour each one needs
+# in order to leave everything except the words untouched.
+#
+#   softlight  the reference look. Subtle, and it needs a reasonably bright
+#              picture behind it — measured on this project's footage, white
+#              over a dark studio shot lifts it far less than over a lit scene,
+#              so the words come out faint.
+#   screen     brighter and always legible, because screening onto black gives
+#              white. Still reads as part of the image rather than pasted on.
+#   overlay    between the two, and like softlight it fades on dark footage.
+CANVAS_FOR_MODE = {
+    "softlight": "gray",    # identity is mid-grey
+    "overlay": "gray",      # identity is mid-grey
+    "screen": "black",      # identity is black
+}
 
-# Plain white. The off-white was chosen to help the words take colour from the
-# image while blending; drawn opaque there is nothing to blend with, and white
-# is what reads.
-CAPTION_COLOUR = "white"
+CAPTION_BLEND = "screen"
+
+# How much of the blend result to keep, against the untouched picture.
+#
+# At 1.0 screening white onto anything gives pure white, and the words stop
+# looking blended at all — they read as flat stickers laid on the video, which
+# is exactly what this effect exists to avoid. Pulling it back lets the picture
+# come through the letters, so a word crossing a lit area is brighter than the
+# same word over shadow. That variation *is* the effect.
+#
+# Low enough to see the image, high enough to still read on dark footage.
+CAPTION_OPACITY = 0.62
+
+# Off-white rather than white. Pure white is the one value that cannot pick up
+# any colour from the image underneath, so it always looks pasted on.
+CAPTION_COLOUR = "0xF2EFE9"
 
 
 def find_font() -> str | None:
@@ -156,23 +179,6 @@ def _ff_text(text: str) -> str:
     return "'" + text.replace("'", "'\\''") + "'"
 
 
-# Punctuation the transcriber attaches to a word, stripped from the ends only.
-# Apostrophes and hyphens survive because they sit inside words — "don't" and
-# "self-made" are one word each, and cleaning them would misspell them.
-_EDGE_PUNCT = ".,!?;:\"“”‘’()[]…—–-"
-
-
-def _clean(text: str) -> str:
-    """One word as it should appear on screen.
-
-    Captions in this style carry no punctuation. On a line of two words a full
-    stop is a third of the visual weight and adds nothing — the pause is
-    already there in the speech, and the caption changes when the phrase does.
-    Grammar is for the SRT, which is written separately and keeps it.
-    """
-    return text.strip().strip(_EDGE_PUNCT).strip()
-
-
 def _measurer(font_path: str):
     """A function giving the pixel width of a word at a given size.
 
@@ -202,56 +208,6 @@ def _measurer(font_path: str):
             return int(len(text) * size * 0.55)
 
     return width
-
-
-def shot_at(shots: list, when: float) -> tuple[str, float] | None:
-    """Which clip is on screen at `when`, and where to seek inside it.
-
-    `shots` is the render's own plan — (path, source_start, seconds) in playing
-    order — so this answers the question the caption placer actually needs:
-    what picture will this word be drawn on top of?
-    """
-    running = 0.0
-    for path, source_start, seconds in shots:
-        span = max(0.2, float(seconds))
-        if when < running + span:
-            return path, float(source_start) + (when - running)
-        running += span
-    if shots:
-        path, source_start, seconds = shots[-1]
-        return path, float(source_start) + max(0.0, float(seconds) - 0.1)
-    return None
-
-
-def read_bands(path: str, seek: float, rows: int = 6) -> list[tuple[float, float]] | None:
-    """Brightness and busyness of each horizontal band of one frame.
-
-    Returns `(mean, detail)` per band, top to bottom, both 0..1. `detail` is
-    the standard deviation of luminance — low means an empty region like sky or
-    a plain wall, high means a face or foliage.
-
-    This is what lets a caption be placed where nothing is happening and
-    coloured against what is behind it, rather than dropped in a fixed spot and
-    hoped for.
-    """
-    w, h = 32, 6 * rows
-    r = subprocess.run(
-        ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error",
-         "-ss", f"{max(0.0, seek):.2f}", "-i", path, "-vframes", "1",
-         "-vf", f"scale={w}:{h},format=gray", "-f", "rawvideo", "-"],
-        capture_output=True)
-    d = r.stdout
-    if len(d) < w * h:
-        return None
-
-    out = []
-    per = h // rows
-    for b in range(rows):
-        vals = [d[y * w + x] / 255 for y in range(b * per, (b + 1) * per) for x in range(w)]
-        mean = sum(vals) / len(vals)
-        var = sum((v - mean) ** 2 for v in vals) / len(vals)
-        out.append((mean, math.sqrt(var)))
-    return out
 
 
 def group_phrases(words: list, per_phrase: int = WORDS_PER_PHRASE,
@@ -294,121 +250,103 @@ def build_filter(
     picture_width: int,
     label_in: str = "vbase",
     label_out: str = "vtxt",
-    shots: list | None = None,
-    frame_height: int = 1920,
+    mode: str = CAPTION_BLEND,
 ) -> str | None:
-    """Draw each phrase low inside the square, in a colour that contrasts.
+    """The filter chain that draws the words and blends them in.
 
-    Three rules, all taken from what the reference edits actually do:
-
-    - **Inside the square, low in it.** Fixed, not searched for. The caption is
-      furniture and belongs in the same place every cut; it sits as far from the
-      face as the frame allows.
-    - **Never past the frame.** Text is sized down until the line fits inside
-      the picture's width, so a long word cannot run off the edge or collide
-      with the rounded corner.
-    - **Never the same colour as what is behind it.** The strip of picture the
-      words will actually cover is measured, not the shot as a whole: a shot can
-      be bright at the top and black at the bottom, and a caption low in the
-      frame cares only about the bottom. Bright gets black text, dark gets
-      white.
-
-    `shots` is the render's shot plan — which clip is on screen when. Without it
-    the colour falls back to white, since there is no way to know what a word
-    lands on.
+    Returns None when there is nothing to draw or no usable font, so the caller
+    can fall through to the ungraded video rather than special-casing.
     """
     font = find_font()
     if not font or not words:
         return None
 
     phrases = group_phrases(words)
-    measure = _measurer(font)
     draws: list[str] = []
-
-    band_h = band_height // ROWS
-    band_bottom = band_top + band_height
-    usable = picture_width - 2 * EDGE_PAD
+    measure = _measurer(font)
 
     for p, phrase in enumerate(phrases):
+        # The phrase stays up until its last word has been said, then clears —
+        # but never past the moment the next phrase starts drawing.
+        #
+        # Without that cap the phrases overlap. Speech rarely leaves 0.28s
+        # between one clause and the next, so the outgoing phrase was still on
+        # screen when the incoming one appeared, and both were drawn at once:
+        # two stacks of words on top of each other, unreadable, and easy to
+        # mistake for a layout or spacing problem rather than a timing one.
         phrase_end = float(phrase[-1].end) + 0.28
         if p + 1 < len(phrases):
-            phrase_end = min(phrase_end, float(phrases[p + 1][0].start) - 0.02)
+            next_start = float(phrases[p + 1][0].start)
+            phrase_end = min(phrase_end, next_start - 0.02)
+        # A phrase whose words all land inside a hair of each other would
+        # otherwise get a negative window and never draw at all.
         phrase_end = max(phrase_end, float(phrase[-1].end) + 0.05)
 
-        text = " ".join(_clean(w.text) for w in phrase).strip()
-        if not text:
-            continue
+        # Lay the block out first, measuring every word, then draw it. Sizes
+        # differ within a phrase, so spacing has to follow the actual glyphs
+        # rather than a constant that is only correct for one of them.
+        sizes = [
+            int(FONT_SIZE * (EMPHASIS_SCALE if i == len(phrase) - 1 else 1.0))
+            for i in range(len(phrase))
+        ]
+        heights = [int(s * LINE_SPACING) for s in sizes]
+        block_h = sum(heights)
+        top = band_top + (band_height - block_h) // 2
 
-        # One size for the whole line, shrunk until it fits.
-        size = FONT_SIZE
-        while size > 30 and measure(text, size) > usable:
-            size = int(size * 0.92)
+        offsets, running = [], 0
+        for h in heights:
+            offsets.append(running)
+            running += h
 
-        y = band_top + CAPTION_ROW * band_h + (band_h - size) // 2
-        y = max(band_top + EDGE_PAD, min(y, band_bottom - size - EDGE_PAD))
-
-        colour, shadow = _colours_at(y, size, band_top, band_bottom, ROWS,
-                                     shots, float(phrase[0].start))
-
-        draws.append(
-            f"drawtext=fontfile='{_ff_path(font)}':text={_ff_text(text)}:"
-            f"fontcolor={colour}:fontsize={size}:"
-            f"shadowcolor={shadow}:shadowx=2:shadowy=2:"
-            f"x={picture_left}+({picture_width}-text_w)/2:y={y}:"
-            f"enable='between(t,{float(phrase[0].start):.3f},{phrase_end:.3f})'"
-        )
+        for i, word in enumerate(phrase):
+            text = _ff_text(word.text.strip())
+            if not text:
+                continue
+            size = sizes[i]
+            x = picture_left + EDGE_PAD + i * INDENT
+            # Pull a long word back so it cannot run past the picture's edge.
+            width = measure(word.text.strip(), size)
+            right_limit = picture_left + picture_width - EDGE_PAD
+            if x + width > right_limit:
+                x = max(picture_left + EDGE_PAD, right_limit - width)
+            y = top + offsets[i]
+            # Each word appears when it is spoken and stays for the rest of the
+            # phrase — that is what builds the stack rather than flashing one
+            # word at a time.
+            # Quoted, so the commas inside between() survive the graph-level
+            # split. See _ff_text for why quoting rather than escaping.
+            enable = f"'between(t,{float(word.start):.3f},{phrase_end:.3f})'"
+            draws.append(
+                f"drawtext=fontfile='{_ff_path(font)}':text={text}:"
+                f"fontcolor={CAPTION_COLOUR}:fontsize={size}:x={x}:y={y}:"
+                f"enable={enable}"
+            )
 
     if not draws:
         return None
 
-    # Drawn straight onto the picture, opaque. The blend this replaced went
-    # faint on dark footage, and raising its opacity removed the very quality
-    # that made it a blend.
-    return f"[{label_in}]{','.join(draws)},format=yuv420p[{label_out}]"
+    # The canvas colour is not a style choice — it is whatever value the chosen
+    # blend treats as "leave this pixel alone", so that only the words change
+    # anything. Get it wrong and the whole frame shifts: screening a grey
+    # canvas turned the picture magenta on the first attempt.
+    identity = CANVAS_FOR_MODE.get(mode, "gray")
 
+    width = picture_width + 2 * picture_left
+    height = band_top * 2 + band_height
+    canvas = f"color=c={identity}:s={width}x{height}:r=30"
 
-def _colours_at(y: int, line_h: int, band_top: int, band_bottom: int,
-                rows: int, shots: list | None, when: float) -> tuple[str, str]:
-    """Text and shadow colours for whatever the line will be drawn over.
+    # Blend in RGB rather than YUV. In YUV the chroma planes get blended too,
+    # and pushing U and V away from neutral is what produced the magenta cast —
+    # the luma was doing the right thing the whole time.
+    return (
+        f"{canvas}[cap_bg];"
+        f"[cap_bg]{','.join(draws)},format=gbrp[cap_txt];"
+        f"[{label_in}]format=gbrp[cap_base];"
+        f"[cap_base][cap_txt]blend=all_mode={mode}:"
+        f"all_opacity={CAPTION_OPACITY}:shortest=1,"
+        f"format=yuv420p[{label_out}]"
+    )
 
-    The measurement is of the strip the text actually covers, not of the shot
-    in general. That distinction is the whole point: a shot can be bright at the
-    top and black at the bottom, and a caption low in the frame cares only about
-    the bottom.
-
-    Text sitting clear of the picture needs no measurement — the margin is
-    black, so the answer is white and a frame does not have to be decoded to
-    learn it.
-    """
-    overlaps = y + line_h > band_top and y < band_bottom
-    if not overlaps or not shots:
-        return _contrast_for(0.0)
-
-    at = shot_at(shots, when)
-    info = read_bands(at[0], at[1], rows=rows) if at else None
-    if not info:
-        return _contrast_for(0.0)
-
-    # Which bands of the picture the text crosses.
-    band_h = max(1, (band_bottom - band_top) // rows)
-    first = max(0, (y - band_top) // band_h)
-    last = min(rows - 1, (y + line_h - band_top) // band_h)
-    covered = info[int(first):int(last) + 1] or info
-    return _contrast_for(sum(m for m, _ in covered) / len(covered))
-
-
-def _contrast_for(mean: float) -> tuple[str, str]:
-    """Text and shadow colours for a background of this brightness.
-
-    The shadow matters most in the middle of the range, where neither black nor
-    white is clearly right and a word can otherwise disappear into the picture
-    for the second it is on screen.
-    """
-    if mean > 0.58:
-        return "black", "white@0.35"
-    if mean < 0.34:
-        return "white", "black@0.45"
-    return "white", "black@0.75"
 
 if __name__ == "__main__":
     import argparse

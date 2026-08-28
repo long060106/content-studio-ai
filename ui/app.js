@@ -271,52 +271,6 @@ function renderAssetsNote() {
     : `Library: ${parts.join(" · ")} — no stock key, using the talk's own footage`;
 }
 
-/* ------------------------------------------------------- uploaded b-roll */
-
-async function refreshBroll() {
-  const note = $("#broll-note");
-  if (!note) return;
-  try {
-    const data = await api("/api/broll");
-    note.textContent = data.count
-      ? `${data.count} clip${data.count === 1 ? "" : "s"} uploaded`
-      : "No uploads yet — “Only my uploads” would fall back to stock";
-  } catch {
-    note.textContent = "";
-  }
-}
-
-/* One request per file, raw body, name in the query string. Sequential rather
-   than parallel: these are video files, and a browser firing six 400 MB
-   uploads at a single-threaded server at once is how you get a hung page. */
-async function uploadBroll(files) {
-  const note = $("#broll-note");
-  const list = [...files];
-  let done = 0;
-  const failed = [];
-
-  for (const file of list) {
-    if (note) note.textContent = `Uploading ${done + 1} of ${list.length}…`;
-    try {
-      await api(`/api/broll/upload?name=${encodeURIComponent(file.name)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/octet-stream" },
-        body: file,
-      });
-      done += 1;
-    } catch (err) {
-      failed.push(`${file.name}: ${err.message}`);
-    }
-  }
-
-  await refreshBroll();
-  if (failed.length && note) {
-    // Say which ones failed rather than only the count — with mixed file
-    // types the reason is usually specific to one file.
-    note.textContent = `${done} uploaded, ${failed.length} failed — ${failed[0]}`;
-  }
-}
-
 /* Cutting clips is the whole product, so there is no pipeline to choose.
    `state.kind` stays in the payload because the server still routes on it and
    cli.py remains runnable from the command line — the UI just never offers it. */
@@ -921,8 +875,6 @@ $("#run-form").addEventListener("submit", async (e) => {
       const chosen = $("#opt-count").value;
       if (chosen !== "auto") payload.count = Number(chosen);
       payload.style = $("#opt-style").value;
-      payload.frame = $("#opt-frame").value;
-      payload.broll_source = $("#opt-broll").value;
       payload.carousel = $("#opt-carousel").checked;
     }
     const job = await api("/api/jobs", {
@@ -952,15 +904,6 @@ $("#run-form").addEventListener("submit", async (e) => {
     renderAssetsNote();
     renderLibrary();
     setKind(state.kind);
-    refreshBroll();
-
-    const picker = $("#opt-upload");
-    $("#upload-button").addEventListener("click", () => picker.click());
-    picker.addEventListener("change", async () => {
-      if (picker.files.length) await uploadBroll(picker.files);
-      // Cleared so choosing the same file twice still fires a change event.
-      picker.value = "";
-    });
 
 
     const running = data.jobs.find((j) => j.status === "running");
