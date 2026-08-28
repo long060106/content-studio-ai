@@ -1,34 +1,24 @@
 """
 kinetic_captions.py
 
-Word-by-word captions that appear as they are spoken, blended into the picture.
+Word-by-word captions that appear as they are spoken, drawn onto the picture.
 
 The reference style does this by hand in CapCut: split the auto-caption into
 individual words, place each one, size it, and drag it back to the frame where
-that word is actually said — then set the whole text layer to `soft light` so
-it sits *in* the image instead of on top of it. For a forty-second clip that is
-sixty words placed by hand. The word timings needed to do it automatically are
-already computed here for the SRT.
+that word is actually said. For a forty-second clip that is sixty words placed
+by hand, and the word timings needed to do it automatically are already
+computed here for the SRT.
 
-**Why the text goes over the picture and not in the black bars.**
+**The text is opaque, not blended.** An earlier version composited the words on
+a separate canvas and blended them into the frame, so each word picked up the
+image behind it. That is what the reference does and it was rejected here: on
+dark footage the words came out faint, and raising the opacity to fix that
+removed the exact quality that made it a blend. A caption exists to be read at
+a glance. Solid white does that; a clever one does not.
 
-Soft light is not a style choice that can be moved anywhere; it is arithmetic.
-Blending white onto a mid-grey canvas leaves the canvas untouched, which is
-what makes the effect invisible everywhere except where a word is. But soft
-light onto *black* is also almost no change — measured here, white text over a
-dark picture lifts it by 126 levels, and the same text over pure black lifts it
-by 22, which reads as nothing at all.
-
-So blended captions have to sit on the picture. The black bars stay what they
-were: room for a separate, opaque caption if one is ever wanted. Both cannot be
-the same layer.
-
-**How the effect is built.** A grey canvas with white words drawn on it, blended
-over the video in `softlight` mode. Mid-grey is the identity value for soft
-light — every pixel that is not part of a word leaves the frame exactly as it
-was — so no mask, no alpha channel, and no per-pixel expression is needed. The
-words take on the brightness and colour of whatever is behind them, which is
-the entire point of the look.
+Words are laid out by measuring the real font rather than counting characters.
+Anton is condensed, so "WILL" and "iiii" are both four characters and nothing
+like the same width.
 """
 
 from __future__ import annotations
@@ -105,38 +95,11 @@ EMPHASIS_SCALE = 1.75
 # the rounded corner or off the frame.
 EDGE_PAD = 48
 
-# Which blend to composite the words with, and the canvas colour each one needs
-# in order to leave everything except the words untouched.
-#
-#   softlight  the reference look. Subtle, and it needs a reasonably bright
-#              picture behind it — measured on this project's footage, white
-#              over a dark studio shot lifts it far less than over a lit scene,
-#              so the words come out faint.
-#   screen     brighter and always legible, because screening onto black gives
-#              white. Still reads as part of the image rather than pasted on.
-#   overlay    between the two, and like softlight it fades on dark footage.
-CANVAS_FOR_MODE = {
-    "softlight": "gray",    # identity is mid-grey
-    "overlay": "gray",      # identity is mid-grey
-    "screen": "black",      # identity is black
-}
 
-CAPTION_BLEND = "screen"
-
-# How much of the blend result to keep, against the untouched picture.
-#
-# At 1.0 screening white onto anything gives pure white, and the words stop
-# looking blended at all — they read as flat stickers laid on the video, which
-# is exactly what this effect exists to avoid. Pulling it back lets the picture
-# come through the letters, so a word crossing a lit area is brighter than the
-# same word over shadow. That variation *is* the effect.
-#
-# Low enough to see the image, high enough to still read on dark footage.
-CAPTION_OPACITY = 0.62
-
-# Off-white rather than white. Pure white is the one value that cannot pick up
-# any colour from the image underneath, so it always looks pasted on.
-CAPTION_COLOUR = "0xF2EFE9"
+# Plain white. The off-white was chosen to help the words take colour from the
+# image while blending; drawn opaque there is nothing to blend with, and white
+# is what reads.
+CAPTION_COLOUR = "white"
 
 
 def find_font() -> str | None:
@@ -250,7 +213,6 @@ def build_filter(
     picture_width: int,
     label_in: str = "vbase",
     label_out: str = "vtxt",
-    mode: str = CAPTION_BLEND,
 ) -> str | None:
     """The filter chain that draws the words and blends them in.
 
@@ -325,27 +287,15 @@ def build_filter(
     if not draws:
         return None
 
-    # The canvas colour is not a style choice — it is whatever value the chosen
-    # blend treats as "leave this pixel alone", so that only the words change
-    # anything. Get it wrong and the whole frame shifts: screening a grey
-    # canvas turned the picture magenta on the first attempt.
-    identity = CANVAS_FOR_MODE.get(mode, "gray")
+    # Drawn straight onto the picture, opaque.
+    #
+    # This used to composite the words on a separate canvas and blend them in,
+    # so the text picked up the image underneath. That was the reference
+    # style's look and it was rejected: on dark footage the words were faint,
+    # and lifting the opacity to fix that removed the very quality that made it
+    # a blend. Solid white reads at a glance, which is what a caption is for.
+    return f"[{label_in}]{','.join(draws)},format=yuv420p[{label_out}]"
 
-    width = picture_width + 2 * picture_left
-    height = band_top * 2 + band_height
-    canvas = f"color=c={identity}:s={width}x{height}:r=30"
-
-    # Blend in RGB rather than YUV. In YUV the chroma planes get blended too,
-    # and pushing U and V away from neutral is what produced the magenta cast —
-    # the luma was doing the right thing the whole time.
-    return (
-        f"{canvas}[cap_bg];"
-        f"[cap_bg]{','.join(draws)},format=gbrp[cap_txt];"
-        f"[{label_in}]format=gbrp[cap_base];"
-        f"[cap_base][cap_txt]blend=all_mode={mode}:"
-        f"all_opacity={CAPTION_OPACITY}:shortest=1,"
-        f"format=yuv420p[{label_out}]"
-    )
 
 
 if __name__ == "__main__":

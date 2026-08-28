@@ -168,7 +168,15 @@ SIDE_MARGIN = 40
 # hidden underneath it, or the margin would be cropping the sides off every
 # shot instead of framing them.
 PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
-BAND_H = (PICTURE_W * 9 // 16) // 2 * 2
+
+# The window is square, not a 16:9 strip.
+#
+# A wide band suits a landscape shot but works against a person: it crops a
+# standing figure to a chest-up sliver and throws away the headroom that makes
+# a portrait read as cinematic. A square holds the character — which is what
+# these edits are actually about — and leaves a deep caption block above and
+# below rather than a thin one.
+BAND_H = PICTURE_W
 
 # Where to take the crop from when a source is taller than the band.
 #
@@ -246,7 +254,11 @@ KINETIC_CAPTIONS = True
 
 # Length of the black end card. Long enough to read three words and register
 # the handle, short enough that nobody swipes away before it lands.
-END_CARD_SECONDS = 2.4
+# The black end card is off. It was built to hold a closing statement and the
+# handle, and was dropped as clutter: the short should end on the speaker's
+# last line, not on a title card asking for a follow.
+END_CARD_SECONDS = 0.0
+END_CARD = False
 
 
 # The window's shape.
@@ -324,7 +336,7 @@ def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") ->
     """
     return (
         f"[{label_in}]scale={PICTURE_W}:{BAND_H}:force_original_aspect_ratio=increase,"
-        f"crop={PICTURE_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
+        f"crop={PICTURE_W}:{BAND_H}:(iw-{PICTURE_W})/2:(ih-{BAND_H})*{CROP_BIAS},"
         f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
         f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{(VIDEO_H - BAND_H) // 2}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
@@ -684,7 +696,7 @@ def build_rough_cut(
     # extended: without the silence the audio track ends first and ffmpeg
     # trims the card back off, which looks like the card silently failing.
     end_card_chain = None
-    if end_statement or handle:
+    if END_CARD and (end_statement or handle):
         try:
             from end_card import build_filter as build_end_card
 
