@@ -680,6 +680,8 @@ def build_rough_cut(
                 picture_width=PICTURE_W,
                 label_in="vframed",
                 label_out="v",
+                shots=shots,
+                frame_height=VIDEO_H,
             )
         except Exception:
             caption_chain = None
