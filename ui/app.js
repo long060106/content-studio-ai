@@ -133,11 +133,31 @@ function saveBtn(mediaPath, suggestedName) {
   };
 
   b.onclick = async () => {
-    // Feature-detect with an actual File: canShare({files}) is the only
-    // reliable check, since navigator.share exists on browsers that cannot
-    // take files at all.
+    // Two checks, and the platform one has to come first.
+    //
+    // The share sheet exists here for one reason: on iOS a downloaded video
+    // lands in Files and getting it into Photos is a chore, so the sheet's
+    // "Save Video" is the only pleasant route. Windows 11 has since gained
+    // Web Share with files, so the capability check alone started catching
+    // desktop — where the sheet offers Teams, Outlook, Nearby Sharing and
+    // OneDrive, and *no way to save the file to disk*. Clicking Save there
+    // produced no file at all, which is the worst possible outcome for a
+    // button named Save.
+    //
+    // This is deliberately a platform test rather than a capability test: the
+    // difference is what the operating system's sheet does with the file, and
+    // no feature detection reports that. Desktop can already download well;
+    // it should just download.
+    const ua = navigator.userAgent || "";
+    const isTouchPlatform =
+      /iPad|iPhone|iPod/.test(ua)
+      // iPadOS reports itself as a Mac, and only the touch points give it away.
+      || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+      || /Android/.test(ua);
+
     const probe = new File([new Blob()], suggestedName, { type: "video/mp4" });
-    if (!(navigator.canShare && navigator.canShare({ files: [probe] }))) {
+    if (!isTouchPlatform
+        || !(navigator.canShare && navigator.canShare({ files: [probe] }))) {
       plainDownload();
       return;
     }
