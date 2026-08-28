@@ -78,10 +78,6 @@ TIGHTEN_SILENCE = True
 # playing under the talk.
 ISOLATE_VOICE = True
 
-# The account the shorts are published under. It appears on the end card, so
-# it lives here rather than being passed in each time.
-HANDLE = "@wentbackforthis1"
-
 
 def _slug(text: str, limit: int = 28) -> str:
     out = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
@@ -949,28 +945,6 @@ def make_shorts(
         except Exception as e:
             say(f"  ⚠ Couldn't write the caption: {e}")
 
-        # The closing line for the end card.
-        #
-        # Two or three words naming a value — "being yourself", "doing the
-        # work" — rather than a summary of the clip. It is generated from the
-        # resolved meaning `topic_tags` produced, not from the hook: the hook
-        # is written to stop a scroll, and repeating it on black just reads as
-        # the video saying the same thing twice.
-        end_statement = ""
-        try:
-            from end_card import closing_line
-
-            end_statement = closing_line(
-                moment.hook,
-                quote=moment.quote,
-                theme=moment.theme,
-                means=(tags.means if tags is not None else ""),
-            )
-            if end_statement:
-                say(f"  ✓ end card: {end_statement}")
-        except Exception as e:
-            say(f"  ⚠ Couldn't write the closing line: {str(e)[:50]}")
-
         # The comment to post under your own short, and pin.
         #
         # A short lands on a feed with no thread under it, and the first comment
@@ -1108,8 +1082,7 @@ def make_shorts(
             if broll_local:
                 shots = [(path, src, dur) for path, src, dur, _kind in plan]
                 build_rough_cut(raw_clip, shots, out_path, render_duration,
-                                words=words,
-                                end_statement=end_statement, handle=HANDLE)
+                                words=words)
                 say(f"  ✓ {out_path} (speaker, cutting to b-roll and back)")
             else:
                 # No footage available — fall back to the speaker's own picture

@@ -244,10 +244,6 @@ CLICKS_ON_CUTS = False
 # rather than in the black bars.
 KINETIC_CAPTIONS = True
 
-# Length of the black end card. Long enough to read three words and register
-# the handle, short enough that nobody swipes away before it lands.
-END_CARD_SECONDS = 2.4
-
 
 # The window's shape.
 #
@@ -536,8 +532,6 @@ def build_rough_cut(
     out_path: str,
     duration: float,
     words: list | None = None,
-    end_statement: str = "",
-    handle: str = "",
 ) -> str:
     """Cut between the speaker and b-roll over one continuous speech track.
 
@@ -677,32 +671,6 @@ def build_rough_cut(
     else:
         parts.append("[vframed]null[v]")
 
-    # Two seconds of black holding the closing line and the handle.
-    #
-    # Appended after the captions rather than before, so the caption filters
-    # only ever see the footage. Both the picture and the sound have to be
-    # extended: without the silence the audio track ends first and ffmpeg
-    # trims the card back off, which looks like the card silently failing.
-    end_card_chain = None
-    if end_statement or handle:
-        try:
-            from end_card import build_filter as build_end_card
-
-            end_card_chain = build_end_card(
-                end_statement, handle, VIDEO_W, VIDEO_H, FPS,
-                label_out="outro", seconds=END_CARD_SECONDS,
-            )
-        except Exception:
-            end_card_chain = None
-
-    outro_seconds = 0.0
-    if end_card_chain:
-        parts.append(end_card_chain)
-        parts.append("[v][outro]concat=n=2:v=1:a=0[vfull]")
-        outro_seconds = END_CARD_SECONDS
-    else:
-        parts.append("[v]null[vfull]")
-
     # A click on every cut. The shot plan already says where the cuts are, so
     # the track is rendered from it rather than detected — see sound_design.
     click_track = None
@@ -737,14 +705,7 @@ def build_rough_cut(
             "alimiter=limit=0.97[a]"
         )
     else:
-        parts.append(f"{speech}[aspeech]")
-        if outro_seconds:
-            parts.append(
-                f"anullsrc=r=48000:cl=stereo:d={outro_seconds:.2f}[asil]"
-            )
-            parts.append("[aspeech][asil]concat=n=2:v=0:a=1[a]")
-        else:
-            parts.append("[aspeech]anull[a]")
+        parts.append(f"{speech}[a]")
 
     # The filtergraph goes in a file, not on the command line.
     #
@@ -772,8 +733,8 @@ def build_rough_cut(
                 # name for it, `-filter_complex_script`, was removed. The
                 # leading slash is what marks the value as a file to read.
                 "-/filter_complex", graph_path,
-                "-map", "[vfull]", "-map", "[a]",
-                "-t", f"{duration + outro_seconds:.3f}",
+                "-map", "[v]", "-map", "[a]",
+                "-t", f"{duration:.3f}",
                 *video_encoder_args(),
                 "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
                 "-movflags", "+faststart",
