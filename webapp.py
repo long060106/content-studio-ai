@@ -397,6 +397,7 @@ class Job:
             cmd = [
                 python, "-u", "make_shorts.py", self.url,
                 "--style", str(self.options.get("style", "broll")),
+                "--frame", str(self.options.get("frame", "square")),
             ]
             count = self.options.get("count")
             if count:
@@ -1397,6 +1398,7 @@ class Handler(BaseHTTPRequestHandler):
                     max(1, min(int(raw_count), 8)) if str(raw_count).strip().isdigit() else None
                 ),
                 "style": body.get("style", "broll"),
+                "frame": ("wide" if body.get("frame") == "wide" else "square"),
                 "carousel": bool(body.get("carousel", False)),
             }
             job = Job(url, kind=kind, options=options)

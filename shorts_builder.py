@@ -169,14 +169,42 @@ SIDE_MARGIN = 40
 # shot instead of framing them.
 PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
 
-# The window is square, not a 16:9 strip.
+# The window's shape, chosen per run rather than fixed.
 #
-# A wide band suits a landscape shot but works against a person: it crops a
-# standing figure to a chest-up sliver and throws away the headroom that makes
-# a portrait read as cinematic. A square holds the character — which is what
-# these edits are actually about — and leaves a deep caption block above and
-# below rather than a thin one.
-BAND_H = PICTURE_W
+# Two are offered, and they are good at opposite things:
+#
+#   wide    A 16:9 strip. The whole width of the source survives, so a
+#           landscape composition arrives intact and nothing is thrown away.
+#           Against a person it is weak — it crops a standing figure to a
+#           chest-up sliver.
+#   square  Holds the character, which is what these edits are usually about,
+#           and leaves a deep block of black above and below. The cost is
+#           arithmetic and unavoidable: filling a square from 1920x1080 keeps
+#           56% of the width and discards the rest.
+#
+# Everything else — the grade, the margin, the corner radius, the captions —
+# is identical between them. The frame is the only variable, which is what
+# makes it safe to offer as a choice rather than as two pipelines.
+FRAMES = {
+    "square": PICTURE_W,
+    "wide": (PICTURE_W * 9 // 16) // 2 * 2,   # 562
+}
+FRAME = "square"
+BAND_H = FRAMES[FRAME]
+
+
+def set_frame(name: str) -> str:
+    """Choose the window shape for this run. Returns the name actually used.
+
+    The geometry is read from these globals at filtergraph-build time rather
+    than captured at import, so setting them here reaches every stage — the
+    matte, the fitting, and the caption placement — without threading a
+    parameter through each one.
+    """
+    global FRAME, BAND_H
+    FRAME = name if name in FRAMES else "square"
+    BAND_H = FRAMES[FRAME]
+    return FRAME
 
 # How much of the square's height the picture fills.
 #

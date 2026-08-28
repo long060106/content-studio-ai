@@ -1238,6 +1238,9 @@ def main() -> None:
                              "one per replay peak worth cutting, up to 8")
     parser.add_argument("--style", default="broll", choices=["broll", "speaker", "split"],
                         help="broll: stock footage; speaker: the talk's own video; split: both")
+    parser.add_argument("--frame", default="square", choices=["square", "wide"],
+                        help="square: holds the character, crops the sides; "
+                             "wide: the whole 16:9 width, a thinner picture")
     parser.add_argument("--output-dir", default="output")
     parser.add_argument("--whisper-model", default="base",
                         help="tiny/base/small — larger is more accurate, slower")
@@ -1277,6 +1280,13 @@ def main() -> None:
     if args.source_file and not os.path.isfile(args.source_file):
         print(f"✗ Source file not found: {args.source_file}")
         sys.exit(1)
+
+    # Set before anything builds a filtergraph. The frame is a module-level
+    # geometry read at build time by the matte, the fitting and the caption
+    # placement alike, so one call here reaches all three.
+    import shorts_builder
+
+    print(f"→ frame: {shorts_builder.set_frame(args.frame)}")
 
     make_shorts(
         args.url,

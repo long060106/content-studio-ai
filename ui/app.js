@@ -875,6 +875,7 @@ $("#run-form").addEventListener("submit", async (e) => {
       const chosen = $("#opt-count").value;
       if (chosen !== "auto") payload.count = Number(chosen);
       payload.style = $("#opt-style").value;
+      payload.frame = $("#opt-frame").value;
       payload.carousel = $("#opt-carousel").checked;
     }
     const job = await api("/api/jobs", {
