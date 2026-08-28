@@ -398,6 +398,7 @@ class Job:
                 python, "-u", "make_shorts.py", self.url,
                 "--style", str(self.options.get("style", "broll")),
                 "--frame", str(self.options.get("frame", "square")),
+                "--broll-source", str(self.options.get("broll_source", "recommended")),
             ]
             count = self.options.get("count")
             if count:
@@ -810,6 +811,85 @@ def library_index() -> list[dict]:
     return items
 
 
+UPLOAD_EXTS = {".mp4", ".mov", ".m4v", ".webm", ".mkv"}
+MAX_UPLOAD_BYTES = 500 * 1024 * 1024
+
+
+def _uploads_dir() -> str:
+    import asset_library
+
+    os.makedirs(asset_library.UPLOADS_DIR, exist_ok=True)
+    return asset_library.UPLOADS_DIR
+
+
+def uploaded_broll() -> dict:
+    """What is in the upload folder, newest first."""
+    folder = _uploads_dir()
+    rows = []
+    for name in os.listdir(folder):
+        full = os.path.join(folder, name)
+        if os.path.isfile(full) and os.path.splitext(name)[1].lower() in UPLOAD_EXTS:
+            rows.append({"name": name, "size": os.path.getsize(full),
+                         "added": os.path.getmtime(full)})
+    rows.sort(key=lambda r: r["added"], reverse=True)
+    return {"count": len(rows), "clips": rows}
+
+
+def save_upload(name: str, stream, length: int) -> tuple[str, str]:
+    """Write one uploaded clip into the upload folder. Returns (saved, error).
+
+    The filename arrives from the browser, so it is rebuilt rather than
+    trusted: the directory part is discarded and everything outside a safe
+    alphabet is replaced. A name like `../../.env` has to land as a file in
+    this folder or not at all — the upload folder is reachable over a shared
+    link, and a path that escapes it is the whole game.
+    """
+    base = os.path.basename(name.replace("\\", "/")).strip()
+    stem, ext = os.path.splitext(base)
+    ext = ext.lower()
+    if ext not in UPLOAD_EXTS:
+        return "", f"{ext or 'That file'} isn't a video ({', '.join(sorted(UPLOAD_EXTS))})."
+    if length <= 0:
+        return "", "The upload was empty."
+    if length > MAX_UPLOAD_BYTES:
+        return "", f"Too big — the limit is {MAX_UPLOAD_BYTES // (1024*1024)} MB."
+
+    stem = re.sub(r"[^a-zA-Z0-9._-]+", "-", stem).strip("-.") or "clip"
+    folder = _uploads_dir()
+    safe = f"{stem}{ext}"
+    n = 2
+    while os.path.exists(os.path.join(folder, safe)):
+        safe = f"{stem}-{n}{ext}"
+        n += 1
+
+    dest = os.path.join(folder, safe)
+    remaining = length
+    try:
+        with open(dest, "wb") as f:
+            while remaining > 0:
+                chunk = stream.read(min(1024 * 256, remaining))
+                if not chunk:
+                    break
+                f.write(chunk)
+                remaining -= len(chunk)
+    except OSError as e:
+        try:
+            os.remove(dest)
+        except OSError:
+            pass
+        return "", f"Couldn't save it: {e}"
+
+    if remaining > 0:
+        # A short read means the connection dropped mid-file. Half a video is
+        # worse than none: it would sit in the library and fail at render time.
+        try:
+            os.remove(dest)
+        except OSError:
+            pass
+        return "", "The upload didn't finish — try again."
+    return safe, ""
+
+
 def read_shorts(video_dir: str) -> dict:
     """Whatever the motivational-shorts pipeline left in this video's folder."""
     shorts_dir = os.path.join(video_dir, "shorts")
@@ -1202,6 +1282,12 @@ class Handler(BaseHTTPRequestHandler):
         except (json.JSONDecodeError, UnicodeDecodeError):
             return {}
 
+    def _content_length(self) -> int:
+        try:
+            return max(0, int(self.headers.get("Content-Length", "0")))
+        except ValueError:
+            return 0
+
     # -- routes -------------------------------------------------------------
 
     def do_GET(self):  # noqa: N802
@@ -1258,6 +1344,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(asset_status())
             return
 
+        if path == "/api/broll":
+            self._send_json(uploaded_broll())
             return
 
         if path == "/api/library":
@@ -1399,6 +1487,11 @@ class Handler(BaseHTTPRequestHandler):
                 ),
                 "style": body.get("style", "broll"),
                 "frame": ("wide" if body.get("frame") == "wide" else "square"),
+                "broll_source": (
+                    body.get("broll_source")
+                    if body.get("broll_source") in ("recommended", "mine", "both")
+                    else "recommended"
+                ),
                 "carousel": bool(body.get("carousel", False)),
             }
             job = Job(url, kind=kind, options=options)
@@ -1407,6 +1500,19 @@ class Handler(BaseHTTPRequestHandler):
                 JOBS[job.id] = job
             job.start()
             self._send_json(job.snapshot(), 201)
+            return
+
+        if path == "/api/broll/upload":
+            # One file per request, sent as a raw body with the name in the
+            # query string. Multipart would be the conventional shape and it
+            # would mean hand-writing a parser against `http.server`, which has
+            # none — for a single file that is a lot of fragile code to own.
+            name = unquote(parse_qs(urlparse(self.path).query).get("name", [""])[0])
+            saved, error = save_upload(name, self.rfile, self._content_length())
+            if error:
+                self._send_json({"error": error}, 400)
+                return
+            self._send_json({"saved": saved, "count": uploaded_broll()["count"]}, 201)
             return
 
         if path.startswith("/api/jobs/") and path.endswith("/cancel"):

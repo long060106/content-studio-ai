@@ -61,6 +61,18 @@
       <option value="wide">Wide — the whole 16:9 width</option>
     </select>
   </label>
+  <label>B-roll
+    <select id="opt-broll">
+      <option value="recommended" selected>Recommended for me</option>
+      <option value="both">Mine first, then recommended</option>
+      <option value="mine">Only my uploads</option>
+    </select>
+  </label>
+  <label class="upload">Upload b-roll
+    <input type="file" id="opt-upload" accept="video/*" multiple hidden />
+    <button type="button" id="upload-button">Choose files…</button>
+  </label>
+  <span class="assets-note" id="broll-note"></span>
   <label class="check"><input type="checkbox" id="opt-carousel" checked /> Quote carousel</label>
   <span class="assets-note" id="assets-note"></span>
 </div>

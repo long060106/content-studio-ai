@@ -810,12 +810,30 @@ def fetch_stock(
 
 CURATED_DIR = os.path.join(ASSETS_DIR, "broll")
 
+# Footage the user uploaded, kept deliberately outside the curated library.
+#
+# It would be less code to drop uploads into `assets/broll/` and let them be
+# found like everything else. They are kept apart because the two folders are
+# owned by different people: the library is built and pruned by this project,
+# and a prune that quietly deleted footage someone uploaded would be a bug of
+# the worst kind — silent, and irreversible. Separate roots also make "use only
+# my own clips" a real choice rather than a filename convention.
+UPLOADS_DIR = os.path.join(ASSETS_DIR, "broll_uploads")
+
+# Where each source draws from, in preference order.
+BROLL_SOURCES = {
+    "recommended": (CURATED_DIR,),
+    "mine": (UPLOADS_DIR,),
+    "both": (UPLOADS_DIR, CURATED_DIR),
+}
+
 
 def curated_broll(
     queries: list[str],
     count: int,
     exclude: Optional[set] = None,
     min_duration: float = 0.0,
+    source: str = "recommended",
 ) -> list[Asset]:
     """Hand-picked b-roll from `assets/broll/`, matched by filename.
 
@@ -833,46 +851,64 @@ def curated_broll(
     Clips with no query match are still returned once the matches run out, so a
     small library is never worse than an empty one.
     """
-    if not os.path.isdir(CURATED_DIR):
+    roots = [d for d in BROLL_SOURCES.get(source, BROLL_SOURCES["recommended"])
+             if os.path.isdir(d)]
+    if not roots:
         return []
 
     seen = set(exclude or ())
     wanted = {w for q in queries for w in re.split(r"[^a-z0-9]+", q.lower()) if len(w) > 2}
 
-    scored: list[tuple[int, Asset]] = []
-    for root, _dirs, names in os.walk(CURATED_DIR):
-        for name in sorted(names):
-            full = os.path.join(root, name)
-            if not os.path.isfile(full) or _kind_for(full) != "video":
-                continue
-            rel = os.path.relpath(full, BASE_DIR).replace("\\", "/")
-            asset_id = f"curated:{os.path.relpath(full, CURATED_DIR)}"
-            if asset_id in seen:
-                continue
+    # (source_rank, match_hits, asset). `source_rank` sorts ahead of the match
+    # score on purpose: under "both", an uploaded clip that matches nothing
+    # still beats a library clip that matches everything. Someone who uploads
+    # footage for a talk means it to be used, and a filename match is a much
+    # weaker signal of intent than a deliberate upload.
+    scored: list[tuple[int, int, Asset]] = []
 
-            duration, width, height = probe(full)
-            if min_duration and duration and duration < min_duration:
-                continue
+    for rank, base in enumerate(roots):
+        origin = "upload" if os.path.abspath(base) == os.path.abspath(UPLOADS_DIR) else "curated"
+        for root, _dirs, names in os.walk(base):
+            for name in sorted(names):
+                full = os.path.join(root, name)
+                if not os.path.isfile(full) or _kind_for(full) != "video":
+                    continue
+                rel = os.path.relpath(full, BASE_DIR).replace("\\", "/")
+                # Namespaced by origin so an uploaded `road.mp4` and a library
+                # `road.mp4` are two assets, not one shadowing the other.
+                asset_id = f"{origin}:{os.path.relpath(full, base)}"
+                if asset_id in seen:
+                    continue
 
-            # Folder names are tags too, so `emotion/lost/road-fog.mp4` matches
-            # "lost" without it having to appear in the filename. Organising by
-            # dropping a file into the right folder is less work than naming it
-            # carefully, and survives being reorganised later.
-            folders = os.path.relpath(root, CURATED_DIR).replace("\\", "/")
-            tags = _tags_from_filename(name)
-            if folders != ".":
-                tags += [p for p in re.split(r"[^a-z0-9]+", folders.lower()) if len(p) > 2]
+                duration, width, height = probe(full)
+                if min_duration and duration and duration < min_duration:
+                    continue
 
-            hits = len(wanted.intersection(tags))
-            scored.append((hits, Asset(
-                id=asset_id, kind="video", path=rel, tags=tags,
-                duration=duration, width=width, height=height,
-                source="curated", licence="local",
-            )))
+                # Folder names are tags too, so `emotion/lost/road-fog.mp4`
+                # matches "lost" without it having to appear in the filename.
+                # Organising by dropping a file into the right folder is less
+                # work than naming it carefully, and survives reorganising.
+                #
+                # Relative to `base`, not to CURATED_DIR: measuring an upload
+                # against the library root gives paths like `../broll_uploads`,
+                # which turns the escape into a tag.
+                folders = os.path.relpath(root, base).replace("\\", "/")
+                tags = _tags_from_filename(name)
+                if folders != ".":
+                    tags += [p for p in re.split(r"[^a-z0-9]+", folders.lower())
+                             if len(p) > 2]
 
-    # Best match first; unmatched clips still usable rather than discarded.
-    scored.sort(key=lambda pair: pair[0], reverse=True)
-    return [asset for _hits, asset in scored[:count]]
+                hits = len(wanted.intersection(tags))
+                scored.append((rank, hits, Asset(
+                    id=asset_id, kind="video", path=rel, tags=tags,
+                    duration=duration, width=width, height=height,
+                    source=origin, licence="local",
+                )))
+
+    # Preferred source first, then best match; unmatched clips are still
+    # usable rather than discarded, so a small library beats an empty one.
+    scored.sort(key=lambda row: (row[0], -row[1]))
+    return [asset for _rank, _hits, asset in scored[:count]]
 
 
 def fetch_broll_set(
