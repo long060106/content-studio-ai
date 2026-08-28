@@ -908,6 +908,14 @@ def read_shorts(video_dir: str) -> dict:
         moment = _read_json(os.path.join(folder, "moment.json")) or {}
         moment["folder_name"] = name
         moment["media"] = os.path.relpath(video_path, OUTPUT_DIR).replace("\\", "/")
+        # The plain version, when the pipeline wrote one. Optional rather than
+        # required: shorts rendered before it existed have no plain file, and
+        # they should still appear rather than vanishing from the library.
+        plain_path = os.path.join(folder, "short_plain.mp4")
+        moment["media_plain"] = (
+            os.path.relpath(plain_path, OUTPUT_DIR).replace("\\", "/")
+            if os.path.isfile(plain_path) else None
+        )
         # The editing brief travels with the clip: it is the part that says
         # what must not be trimmed, and it is useless if you have to go
         # looking for it in a folder.

@@ -648,9 +648,41 @@ function renderTab(d, tab) {
       card(`${m.shorts.length} short${m.shorts.length > 1 ? "s" : ""}`,
         [copyBtn(() => m.shorts.map((s) =>
           `${s.hook}\n"${s.quote}"\n${s.theme} · ${s.duration_seconds}s`).join("\n\n"), "Copy hooks")],
-        el("div", { className: "shorts-grid" }, m.shorts.map((s) =>
-          el("div", { className: "short-card" },
-            el("video", { src: `/media/${s.media}`, controls: true, preload: "metadata", playsInline: true }),
+        el("div", { className: "shorts-grid" }, m.shorts.map((s) => {
+          // Two renders of the same moment. The player swaps between them
+          // rather than showing two, so the pair reads as one clip with two
+          // finishes — which is what it is — and the cards stay the same size.
+          const player = el("video", {
+            src: `/media/${s.media}`, controls: true,
+            preload: "metadata", playsInline: true,
+          });
+          const buttons = [];
+          const show = (path, pressed) => {
+            const at = player.currentTime;
+            player.src = `/media/${path}`;
+            // Keep the position across the swap: the two are frame-aligned,
+            // so landing back at the same second is the whole point of being
+            // able to compare them.
+            player.addEventListener("loadedmetadata", () => {
+              try { player.currentTime = at; } catch { /* start over */ }
+            }, { once: true });
+            buttons.forEach((b) => b.classList.toggle("on", b === pressed));
+          };
+          if (s.media_plain) {
+            const styled = el("button", {
+              className: "btn-sm on", textContent: "Styled",
+              title: "frame, b-roll and captions",
+              onclick: () => show(s.media, styled),
+            });
+            const plain = el("button", {
+              className: "btn-sm", textContent: "Plain",
+              title: "same cut and voice, no frame, b-roll or captions",
+              onclick: () => show(s.media_plain, plain),
+            });
+            buttons.push(styled, plain);
+          }
+          return el("div", { className: "short-card" },
+            player,
             el("div", { className: "body" },
               el("div", { className: "hook" }, s.hook || "—"),
               s.quote && el("div", { className: "quote" }, `“${s.quote}”`),
@@ -663,11 +695,21 @@ function renderTab(d, tab) {
                   title: "where this moment starts in the original talk",
                 }, `from ${fmtDuration(s.start_seconds)}`),
                 s.style && el("span", { className: "chip" }, s.style),
+                ...buttons,
                 copyBtn(() => s.quote || s.hook, "Copy"),
-                saveBtn(s.media, clipFileName(s))),
+                saveBtn(s.media, clipFileName(s)),
+                // Relabelled, because two buttons both reading "Save" say
+                // nothing about which file you would get.
+                s.media_plain
+                  ? Object.assign(
+                      saveBtn(s.media_plain,
+                              clipFileName(s).replace(/\.mp4$/, "-plain.mp4")),
+                      { textContent: "Save plain", title: "the version with no frame, b-roll or captions" })
+                  : null),
               s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
               s.brief ? briefBlock(s) : null,
-            ))))),
+            ));
+        }))),
       m.carousel ? card("Carousel copy", [copyBtn(() => m.carousel, "Copy all")],
         el("pre", { className: "text-block", style: "white-space:pre-wrap" }, m.carousel)) : null,
     );
