@@ -178,6 +178,22 @@ PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
 # below rather than a thin one.
 BAND_H = PICTURE_W
 
+# How much of the square's height the picture fills.
+#
+# This is the zoom dial, and it exists because two things that both sound
+# reasonable cannot both be had. A square window filled edge to edge from
+# 1920x1080 footage keeps 56% of the frame's width — everything outside the
+# middle is gone, which is what "zoomed in too far" means. Showing more width
+# means a shorter picture, and a shorter picture does not fill the square.
+#
+#   1.00  fills the square; keeps 56% of the width
+#   0.80  keeps 70%; a 200px black strip inside the square, above and below
+#   0.5625  the whole 16:9 frame, which is the old letterbox with more black
+#
+# The matte's hole stays square whatever this is set to, so the frame does not
+# change shape between clips — only how much picture sits inside it.
+PICTURE_FILL = 1.00
+
 # Where to take the crop from when a source is taller than the band.
 #
 # Dead centre is wrong for people. A talking head shot vertically has the face
@@ -324,21 +340,24 @@ def _grade_chain() -> str:
 
 
 def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") -> str:
-    """Fit any source into the band: full width, cropped to height if taller.
+    """Fit any source into the square window, cropping the sides to do it.
 
-    A 16:9 source lands exactly on the band with nothing cropped, which is the
-    common case and unchanged from before. Anything taller — 4:3, 4:5, a
-    vertical phone recording — is cropped rather than given a taller band, so
-    the window stays the same size no matter what came in.
+    The docstring here used to say a 16:9 source landed on the band with
+    nothing cropped. That was true of the old 16:9 band and is not true of the
+    square one, and the difference is the whole of what `PICTURE_FILL` exists
+    to control: a square window filled from 1920x1080 footage keeps 56% of the
+    width and discards the rest.
 
     `extra` carries filters that belong to one kind of shot only, such as the
     b-roll grade and slow-down.
     """
+    inner_h = max(2, int(BAND_H * PICTURE_FILL) // 2 * 2)
+    top = (VIDEO_H - BAND_H) // 2 + (BAND_H - inner_h) // 2
     return (
-        f"[{label_in}]scale={PICTURE_W}:{BAND_H}:force_original_aspect_ratio=increase,"
-        f"crop={PICTURE_W}:{BAND_H}:(iw-{PICTURE_W})/2:(ih-{BAND_H})*{CROP_BIAS},"
+        f"[{label_in}]scale={PICTURE_W}:{inner_h}:force_original_aspect_ratio=increase,"
+        f"crop={PICTURE_W}:{inner_h}:(iw-{PICTURE_W})/2:(ih-{inner_h})*{CROP_BIAS},"
         f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
-        f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{(VIDEO_H - BAND_H) // 2}:black,"
+        f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{top}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
 

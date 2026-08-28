@@ -64,10 +64,11 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
 ]
 
-# Words held on screen together. The reference keeps these short — three words
-# is a glance, seven is reading, and a viewer who is reading has stopped
-# listening.
-WORDS_PER_PHRASE = 3
+# Words held on screen together. The reference keeps these very short — two
+# words is a glance, and a viewer who is reading has stopped listening. Three
+# was tried and reads as a subtitle rather than a caption; the text stops
+# tracking the voice and becomes something to be read at your own pace.
+WORDS_PER_PHRASE = 2
 
 # A phrase breaks early when the speaker pauses this long, so the text follows
 # the sense of the sentence rather than an arbitrary count.
@@ -77,35 +78,32 @@ PHRASE_GAP = 0.55
 # which is what makes it readable at a glance on a phone.
 FONT_SIZE = 104
 
-# How far the caption sits below the picture's bottom edge.
+# The caption sits inside the square, low in it.
 #
-# The square window leaves 460px of black under the picture, and that is where
-# the caption goes. Placing it there is what makes "never over the speaker" a
-# property of the layout rather than something measured and hoped for — there
-# is no character in the black.
+# Two placements were tried before this one. Measuring the picture for its
+# quietest band moved the text around from cut to cut, which reads as unstable
+# — a caption is furniture, and furniture that wanders is noticed. Putting it
+# in the black below the picture was steady and completely clear of the
+# subject, but it also put the words outside the frame the design is built
+# around.
 #
-# An earlier version divided the picture into bands, measured each for
-# busyness, and put the text in the quietest one. That reasoning is sound for a
-# wide letterbox and wrong for a square: a square window is chosen precisely
-# because a person fills it, so every band has the subject in it and "quietest"
-# picks his chest instead of his face. The measurement was working; the place
-# it was measuring had no right answer.
-CAPTION_GAP = 40
+# Low inside the square is the position the reference edits use. It is the
+# furthest point from the face, which is the part of a person that must not be
+# covered — a caption across the chest is a caption, a caption across the mouth
+# is a mistake. Being on the picture is also what makes the colour rule matter:
+# there is something behind the text to contrast against.
+CAPTION_ROW = 5          # of ROWS, counting from the top
+ROWS = 6
 
-# Gap between words on a line, as a fraction of the base size.
+# Gap between words, as a fraction of the font size.
 WORD_GAP = 0.26
 
-# Which band to use when the margin is too shallow to hold the text and the
-# caption has to go back inside the picture. The upper area is the safer
-# default: subjects sit centre and low far more often than high.
-DEFAULT_ROW = 1
-
-# The last word of a phrase is the one that lands, so it gets to be bigger.
+# Every word is the same size.
 #
-# 1.28x was too timid to read as emphasis — it looked like inconsistent sizing
-# rather than a deliberate accent. The gap has to be obvious enough that the
-# eye goes to the payoff word without being told.
-EMPHASIS_SCALE = 1.75
+# Sizing the last word of each phrase up was tried and dropped. It was built to
+# mark where the sense lands, and at two words a phrase the "payoff word" is
+# half the caption, so the effect was not emphasis — it was two sizes of text
+# alternating, which reads as a mistake rather than an accent.
 
 # Keep the block clear of the picture's edges, so a long word never runs into
 # the rounded corner or off the frame.
@@ -156,6 +154,23 @@ def _ff_text(text: str) -> str:
     all appear in the first ten seconds of the test clip.
     """
     return "'" + text.replace("'", "'\\''") + "'"
+
+
+# Punctuation the transcriber attaches to a word, stripped from the ends only.
+# Apostrophes and hyphens survive because they sit inside words — "don't" and
+# "self-made" are one word each, and cleaning them would misspell them.
+_EDGE_PUNCT = ".,!?;:\"“”‘’()[]…—–-"
+
+
+def _clean(text: str) -> str:
+    """One word as it should appear on screen.
+
+    Captions in this style carry no punctuation. On a line of two words a full
+    stop is a third of the visual weight and adds nothing — the pause is
+    already there in the speech, and the caption changes when the phrase does.
+    Grammar is for the SRT, which is written separately and keeps it.
+    """
+    return text.strip().strip(_EDGE_PUNCT).strip()
 
 
 def _measurer(font_path: str):
@@ -282,23 +297,25 @@ def build_filter(
     shots: list | None = None,
     frame_height: int = 1920,
 ) -> str | None:
-    """Draw each phrase under the picture, in a colour that contrasts.
+    """Draw each phrase low inside the square, in a colour that contrasts.
 
     Three rules, all taken from what the reference edits actually do:
 
-    - **Never over the subject.** The caption sits in the black margin below the
-      picture. Not "usually clear of him" — structurally clear, because that
-      part of the frame holds no picture at all.
-    - **Never past the frame.** Text is sized down until the whole line fits
-      inside the picture's width, so a long word cannot run off the edge or
-      collide with the rounded corner.
-    - **Never the same colour as what is behind it.** White on black is the
-      normal case. When the margin is too shallow to hold the line and the text
-      has to sit on the picture, the pixels it will cover are measured: a bright
-      shot gets black text, a dark one white.
+    - **Inside the square, low in it.** Fixed, not searched for. The caption is
+      furniture and belongs in the same place every cut; it sits as far from the
+      face as the frame allows.
+    - **Never past the frame.** Text is sized down until the line fits inside
+      the picture's width, so a long word cannot run off the edge or collide
+      with the rounded corner.
+    - **Never the same colour as what is behind it.** The strip of picture the
+      words will actually cover is measured, not the shot as a whole: a shot can
+      be bright at the top and black at the bottom, and a caption low in the
+      frame cares only about the bottom. Bright gets black text, dark gets
+      white.
 
-    `shots` is the render's shot plan, and is only consulted in that last case —
-    on black there is nothing to measure and nothing to decide.
+    `shots` is the render's shot plan — which clip is on screen when. Without it
+    the colour falls back to white, since there is no way to know what a word
+    lands on.
     """
     font = find_font()
     if not font or not words:
@@ -308,10 +325,8 @@ def build_filter(
     measure = _measurer(font)
     draws: list[str] = []
 
-    rows = 6
-    band_h = band_height // rows
+    band_h = band_height // ROWS
     band_bottom = band_top + band_height
-    margin_below = max(0, frame_height - band_bottom)
     usable = picture_width - 2 * EDGE_PAD
 
     for p, phrase in enumerate(phrases):
@@ -320,53 +335,28 @@ def build_filter(
             phrase_end = min(phrase_end, float(phrases[p + 1][0].start) - 0.02)
         phrase_end = max(phrase_end, float(phrase[-1].end) + 0.05)
 
-        texts = [w.text.strip() for w in phrase if w.text.strip()]
-        if not texts:
+        text = " ".join(_clean(w.text) for w in phrase).strip()
+        if not text:
             continue
 
-        # Lay the words out at a size that fits, with the last one larger.
-        #
-        # The last word of a phrase is where the sense lands, and sizing it up
-        # is what makes the caption look edited rather than transcribed. It has
-        # to be part of the fitting loop rather than applied afterwards, or the
-        # emphasis is exactly what pushes the line off the frame.
+        # One size for the whole line, shrunk until it fits.
         size = FONT_SIZE
-        while size > 30:
-            sizes = [size] * len(texts)
-            sizes[-1] = int(size * EMPHASIS_SCALE)
-            widths = [measure(t, s) for t, s in zip(texts, sizes)]
-            total = sum(widths) + int(size * WORD_GAP) * (len(texts) - 1)
-            if total <= usable:
-                break
+        while size > 30 and measure(text, size) > usable:
             size = int(size * 0.92)
 
-        line_h = max(sizes)
+        y = band_top + CAPTION_ROW * band_h + (band_h - size) // 2
+        y = max(band_top + EDGE_PAD, min(y, band_bottom - size - EDGE_PAD))
 
-        # Below the picture if the margin can hold it, which with a square
-        # window it always can; inside the quietest band only as a fallback.
-        if margin_below >= line_h + CAPTION_GAP:
-            y = min(band_bottom + CAPTION_GAP, frame_height - line_h - 12)
-        else:
-            y = band_top + DEFAULT_ROW * band_h + (band_h - line_h) // 2
-            y = max(band_top + EDGE_PAD,
-                    min(y, band_bottom - line_h - EDGE_PAD))
-
-        colour, shadow = _colours_at(y, line_h, band_top, band_bottom, rows,
+        colour, shadow = _colours_at(y, size, band_top, band_bottom, ROWS,
                                      shots, float(phrase[0].start))
 
-        x = picture_left + (picture_width - total) // 2
-        for text, word_size, width in zip(texts, sizes, widths):
-            draws.append(
-                f"drawtext=fontfile='{_ff_path(font)}':text={_ff_text(text)}:"
-                f"fontcolor={colour}:fontsize={word_size}:"
-                f"shadowcolor={shadow}:shadowx=2:shadowy=2:"
-                # Bottom-aligned, not top-aligned: drawtext positions the top of
-                # the box, so equal y values would leave the emphasised word
-                # hanging below the others instead of sharing their baseline.
-                f"x={x}:y={y + line_h - word_size}:"
-                f"enable='between(t,{float(phrase[0].start):.3f},{phrase_end:.3f})'"
-            )
-            x += width + int(size * WORD_GAP)
+        draws.append(
+            f"drawtext=fontfile='{_ff_path(font)}':text={_ff_text(text)}:"
+            f"fontcolor={colour}:fontsize={size}:"
+            f"shadowcolor={shadow}:shadowx=2:shadowy=2:"
+            f"x={picture_left}+({picture_width}-text_w)/2:y={y}:"
+            f"enable='between(t,{float(phrase[0].start):.3f},{phrase_end:.3f})'"
+        )
 
     if not draws:
         return None
