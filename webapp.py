@@ -288,6 +288,76 @@ def _step_for_line(text: str, kind: str = "studio") -> str | None:
 # ---------------------------------------------------------------------------
 
 
+_FLAGS_CACHE: dict[str, frozenset] = {}
+
+
+def accepted_flags(script: str) -> frozenset:
+    """The long options a script's argparse will accept.
+
+    Read from its own `--help` rather than kept in a list here, because a list
+    here is the thing that goes stale. Cached per path: this shells out, and
+    the answer cannot change while the server runs.
+    """
+    if script in _FLAGS_CACHE:
+        return _FLAGS_CACHE[script]
+
+    found: frozenset = frozenset()
+    try:
+        python = os.path.join(BASE_DIR, "venv", "Scripts", "python.exe")
+        if not os.path.isfile(python):
+            python = sys.executable
+        r = subprocess.run([python, script, "--help"], capture_output=True,
+                           text=True, timeout=60, cwd=BASE_DIR)
+        found = frozenset(re.findall(r"--[a-z][a-z0-9-]*", r.stdout or ""))
+    except (OSError, subprocess.SubprocessError):
+        # Couldn't ask. Return empty, which the filter below treats as
+        # "don't know, change nothing" rather than "drop everything".
+        found = frozenset()
+
+    _FLAGS_CACHE[script] = found
+    return found
+
+
+def _drop_unknown_flags(cmd: list[str], script: str, log=None) -> list[str]:
+    """Remove options the target script would reject, and say so.
+
+    This exists because of a failure that is entirely invisible until someone
+    presses the button: the UI builds a command line for a separate script, and
+    when the two drift apart argparse exits with code 2 before the first stage
+    runs. The user sees "Pipeline exited with code 2" and a usage dump, which
+    describes the symptom and not the cause.
+
+    Losing one option is a far better outcome than losing the whole run, so a
+    flag the script does not recognise is dropped rather than sent. The
+    mismatch is still reported into the run log, so it gets fixed rather than
+    silently tolerated.
+    """
+    known = accepted_flags(script)
+    if not known:
+        return cmd
+
+    out: list[str] = []
+    dropped: list[str] = []
+    i = 0
+    while i < len(cmd):
+        token = cmd[i]
+        if token.startswith("--") and token not in known:
+            dropped.append(token)
+            i += 1
+            # Also drop its value, if it had one.
+            if i < len(cmd) and not cmd[i].startswith("--"):
+                i += 1
+            continue
+        out.append(token)
+        i += 1
+
+    if dropped and log:
+        log(f"⚠ Ignoring option(s) {' '.join(dropped)} — "
+            f"{os.path.basename(script)} does not accept them. "
+            f"The run continues without them; this mismatch needs fixing.")
+    return out
+
+
 class Job:
     def __init__(self, url: str, kind: str = "studio", options: dict | None = None):
         self.id = uuid.uuid4().hex[:12]
@@ -401,10 +471,18 @@ class Job:
             count = self.options.get("count")
             if count:
                 cmd += ["--count", str(int(count))]
-            if self.options.get("carousel"):
-                cmd.append("--carousel")
-            return cmd
+            # The carousel is on by default in the pipeline, so the flag to
+            # send is the one that turns it *off*. Sending "--carousel"
+            # instead is not a no-op — argparse rejects the unknown option and
+            # the run dies at two seconds, before the first stage.
+            if not self.options.get("carousel"):
+                cmd.append("--no-carousel")
+            return _drop_unknown_flags(cmd, self._script_path("make_shorts.py"),
+                                       self._append)
         return [python, "-u", "cli.py", self.url]
+
+    def _script_path(self, name: str) -> str:
+        return os.path.join(BASE_DIR, name)
 
     def _run(self) -> None:
         env = dict(os.environ)
@@ -1440,6 +1518,14 @@ def main() -> None:
         print(f"UI files missing - expected {os.path.join(UI_DIR, 'index.html')}")
         sys.exit(1)
 
+    # Every option this server can send, checked against what the pipeline
+    # actually accepts. A drift here costs nothing until someone presses the
+    # button, and then it costs the whole run — so it is worth one subprocess
+    # at startup to find out while there is still someone reading the console.
+    script = os.path.join(BASE_DIR, "make_shorts.py")
+    known = accepted_flags(script)
+    unknown = sorted({"--style", "--count", "--no-carousel"} - known) if known else []
+
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     url = f"http://{HOST}:{PORT}"
     status = env_status()
@@ -1448,6 +1534,11 @@ def main() -> None:
     print(f"  {url}")
     print(f"  ANTHROPIC_API_KEY:  {'set' if status['anthropic'] else 'MISSING (runs will fail)'}")
     print(f"  ELEVENLABS_API_KEY: {'set' if status['elevenlabs'] else 'not set (voice-over skipped)'}")
+    if unknown:
+        print(f"  ⚠ make_shorts.py does not accept {' '.join(unknown)} — "
+              f"those options will be dropped from runs. Fix the mismatch.")
+    else:
+        print("  Pipeline options:   match")
     print("  Ctrl+C to stop.\n")
 
     if os.environ.get("CONTENT_STUDIO_UI_NO_BROWSER") != "1":

@@ -49,6 +49,7 @@ from caption_timing import captions_for_clip
 from moment_finder import MAX_TOTAL_SECONDS, Moment, find_moments
 from shorts_builder import (
     ShortSpec,
+    build_plain_cut,
     build_rough_cut,
     build_short,
     join_clips,
@@ -1098,6 +1099,21 @@ def make_shorts(
         except Exception as e:
             say(f"  ⚠ Render failed: {e}")
             return None, log
+
+        # The same moment again, stripped: same cut, same separated voice, no
+        # b-roll, no window, no captions. It is the raw material of the short
+        # rather than an alternative edit of it, which is why it takes the same
+        # duration and the same audio chain and differs only in the picture.
+        #
+        # Rendered after the styled version and never allowed to fail the run:
+        # if this one breaks, the finished short still exists, and that is the
+        # right way round to lose something.
+        plain_path = os.path.join(folder, "short_plain.mp4")
+        try:
+            build_plain_cut(raw_clip, plain_path, render_duration)
+            say(f"  ✓ {plain_path} (plain — cut and voice only)")
+        except Exception as e:
+            say(f"  ⚠ Plain version failed, keeping the styled one: {e}")
 
         record = moment.to_dict()
         record.update({

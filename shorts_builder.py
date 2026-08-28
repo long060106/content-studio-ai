@@ -750,6 +750,48 @@ def build_rough_cut(
     return out_path
 
 
+def build_plain_cut(speech_source: str, out_path: str, duration: float) -> str:
+    """The same cut and the same cleaned voice, with none of the styling.
+
+    No b-roll, no window, no grade, no captions — the speaker's own picture at
+    its native shape, which is the most useful thing to hand to an editor. It
+    is the raw material of the finished short rather than a second attempt at
+    it, so nothing here bakes in a decision that would have to be undone.
+
+    **The audio chain is deliberately identical to the styled render**, down to
+    the loudness target. That is the whole reason this is a real render and not
+    a copy of the `clip_voice.mp4` the pipeline already writes on the way
+    through: that intermediate has been through voice separation but not
+    through loudness normalisation, and its duration differs from the finished
+    short by a few frames. Shipping it would give two files that sound
+    different and do not line up, which is worse than shipping one.
+    """
+    if not os.path.isfile(speech_source):
+        raise RenderError(f"Speech source not found: {speech_source}")
+
+    duration = max(1.0, float(duration))
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
+
+    graph = (
+        f"[0:v]fps={FPS},trim=duration={duration:.3f},setpts=PTS-STARTPTS[v];"
+        f"[0:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
+        f"highpass=f=85,{SPEECH_CLEANUP}loudnorm=I=-14:TP=-1.5:LRA=11[a]"
+    )
+
+    _run(
+        ["ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error",
+         "-i", os.path.abspath(speech_source),
+         "-filter_complex", graph,
+         "-map", "[v]", "-map", "[a]",
+         "-t", f"{duration:.3f}",
+         *video_encoder_args(),
+         "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+         "-movflags", "+faststart",
+         os.path.abspath(out_path)]
+    )
+    return out_path
+
+
 # B-roll playback rate. Below 1.0 is slow motion.
 #
 # These cuts sit under a voice, and footage moving at normal speed competes
