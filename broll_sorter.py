@@ -154,6 +154,15 @@ def main() -> None:
             if os.path.abspath(dest) == os.path.abspath(path):
                 continue
             if os.path.exists(dest):
+                # The same clip is already filed correctly, so this one is a
+                # leftover from an earlier arrangement. Skipping the move left
+                # it stranded in a folder that then could not be cleaned up as
+                # empty — one clip kept a whole obsolete category alive.
+                try:
+                    if os.path.getsize(dest) == os.path.getsize(path):
+                        os.remove(path)
+                except OSError:
+                    pass
                 continue
             try:
                 shutil.move(path, dest)
