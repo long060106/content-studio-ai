@@ -87,13 +87,35 @@ def mid_frame(path: str) -> bytes | None:
     return out.stdout or None
 
 
+# Words that mean the reply was a sentence rather than a description.
+#
+# The model occasionally declines a frame — one clip in this library came back
+# as "I can't provide a..." and was duly renamed `subs-11-i-can-t-provide-a.mp4`,
+# because the slugifier will happily turn any English into a filename. A refusal
+# is not a description and must not become a name; better an unnamed clip that a
+# later run can retry than a permanent lie in the library.
+#
+# Descriptions are concrete nouns and adjectives, so function words are the
+# giveaway. No real answer contains "i", "can", "the" or "sorry".
+_NOT_A_DESCRIPTION = {
+    "i", "im", "cant", "can", "cannot", "unable", "sorry", "unfortunately",
+    "apologize", "apologise", "provide", "assist", "help", "as", "an", "ai",
+    "this", "that", "the", "a", "is", "are", "it", "unclear", "sure", "here",
+}
+
+
 def _slug(text: str) -> str:
-    """The model's answer as a filename fragment, whatever it actually sent."""
+    """The model's answer as a filename fragment, or empty if it wasn't one."""
     text = (text or "").strip().lower().splitlines()[0] if text else ""
     text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+    words = [w for w in text.split("-") if w]
+    if not words:
+        return ""
+    if any(w in _NOT_A_DESCRIPTION for w in words):
+        return ""
     # Five words is the cap: past that the name stops being scannable and the
     # extra tags are noise rather than signal.
-    return "-".join(text.split("-")[:5])[:60]
+    return "-".join(words[:5])[:60]
 
 
 def describe(client, path: str) -> str | None:
