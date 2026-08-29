@@ -1151,7 +1151,26 @@ def make_shorts(
                     say(f"  ⚠ Voice separation failed ({str(e)[:60]}) — keeping the mix")
 
             words_to_srt(words, os.path.join(folder, "captions.srt"))
-            say(f"  ✓ {len(words)} words timed → captions.srt")
+
+            # The spoken words as plain prose, to be copied into whatever
+            # subtitles the clip gets by hand.
+            #
+            # Not a duplicate of the SRT beside it: an SRT carries timings and
+            # cue numbers, which is what an editor imports, while this is what
+            # gets pasted into a caption box or a post. Selecting the words out
+            # of an SRT means dragging past a timestamp every second line.
+            try:
+                spoken = " ".join(w.text.strip() for w in words if w.text.strip())
+                # Break after a sentence ends so it reads as paragraphs rather
+                # than one unbroken wall of text.
+                spoken = re.sub(r"(?<=[.!?]) +", "\n", spoken)
+                with open(os.path.join(folder, "transcript.txt"), "w",
+                          encoding="utf-8") as f:
+                    f.write(spoken.strip() + "\n")
+            except Exception as e:
+                say(f"  ⚠ Couldn't write transcript.txt: {e}")
+
+            say(f"  ✓ {len(words)} words timed → captions.srt, transcript.txt")
             if captions:
                 captions_path = os.path.join(folder, "captions.ass")
                 build_ass(words, captions_path, hook=moment.hook)

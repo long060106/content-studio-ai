@@ -256,7 +256,11 @@ CLICKS_ON_CUTS = False
 # Word-by-word captions burned into the picture, appearing as each word is
 # said. See kinetic_captions for the blend and why the words sit on the picture
 # rather than in the black bars.
-KINETIC_CAPTIONS = True
+# Off. The words are delivered as transcript.txt and captions.srt beside each
+# clip instead, and the subtitles get made by hand from those — burned-in text
+# is in the pixels, so a clip that arrives with the wrong words on it has to be
+# rendered again rather than edited.
+KINETIC_CAPTIONS = False
 
 
 # The window's shape.
