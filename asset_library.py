@@ -44,11 +44,13 @@ you have rights to into `assets/image/` and `scan()` will pick them up.
 
 from __future__ import annotations
 
+import atexit
 import json
 import mimetypes
 import os
 import re
 import subprocess
+import threading
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, asdict, field
@@ -138,14 +140,87 @@ def ensure_dirs() -> None:
 # --------------------------------------------------------------------------
 
 
+# Probe results, cached on disk between runs.
+#
+# `curated_broll` walks the whole library and probes every clip on every call,
+# and each probe is a subprocess. At 92 clips that cost a few seconds and nobody
+# noticed. The library then grew to 1,190 and the same call took minutes — long
+# enough that a query timed out at five — because process spawning on Windows is
+# expensive and this does it once per file per call, several times per short.
+#
+# Keyed by size and modification time as well as path, so a re-cut or replaced
+# clip is re-probed rather than silently keeping the old duration.
+_PROBE_CACHE_PATH = os.path.join(ASSETS_DIR, ".probe_cache.json")
+_PROBE_CACHE: Optional[dict] = None
+_PROBE_DIRTY = False
+_PROBE_LOCK = threading.Lock()
+
+
+def _probe_key(path: str) -> Optional[str]:
+    try:
+        st = os.stat(path)
+    except OSError:
+        return None
+    return f"{os.path.abspath(path)}::{st.st_size}::{int(st.st_mtime)}"
+
+
+def _probe_cache() -> dict:
+    global _PROBE_CACHE
+    if _PROBE_CACHE is None:
+        try:
+            with open(_PROBE_CACHE_PATH, encoding="utf-8") as f:
+                _PROBE_CACHE = json.load(f)
+        except (OSError, ValueError):
+            _PROBE_CACHE = {}
+    return _PROBE_CACHE
+
+
+def save_probe_cache() -> None:
+    """Write the cache out. Registered at exit; safe to call any time."""
+    global _PROBE_DIRTY
+    with _PROBE_LOCK:
+        if not _PROBE_DIRTY or _PROBE_CACHE is None:
+            return
+        try:
+            os.makedirs(os.path.dirname(_PROBE_CACHE_PATH), exist_ok=True)
+            with open(_PROBE_CACHE_PATH, "w", encoding="utf-8") as f:
+                json.dump(_PROBE_CACHE, f)
+            _PROBE_DIRTY = False
+        except OSError:
+            pass
+
+
+atexit.register(save_probe_cache)
+
+
 def probe(path: str) -> tuple[float, int, int]:
     """(duration, width, height) via ffprobe, falling back to ffmpeg.
+
+    Cached on disk — see `_PROBE_CACHE_PATH`. The first pass over a new library
+    still costs one subprocess per clip; every pass afterwards costs nothing.
 
     The fallback matters because the two binaries are permitted separately:
     Windows Application Control can block `ffprobe.exe` while leaving
     `ffmpeg.exe` runnable, and without this the whole asset library reads as
     zero-length and every b-roll clip gets rejected for being too short.
     """
+    global _PROBE_DIRTY
+
+    key = _probe_key(path)
+    if key:
+        cached = _probe_cache().get(key)
+        if cached:
+            return float(cached[0]), int(cached[1]), int(cached[2])
+
+    result = _probe_uncached(path)
+    if key and result[0] > 0:
+        with _PROBE_LOCK:
+            _probe_cache()[key] = list(result)
+            _PROBE_DIRTY = True
+    return result
+
+
+def _probe_uncached(path: str) -> tuple[float, int, int]:
     cmd = [
         "ffprobe", "-v", "error",
         "-select_streams", "v:0",

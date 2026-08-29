@@ -36,3 +36,6 @@ assets/_pruned/
 current_link.txt
 cookies.txt
 *.log
+
+# Generated probe cache: derived from the media files, rebuilt on demand.
+assets/.probe_cache.json
