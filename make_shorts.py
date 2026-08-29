@@ -232,9 +232,20 @@ SENTENCE_SHOTS = True
 SENTENCE_MIN = 1.2
 SENTENCE_MAX = 8.0
 
-# How the two alternate, counted in sentences.
-SPEAKER_SENTENCES = 1
-BROLL_SENTENCES = 1
+# How many sentences show the speaker. Everything else is b-roll.
+#
+# Not an alternation. Cutting speaker-b-roll-speaker-b-roll all the way down
+# gives the speaker half the running time and makes the edit feel metronomic —
+# the viewer learns the rhythm and stops being surprised by the picture. A
+# couple of appearances is enough: one at the top so the face is established
+# and the voice has an owner, one late so the person is still there at the end.
+# The rest of the clip belongs to the footage.
+SPEAKER_SHOTS = 2
+
+# Where the later speaker shot falls, as a fraction of the way through. Near
+# the end rather than at it — closing on footage lets the last line land over a
+# picture instead of over a talking head.
+SPEAKER_LATE_AT = 0.72
 # One clip per cutaway, never reused inside a short. A repeat is noticeable:
 # the same footage returning twenty seconds later reads as running out of
 # material rather than as a deliberate callback. The ceiling exists only to
@@ -331,24 +342,31 @@ def _shot_plan(
 
     spans = _sentences(words or [], total) if SENTENCE_SHOTS else []
     if spans and broll_paths:
-        # One picture per sentence, alternating. The speaker gets the first one
-        # so the face is established before anything cuts away from it.
-        run = 0
-        on_speaker = True
-        for a, b in spans:
-            a, b = max(0.0, a), min(total, b)
-            if b - a <= epsilon:
-                continue
-            if on_speaker:
+        # One picture per sentence. The speaker takes a couple of them and the
+        # footage takes the rest.
+        usable = [(max(0.0, a), min(total, b)) for a, b in spans
+                  if min(total, b) - max(0.0, a) > epsilon]
+
+        # The first sentence is always the speaker: a short that opens on stock
+        # footage with a disembodied voice reads as a montage, and the face is
+        # what says who is talking.
+        speaker_at = {0}
+        if SPEAKER_SHOTS >= 2 and len(usable) >= 3:
+            late = min(len(usable) - 2, round(len(usable) * SPEAKER_LATE_AT))
+            # Only if it leaves footage in between. On a three-sentence clip the
+            # arithmetic lands on index 1, which puts two speaker shots back to
+            # back — the picture then does not change on a sentence boundary at
+            # all, which looks like the cut failed rather than like a choice.
+            if late >= 2:
+                speaker_at.add(late)
+
+        for i, (a, b) in enumerate(usable):
+            if i in speaker_at:
                 plan.append((speech_path, a, b - a, "original"))
             else:
                 plan.append((broll_paths[index % len(broll_paths)], 0.0,
                              b - a, "b-roll"))
                 index += 1
-            run += 1
-            if run >= (SPEAKER_SENTENCES if on_speaker else BROLL_SENTENCES):
-                on_speaker = not on_speaker
-                run = 0
         if plan:
             return plan
 
