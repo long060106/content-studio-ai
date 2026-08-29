@@ -227,6 +227,14 @@ def caption_text(text: str) -> str:
     while cleaned and cleaned[-1] in _END_PUNCT:
         tail = cleaned[-1] + tail
         cleaned = cleaned[:-1]
+    # A hyphen belongs inside a word, never at its edge.
+    #
+    # Hyphens are kept because "self-made" is one word and stripping it would
+    # misspell it. But the transcriber also emits fragments like "-saviyos"
+    # where it has split a phrase it could not place — usually where the
+    # speaker changed language mid-sentence — and a caption that opens with a
+    # dash reads as a rendering fault rather than as a word.
+    cleaned = cleaned.strip("-")
     # Only one mark, however many the transcriber ran together.
     return (cleaned.lower() + tail[:1]).strip()
 
