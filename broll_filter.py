@@ -59,7 +59,21 @@ VIOLENT = {
 #
 # So horror sources are excluded whole. A per-clip rule cannot see what a
 # per-clip description leaves out.
-BLOCKED_FILMS = ("subs-", "nosf-", "28yl-", "alsg-")
+BLOCKED_FILMS = (
+    # Horror sources. The Substance put nudity and body horror into a finished
+    # short behind the description `figure-sitting-bathroom-fluorescent-light`.
+    "subs-", "nosf-", "28yl-", "alsg-",
+    # Films where graphic violence is a signature rather than an occasional
+    # scene. RoboCop put an extreme close-up of a bloodied eye into a short,
+    # described as `close-up-hand-dark-object` — the second time a composition
+    # was recorded accurately while what made it unusable went unmentioned.
+    #
+    # Two escapes of the same shape is the argument for judging the source
+    # instead of the shot. A description is written by looking at a frame for a
+    # moment; whether a film is full of gore is known before a single frame is
+    # cut.
+    "rbcp-", "sinn-", "sqg2-", "pngn-", "dda1-", "dda2-",
+)
 
 # Matches a rule word but is not the thing. Checked as phrases, so only the
 # innocent use is spared — "dead tree" stays, a dead body does not.
