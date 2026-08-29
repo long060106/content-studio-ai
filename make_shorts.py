@@ -206,6 +206,73 @@ def _spoken_text(moment: Moment, segments: list[dict]) -> str:
     return "\n\n[hard cut]\n\n".join(parts)
 
 
+def _words_from_segments(moment: Moment, segments: list[dict]) -> list:
+    """Approximate word timings from the talk's own transcript.
+
+    The fallback for when Whisper cannot run. It was referenced here for months
+    and never actually written: every time the safety net deployed it raised
+    NameError, the broad `except` around it swallowed that, and the run reported
+    "Transcript timings failed too" — a message describing a data problem when
+    the truth was that the code did not exist. The day Windows blocked both
+    Whisper engines, this was the thing that should have kept captions and the
+    shot plan alive, and it took the whole batch down instead.
+
+    Precision is line-level, not word-level: each segment's words are spread
+    evenly across its span, so a word's time is right to within a syllable or
+    two rather than exact. That is enough for captions to track the voice and
+    for the shot planner to cut on sentence ends, which is the whole point of
+    having it.
+
+    **Times come back clip-relative**, because everything downstream measures
+    from the start of the cut and not from the start of the talk. Where a moment
+    stitches several cuts, each one's words are shifted by the running length of
+    the cuts before it — the clip is their concatenation.
+
+    YouTube's caption segments overlap by design: they roll, so one starts
+    before the last has finished. Each segment's end is therefore clamped to the
+    next one's start, or words would be handed timings that run past the words
+    after them.
+    """
+    from caption_timing import Word
+
+    words: list = []
+    offset = 0.0
+
+    for cut in moment.cuts:
+        inside = sorted(
+            (s for s in segments
+             if cut.start_seconds <= float(s["start"]) < cut.end_seconds),
+            key=lambda s: float(s["start"]),
+        )
+        for i, seg in enumerate(inside):
+            text = (seg.get("text") or "").strip()
+            if not text:
+                continue
+            start = float(seg["start"])
+            end = start + float(seg.get("duration") or 0.0)
+            if i + 1 < len(inside):
+                end = min(end, float(inside[i + 1]["start"]))
+            end = min(end, cut.end_seconds)
+            span = max(0.12, end - start)
+
+            # Drop the transcriber's own stage directions. YouTube writes
+            # "[Music]", "[Applause]" and "[Laughter]" into the caption stream,
+            # and they are not spoken — burning one onto the screen as though
+            # the speaker said it is the sort of mistake nobody looks for.
+            parts = [w for w in text.split()
+                     if not (w.startswith("[") and w.endswith("]"))]
+            if not parts:
+                continue
+            step = span / len(parts)
+            for j, word in enumerate(parts):
+                a = offset + (start - cut.start_seconds) + j * step
+                words.append(Word(text=word, start=a, end=a + step * 0.92))
+
+        offset += max(0.0, cut.end_seconds - cut.start_seconds)
+
+    return words
+
+
 # The cutting rhythm. Short holds on the speaker, one or two quick b-roll
 # shots, then back to the speaker — the pattern the reference videos use.
 #
@@ -1232,6 +1299,21 @@ def make_shorts(
             say(f"  ⚠ Couldn't write the shot list: {e}")
 
         out_path = os.path.join(folder, "short.mp4")
+
+        # A run that cannot time words produces a lesser short: no captions, and
+        # a shot plan that falls back to a stopwatch instead of cutting on
+        # sentences. That is worth having when there is nothing else, and it is
+        # not worth writing over a good version of the same clip.
+        #
+        # This happened: both Whisper engines were blocked, eighteen shorts
+        # rendered silently without captions, and each overwrote the captioned
+        # version already sitting in its folder. The run reported success
+        # because it had produced files.
+        if not words and os.path.isfile(out_path):
+            say("  ⚠ No word timings, and a previous version of this short "
+                "exists — keeping it rather than overwriting with an "
+                "uncaptioned one.")
+            return None, log
         try:
             if broll_local:
                 shots = [(path, src, dur) for path, src, dur, _kind in plan]
