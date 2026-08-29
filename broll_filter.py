@@ -69,8 +69,26 @@ INNOCENT = (
 )
 
 
+# Clips that are a card rather than a shot: opening titles, credits, a logo.
+#
+# One of these put the name of another series across a finished short in
+# letters a foot high. They are footage in the sense that they move, and they
+# are useless here — the account's own captions are the only text that belongs
+# on screen.
+#
+# Matched as whole words, which is the entire reason this is a separate set:
+# "texture" and "textured" both contain "text", and two perfectly good
+# close-ups were nearly deleted for it.
+CARDS = {
+    "title", "titles", "credits", "logo", "subtitle", "subtitles",
+    "caption", "captions", "typography", "lettering", "watermark", "text",
+}
+
+
 def is_violent(filename: str) -> bool:
     low = os.path.splitext(filename.lower())[0]
+    if set(low.split("-")) & CARDS:
+        return True
     # The film is checked before the words, because the words are exactly what
     # failed: a blocked film's clip can carry a perfectly innocent description.
     if low.startswith(BLOCKED_FILMS):
