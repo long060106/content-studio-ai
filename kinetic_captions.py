@@ -86,6 +86,18 @@ WORDS_PER_PHRASE = 1
 # the sense of the sentence rather than an arbitrary count.
 PHRASE_GAP = 0.55
 
+# How long a word lingers after it stops being spoken. Only ever taken up to
+# the moment the next word appears — see where it is used.
+CAPTION_HOLD = 0.28
+
+# Clear air between one word leaving and the next arriving. Small enough to read
+# as continuous, large enough that no frame ever carries two words.
+CAPTION_GAP = 0.02
+
+# The shortest a word may stay up, measured from when it appears. A window of
+# zero length never draws at all, which loses the word entirely.
+CAPTION_MIN_ON = 0.06
+
 # Large. One word has the whole width to itself, and at the old size — set
 # when three words shared the line — a single word sat marooned in the middle
 # of the frame looking like a mistake.
@@ -334,13 +346,31 @@ def build_filter(
         # screen when the incoming one appeared, and both were drawn at once:
         # two stacks of words on top of each other, unreadable, and easy to
         # mistake for a layout or spacing problem rather than a timing one.
-        phrase_end = float(phrase[-1].end) + 0.28
-        if p + 1 < len(phrases):
-            next_start = float(phrases[p + 1][0].start)
-            phrase_end = min(phrase_end, next_start - 0.02)
-        # A phrase whose words all land inside a hair of each other would
-        # otherwise get a negative window and never draw at all.
-        phrase_end = max(phrase_end, float(phrase[-1].end) + 0.05)
+        # When this word leaves the screen.
+        #
+        # The order of these three steps is the whole of it, and it was wrong.
+        # The minimum-duration floor used to be applied *after* the clamp that
+        # keeps a word from outliving its successor, so the floor simply undid
+        # the clamp. Whisper reports a word's end as roughly the next word's
+        # start, so `end + 0.05` beat `next_start - 0.02` almost every time and
+        # nearly every word sat on screen on top of the one after it — which
+        # reads as a font or spacing problem rather than as a timing one.
+        #
+        # Not overlapping is the rule that cannot bend: a caption showing two
+        # words at once is unreadable, while one that flashes slightly short is
+        # merely quick.
+        next_start = (float(phrases[p + 1][0].start)
+                      if p + 1 < len(phrases) else None)
+
+        phrase_end = float(phrase[-1].end) + CAPTION_HOLD
+        if next_start is not None:
+            phrase_end = min(phrase_end, next_start - CAPTION_GAP)
+        # Floor measured from the word's own start, not its end: a zero-length
+        # window never draws at all.
+        phrase_end = max(phrase_end, float(phrase[0].start) + CAPTION_MIN_ON)
+        # And the floor is never allowed to reintroduce the overlap.
+        if next_start is not None:
+            phrase_end = min(phrase_end, next_start - 0.010)
 
         # Lay the block out first, measuring every word, then draw it. Sizes
         # differ within a phrase, so spacing has to follow the actual glyphs

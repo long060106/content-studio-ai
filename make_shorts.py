@@ -216,6 +216,25 @@ def _spoken_text(moment: Moment, segments: list[dict]) -> str:
 SPEAKER_HOLD_SECONDS = 2.0
 BROLL_SHOT_SECONDS = 1.5
 BROLL_RUN = 2          # b-roll shots before cutting back to the speaker
+
+# The cut follows the sentence, not a stopwatch.
+#
+# A cutaway that changes mid-clause fights the speech: the viewer is still
+# holding the first half of a thought when the picture tells them a new one has
+# started. Cutting where the speaker actually stops means the edit and the
+# sentence agree, which is what makes the b-roll read as illustration rather
+# than as decoration laid over the top.
+#
+# Sentences that run past the upper bound are split at their longest internal
+# pause, and ones under the lower bound are folded into their neighbour — a
+# two-word sentence is a beat, not a shot.
+SENTENCE_SHOTS = True
+SENTENCE_MIN = 1.2
+SENTENCE_MAX = 8.0
+
+# How the two alternate, counted in sentences.
+SPEAKER_SENTENCES = 1
+BROLL_SENTENCES = 1
 # One clip per cutaway, never reused inside a short. A repeat is noticeable:
 # the same footage returning twenty seconds later reads as running out of
 # material rather than as a deliberate callback. The ceiling exists only to
@@ -229,10 +248,70 @@ def _text_between(words: list, start: float, end: float) -> str:
     return " ".join(said).strip()
 
 
+def _sentences(words: list, total: float) -> list[tuple[float, float]]:
+    """The clip split into spans that each end where a sentence ends.
+
+    Punctuation first — it is what the transcriber already knows about the
+    grammar and it costs nothing to read. A long silence closes a span too,
+    because a speaker who stops for most of a second has finished a thought
+    whether or not the transcript put a full stop on it.
+    """
+    if not words:
+        return []
+
+    spans: list[tuple[float, float]] = []
+    start = max(0.0, float(words[0].start))
+
+    for i, w in enumerate(words):
+        text = (w.text or "").strip()
+        last = i + 1 >= len(words)
+        ends_sentence = text.endswith((".", "!", "?"))
+        long_pause = (not last
+                      and float(words[i + 1].start) - float(w.end) >= 0.45)
+        if last or ends_sentence or long_pause:
+            end = float(w.end) if last else min(float(w.end) + 0.06,
+                                                float(words[i + 1].start))
+            if end - start > 0.05:
+                spans.append((start, end))
+            start = end
+
+    if not spans:
+        return []
+
+    # Fold anything too short into its neighbour: a two-word sentence is a
+    # beat, not a shot, and cutting on it produces a flicker.
+    merged: list[list[float]] = [list(spans[0])]
+    for a, b in spans[1:]:
+        if b - a < SENTENCE_MIN and merged:
+            merged[-1][1] = b
+        else:
+            merged.append([a, b])
+    if len(merged) > 1 and merged[0][1] - merged[0][0] < SENTENCE_MIN:
+        merged[1][0] = merged[0][0]
+        merged.pop(0)
+
+    # And split anything too long, so one rambling sentence does not hold a
+    # single picture for a third of the clip.
+    out: list[tuple[float, float]] = []
+    for a, b in merged:
+        while b - a > SENTENCE_MAX:
+            out.append((a, a + SENTENCE_MAX))
+            a += SENTENCE_MAX
+        out.append((a, b))
+
+    # Cover the whole clip: the last span runs to the end, whatever the word
+    # timings said, or the final shot would be missing.
+    if out:
+        out[0] = (0.0, out[0][1])
+        out[-1] = (out[-1][0], max(total, out[-1][1]))
+    return [(a, b) for a, b in out if b - a > 0.05]
+
+
 def _shot_plan(
     total: float,
     speech_path: str,
     broll_paths: list[str],
+    words: list | None = None,
 ) -> list[tuple[str, float, float, str]]:
     """Alternate speaker and b-roll across the clip.
 
@@ -246,10 +325,34 @@ def _shot_plan(
     which is exactly the old behaviour.
     """
     plan: list[tuple[str, float, float, str]] = []
-    t = 0.0
     index = 0
     # Anything shorter than this isn't a shot, it's a flicker.
     epsilon = 0.2
+
+    spans = _sentences(words or [], total) if SENTENCE_SHOTS else []
+    if spans and broll_paths:
+        # One picture per sentence, alternating. The speaker gets the first one
+        # so the face is established before anything cuts away from it.
+        run = 0
+        on_speaker = True
+        for a, b in spans:
+            a, b = max(0.0, a), min(total, b)
+            if b - a <= epsilon:
+                continue
+            if on_speaker:
+                plan.append((speech_path, a, b - a, "original"))
+            else:
+                plan.append((broll_paths[index % len(broll_paths)], 0.0,
+                             b - a, "b-roll"))
+                index += 1
+            run += 1
+            if run >= (SPEAKER_SENTENCES if on_speaker else BROLL_SENTENCES):
+                on_speaker = not on_speaker
+                run = 0
+        if plan:
+            return plan
+
+    t = 0.0
 
     while t < total - epsilon:
         span = min(SPEAKER_HOLD_SECONDS, total - t)
@@ -271,13 +374,13 @@ def _shot_plan(
     return plan
 
 
-def _broll_slots(total: float) -> int:
+def _broll_slots(total: float, words: list | None = None) -> int:
     """How many distinct b-roll clips a short of this length needs.
 
     Counted from the plan itself rather than estimated, so the fetch asks for
     exactly as many as there are cutaways and nothing has to repeat.
     """
-    plan = _shot_plan(total, "SPEECH", ["placeholder"])
+    plan = _shot_plan(total, "SPEECH", ["placeholder"], words)
     cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
     return min(max(1, cutaways), MAX_DISTINCT_BROLL)
 
@@ -996,7 +1099,7 @@ def make_shorts(
             if not queries:
                 queries = list(moment.visual_keywords)
             picked = []
-            wanted = _broll_slots(render_duration)
+            wanted = _broll_slots(render_duration, words)
             try:
                 # Serialised: three workers hitting the same stock API at once
                 # gets rate-limited, and the shared "already used" set has to be
@@ -1085,7 +1188,7 @@ def make_shorts(
                 ]
 
         # Opens on the speaker, cuts away for a second or two, comes back.
-        plan = _shot_plan(render_duration, raw_clip, broll_local)
+        plan = _shot_plan(render_duration, raw_clip, broll_local, words)
         cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
         if broll_local:
             say(f"  ✓ {len(broll_local)} b-roll clip(s), {len(plan)} shots ({cutaways} cutaways)")
