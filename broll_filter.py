@@ -44,6 +44,23 @@ VIOLENT = {
     "flames", "burning", "bruised", "bleeding", "noose", "hanging",
 }
 
+# Whole films whose footage is unusable here, by clip prefix.
+#
+# Keyword filtering works on what a description says, and a description can be
+# accurate and still miss the point entirely. A clip from The Substance was
+# named `figure-sitting-bathroom-fluorescent-light` — a fair account of the
+# composition, and nothing in it hints at the nudity and body horror actually
+# on screen. It went into a finished short.
+#
+# There was a warning and it was not acted on: the namer *refused* to describe
+# one frame from that film, which was evidence about the source rather than a
+# one-off glitch. When a model declines to look at a film, that film does not
+# belong in a library for motivational shorts.
+#
+# So horror sources are excluded whole. A per-clip rule cannot see what a
+# per-clip description leaves out.
+BLOCKED_FILMS = ("subs-", "nosf-", "28yl-", "alsg-")
+
 # Matches a rule word but is not the thing. Checked as phrases, so only the
 # innocent use is spared — "dead tree" stays, a dead body does not.
 INNOCENT = (
@@ -54,6 +71,10 @@ INNOCENT = (
 
 def is_violent(filename: str) -> bool:
     low = os.path.splitext(filename.lower())[0]
+    # The film is checked before the words, because the words are exactly what
+    # failed: a blocked film's clip can carry a perfectly innocent description.
+    if low.startswith(BLOCKED_FILMS):
+        return True
     if any(phrase in low for phrase in INNOCENT):
         return False
     return bool(set(low.split("-")) & VIOLENT)
