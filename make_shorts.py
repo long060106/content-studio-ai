@@ -79,6 +79,13 @@ TIGHTEN_SILENCE = True
 # playing under the talk.
 ISOLATE_VOICE = True
 
+# Whether a run may top up its b-roll from the stock APIs.
+#
+# Off. Every cutaway comes from the film library in assets/broll/film, which is
+# cut from films on this machine and named for what each shot shows. Stock was
+# the reason that folder filled up with footage that reads as advertising.
+STOCK_BROLL = False
+
 
 def _slug(text: str, limit: int = 28) -> str:
     out = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
@@ -1013,7 +1020,18 @@ def make_shorts(
                         picked += asset_library.curated_broll(
                             queries, count=wanted - len(picked), exclude=already
                         )
-                    if len(picked) < wanted:
+                    # Stock is not a fallback any more, it is excluded.
+                    #
+                    # The library used to top up from Pexels whenever the
+                    # curated folder ran short, which is why 104 stock clips
+                    # accumulated there and were eventually deleted by hand.
+                    # Leaving the top-up in would quietly refill the folder on
+                    # the next run and undo that.
+                    #
+                    # Running short now means fewer cutaways, which is the right
+                    # failure: a shot from the films is the point, and a stock
+                    # clip that reads as an advert costs more than a repeat.
+                    if STOCK_BROLL and len(picked) < wanted:
                         for asset in picked:
                             used_broll.add(asset.id)
                         picked += asset_library.fetch_broll_set(

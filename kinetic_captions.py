@@ -1,34 +1,28 @@
 """
 kinetic_captions.py
 
-Word-by-word captions that appear as they are spoken, blended into the picture.
+Word-by-word captions that appear as they are spoken, drawn onto the picture.
 
 The reference style does this by hand in CapCut: split the auto-caption into
 individual words, place each one, size it, and drag it back to the frame where
-that word is actually said — then set the whole text layer to `soft light` so
-it sits *in* the image instead of on top of it. For a forty-second clip that is
-sixty words placed by hand. The word timings needed to do it automatically are
-already computed here for the SRT.
+that word is actually said. For a forty-second clip that is sixty words placed
+by hand, and it is the slowest part of finishing one of these videos. The word
+timings needed to do it automatically are already computed here for the SRT.
 
-**Why the text goes over the picture and not in the black bars.**
+**One word at a time, opaque, in Inter Black.** The caption changes on every
+word, so the text tracks the voice exactly instead of trailing it. Each word is
+on screen for a fraction of a second, which decides the other two choices: it
+has to be legible instantly, so it is drawn solid rather than blended, and it
+has to hold the frame alone, so the face is a heavy grotesque set large.
 
-Soft light is not a style choice that can be moved anywhere; it is arithmetic.
-Blending white onto a mid-grey canvas leaves the canvas untouched, which is
-what makes the effect invisible everywhere except where a word is. But soft
-light onto *black* is also almost no change — measured here, white text over a
-dark picture lifts it by 126 levels, and the same text over pure black lifts it
-by 22, which reads as nothing at all.
+**The blend is still here and still works** — set `CAPTION_BLEND_ON` to turn it
+back on. It composites the words into the picture so they take its light, which
+looks better on a phrase held for a second and worse on a word held for a third
+of one. See CANVAS_FOR_MODE for why the canvas colour is arithmetic rather than
+taste, and why blended captions cannot live in the black bars.
 
-So blended captions have to sit on the picture. The black bars stay what they
-were: room for a separate, opaque caption if one is ever wanted. Both cannot be
-the same layer.
-
-**How the effect is built.** A grey canvas with white words drawn on it, blended
-over the video in `softlight` mode. Mid-grey is the identity value for soft
-light — every pixel that is not part of a word leaves the frame exactly as it
-was — so no mask, no alpha channel, and no per-pixel expression is needed. The
-words take on the brightness and colour of whatever is behind them, which is
-the entire point of the look.
+Words are laid out by measuring the real font rather than counting characters:
+"WILL" and "iiii" are both four characters and nothing like the same width.
 """
 
 from __future__ import annotations
@@ -49,6 +43,14 @@ BUNDLED_FONT_DIR = os.path.join(
 )
 
 FONT_CANDIDATES = [
+    # Inter Black, shipped with the project. Chosen by name: it is a grotesque
+    # rather than a condensed display face, so a single word set large stays
+    # wide and even rather than tall and narrow — which is what makes one word
+    # at a time read as a caption instead of as a headline.
+    #
+    # Licensed under the SIL Open Font License, which permits redistribution;
+    # Inter-OFL.txt sits beside it as that licence requires.
+    os.path.join(BUNDLED_FONT_DIR, "Inter-Black.ttf"),
     # Anton, shipped with the project. It is the heavy condensed face these
     # edits actually use, and it is a real step up from anything Windows
     # includes — the stock faces are all either too light or too wide.
@@ -72,16 +74,22 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
 ]
 
-# Words held on screen together. The reference keeps these short — three words
-# is a glance, seven is reading, and a viewer who is reading has stopped
-# listening.
-WORDS_PER_PHRASE = 3
+# One word on screen at a time.
+#
+# Not a cap but the whole rule: the caption changes on every word, so the text
+# tracks the voice exactly rather than trailing it. It only works with timings
+# accurate to the word, which is what Whisper gives and what the SRT already
+# carries.
+WORDS_PER_PHRASE = 1
 
 # A phrase breaks early when the speaker pauses this long, so the text follows
 # the sense of the sentence rather than an arbitrary count.
 PHRASE_GAP = 0.55
 
-FONT_SIZE = 62
+# Large. One word has the whole width to itself, and at the old size — set
+# when three words shared the line — a single word sat marooned in the middle
+# of the frame looking like a mistake.
+FONT_SIZE = 110
 
 # Line spacing as a multiple of the largest word on that line, not a fixed
 # number of pixels.
@@ -94,12 +102,9 @@ LINE_SPACING = 1.34
 
 INDENT = 54          # how far each line steps right — the "pyramid" stagger
 
-# The last word of a phrase is the one that lands, so it gets to be bigger.
-#
-# 1.28x was too timid to read as emphasis — it looked like inconsistent sizing
-# rather than a deliberate accent. The gap has to be obvious enough that the
-# eye goes to the payoff word without being told.
-EMPHASIS_SCALE = 1.75
+# No emphasis. With one word on screen the "last word of the phrase" is the
+# only word, so scaling it up scales everything and means nothing.
+EMPHASIS_SCALE = 1.0
 
 # Keep the block clear of the picture's edges, so a long word never runs into
 # the rounded corner or off the frame.
@@ -134,9 +139,17 @@ CAPTION_BLEND = "screen"
 # Low enough to see the image, high enough to still read on dark footage.
 CAPTION_OPACITY = 0.62
 
-# Off-white rather than white. Pure white is the one value that cannot pick up
-# any colour from the image underneath, so it always looks pasted on.
-CAPTION_COLOUR = "0xF2EFE9"
+# The caption colour. This is the knob to turn — any ffmpeg colour works:
+# a name ("white", "yellow"), or a hex value ("0xF2EFE9").
+#
+# White rather than the previous off-white: the off-white existed to help the
+# words take a tint from the image while blending, and drawn opaque there is
+# nothing to tint against.
+CAPTION_COLOUR = "white"
+
+# Composite the words into the picture instead of drawing them on top of it.
+# Off: one word at a time has to be readable the instant it appears.
+CAPTION_BLEND_ON = False
 
 
 def find_font() -> str | None:
@@ -303,12 +316,27 @@ def build_filter(
             if not text:
                 continue
             size = sizes[i]
-            x = picture_left + EDGE_PAD + i * INDENT
-            # Pull a long word back so it cannot run past the picture's edge.
-            width = measure(word.text.strip(), size)
-            right_limit = picture_left + picture_width - EDGE_PAD
-            if x + width > right_limit:
-                x = max(picture_left + EDGE_PAD, right_limit - width)
+            if len(phrase) == 1:
+                # One word to itself: centre it.
+                #
+                # The staggered layout below builds a pyramid out of a phrase —
+                # each word steps right and down as it is spoken, and they all
+                # stay up together. With a single word there is no pyramid to
+                # build, and the first step of it is just the left margin, so
+                # every word pinned itself to the left edge of the picture and
+                # sat there half over the frame's rounded corner.
+                #
+                # Centred with drawtext's own `text_w` rather than a measured
+                # width, so the arithmetic is done on the glyphs ffmpeg will
+                # actually draw instead of on Pillow's estimate of them.
+                x = f"{picture_left}+({picture_width}-text_w)/2"
+            else:
+                x = picture_left + EDGE_PAD + i * INDENT
+                # Pull a long word back so it cannot run past the picture's edge.
+                width = measure(word.text.strip(), size)
+                right_limit = picture_left + picture_width - EDGE_PAD
+                if x + width > right_limit:
+                    x = max(picture_left + EDGE_PAD, right_limit - width)
             y = top + offsets[i]
             # Each word appears when it is spoken and stays for the rest of the
             # phrase — that is what builds the stack rather than flashing one
@@ -329,6 +357,16 @@ def build_filter(
     # blend treats as "leave this pixel alone", so that only the words change
     # anything. Get it wrong and the whole frame shifts: screening a grey
     # canvas turned the picture magenta on the first attempt.
+    if not CAPTION_BLEND_ON:
+        # Drawn straight onto the picture, fully opaque.
+        #
+        # One word at a time has to be legible the instant it appears — it is on
+        # screen for a third of a second, and a word that has to be worked out
+        # has already gone. Blending trades exactly that legibility for the
+        # picture showing through the letters, which is a good trade for a
+        # phrase held for a second and a bad one here.
+        return f"[{label_in}]{','.join(draws)},format=yuv420p[{label_out}]"
+
     identity = CANVAS_FOR_MODE.get(mode, "gray")
 
     width = picture_width + 2 * picture_left
