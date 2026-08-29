@@ -21,6 +21,8 @@ short on TikTok uses.
 
 from __future__ import annotations
 
+import atexit
+import json
 import os
 import threading
 import warnings
@@ -103,6 +105,17 @@ def transcribe_words(
     fail for unrelated reasons are worth their weight when either one going
     down stops everything.
     """
+    cached = _cached_words(media_path, model_size, language)
+    if cached is not None:
+        return cached
+
+    words = _transcribe_either(media_path, model_size, language)
+    _remember_words(media_path, model_size, language, words)
+    return words
+
+
+def _transcribe_either(media_path: str, model_size: str,
+                       language: str) -> list[Word]:
     try:
         return _transcribe_faster(media_path, model_size, language)
     except Exception as fast_error:
@@ -112,6 +125,96 @@ def transcribe_words(
             # Report the first failure: it is the one describing the engine
             # this project prefers, and the more useful of the two to read.
             raise fast_error
+
+
+# Word timings, cached on disk against the clip they came from.
+#
+# Transcription is the one thing in this pipeline that a blocked native package
+# can stop outright, and it is the one thing a re-render does not actually need
+# to redo: the same clip yields the same timings. When Windows Application
+# Control took numba *and* PyAV on the same afternoon, a rerun of three talks
+# produced nothing — and every one of those clips had been transcribed an hour
+# earlier.
+#
+# The lookup deliberately sits in front of the engines rather than inside them.
+# Both `_transcribe_faster` and `_transcribe_openai` import their dependencies
+# lazily, so a cache hit never reaches the import at all, and a re-render
+# survives a block that would otherwise take the whole run down.
+#
+# Keyed by size and modification time as well as path: a clip re-cut at
+# different timings is a different clip and must be transcribed again. When the
+# moment is unchanged the pipeline reuses the existing file untouched, which is
+# exactly the case this is for.
+_WORDS_CACHE_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", ".word_timings.json")
+_WORDS_CACHE: dict | None = None
+_WORDS_DIRTY = False
+_WORDS_LOCK = threading.Lock()
+
+
+def _words_key(media_path: str, model_size: str, language: str) -> str | None:
+    try:
+        st = os.stat(media_path)
+    except OSError:
+        return None
+    return (f"{os.path.abspath(media_path)}::{st.st_size}::{int(st.st_mtime)}"
+            f"::{model_size}::{language}")
+
+
+def _words_cache() -> dict:
+    global _WORDS_CACHE
+    if _WORDS_CACHE is None:
+        try:
+            with open(_WORDS_CACHE_PATH, encoding="utf-8") as f:
+                _WORDS_CACHE = json.load(f)
+        except (OSError, ValueError):
+            _WORDS_CACHE = {}
+    return _WORDS_CACHE
+
+
+def _cached_words(media_path: str, model_size: str,
+                  language: str) -> list[Word] | None:
+    key = _words_key(media_path, model_size, language)
+    if not key:
+        return None
+    rows = _words_cache().get(key)
+    if not rows:
+        return None
+    try:
+        return [Word(text=r[0], start=float(r[1]), end=float(r[2]))
+                for r in rows]
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+def _remember_words(media_path: str, model_size: str, language: str,
+                    words: list[Word]) -> None:
+    global _WORDS_DIRTY
+    key = _words_key(media_path, model_size, language)
+    if not key or not words:
+        return
+    with _WORDS_LOCK:
+        _words_cache()[key] = [[w.text, round(float(w.start), 3),
+                                round(float(w.end), 3)] for w in words]
+        _WORDS_DIRTY = True
+
+
+def save_word_cache() -> None:
+    """Write the cache out. Registered at exit; safe to call any time."""
+    global _WORDS_DIRTY
+    with _WORDS_LOCK:
+        if not _WORDS_DIRTY or _WORDS_CACHE is None:
+            return
+        try:
+            os.makedirs(os.path.dirname(_WORDS_CACHE_PATH), exist_ok=True)
+            with open(_WORDS_CACHE_PATH, "w", encoding="utf-8") as f:
+                json.dump(_WORDS_CACHE, f)
+            _WORDS_DIRTY = False
+        except OSError:
+            pass
+
+
+atexit.register(save_word_cache)
 
 
 def _transcribe_faster(media_path: str, model_size: str, language: str) -> list[Word]:

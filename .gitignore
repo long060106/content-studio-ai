@@ -39,3 +39,6 @@ cookies.txt
 
 # Generated probe cache: derived from the media files, rebuilt on demand.
 assets/.probe_cache.json
+
+# Generated word-timing cache: derived from the clips, rebuilt on demand.
+assets/.word_timings.json
