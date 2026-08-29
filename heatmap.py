@@ -28,6 +28,8 @@ fall back to reading the transcript alone.
 
 from __future__ import annotations
 
+import json
+import os
 import statistics
 from dataclasses import dataclass, asdict
 from typing import Optional
@@ -181,14 +183,74 @@ def describe(windows: list[HotWindow], segments: list[dict]) -> list[dict]:
     return described
 
 
+def cache_path(url: str, output_dir: str = "output") -> Optional[str]:
+    """Where this video's replay data is kept between runs."""
+    try:
+        from youtube_extractor import extract_video_id
+
+        video_id = extract_video_id(url)
+    except Exception:
+        return None
+    if not video_id:
+        return None
+    return os.path.join(output_dir, video_id, "heatmap.json")
+
+
+def _load_cached(path: Optional[str]) -> Optional[list[dict]]:
+    if not path or not os.path.isfile(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            points = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return points or None
+
+
+def _save_cached(path: Optional[str], points: list[dict]) -> None:
+    if not path or not points:
+        return
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(points, f)
+    except OSError:
+        pass
+
+
 def for_video(
     url: str,
     segments: Optional[list[dict]] = None,
     count: int = 8,
     info: Optional[dict] = None,
 ) -> Optional[list[dict]]:
-    """Hot windows with their transcript text, or None if there's no heatmap."""
+    """Hot windows with their transcript text, or None if there's no heatmap.
+
+    **The replay data is kept once it has been seen.** It was fetched fresh on
+    every run and thrown away, so the day YouTube answered a metadata request
+    with a bot check instead of a video, a signal we had already had eight times
+    that morning was simply gone — and the moment finder fell back to reading
+    the transcript, which is a far weaker way to choose what to cut.
+
+    Nothing about a video's replay graph needs re-fetching. It moves slowly, and
+    a slightly old copy of it is worth immeasurably more than none.
+
+    `output/<video_id>/heatmap.json` is also read if something else put it
+    there. That is deliberate: when YouTube gates automated requests, this
+    project cannot honestly work around the check — but a person signed in to
+    their own account can export the same data themselves and drop it in, and
+    the pipeline will use it without knowing the difference.
+    """
+    path = cache_path(url)
+
     raw = fetch(url, info=info)
+    if raw:
+        _save_cached(path, raw)
+    else:
+        raw = _load_cached(path)
+        if raw:
+            print(f"  · Replay data unavailable — reusing {os.path.basename(path)}")
+
     if not raw:
         return None
     windows = find_hot_windows(raw, count=count)
