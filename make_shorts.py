@@ -297,7 +297,20 @@ BROLL_RUN = 2          # b-roll shots before cutting back to the speaker
 # two-word sentence is a beat, not a shot.
 SENTENCE_SHOTS = True
 SENTENCE_MIN = 1.2
-SENTENCE_MAX = 8.0
+
+# The longest a single picture may hold. Lowered from 8s: a shot that runs
+# that long stops reading as a cutaway and starts reading as a scene, and it
+# is also long enough that most library clips have to loop to cover it.
+SENTENCE_MAX = 4.5
+
+# Break inside a sentence as well as at the end of one.
+#
+# A comma marks a place the speaker actually paused — it is the transcriber's
+# record of the breath between clauses — so it is exactly where the picture can
+# change without cutting across a thought. The comma never reaches the screen;
+# captions strip it. It earns its keep here instead, by doubling the number of
+# places a cutaway can land and so halving how long each one has to hold.
+CLAUSE_BREAKS = (",", ";", ":", "—")
 
 # How many sentences show the speaker. Everything else is b-roll.
 #
@@ -344,9 +357,10 @@ def _sentences(words: list, total: float) -> list[tuple[float, float]]:
         text = (w.text or "").strip()
         last = i + 1 >= len(words)
         ends_sentence = text.endswith((".", "!", "?"))
+        ends_clause = text.endswith(CLAUSE_BREAKS)
         long_pause = (not last
                       and float(words[i + 1].start) - float(w.end) >= 0.45)
-        if last or ends_sentence or long_pause:
+        if last or ends_sentence or ends_clause or long_pause:
             end = float(w.end) if last else min(float(w.end) + 0.06,
                                                 float(words[i + 1].start))
             if end - start > 0.05:
@@ -430,10 +444,30 @@ def _shot_plan(
         for i, (a, b) in enumerate(usable):
             if i in speaker_at:
                 plan.append((speech_path, a, b - a, "original"))
-            else:
-                plan.append((broll_paths[index % len(broll_paths)], 0.0,
-                             b - a, "b-roll"))
+                continue
+
+            # Cover a long span with several clips rather than one on repeat.
+            #
+            # B-roll inputs are opened with `-stream_loop -1`, so a two-second
+            # clip asked to hold a six-second span simply plays three times.
+            # That is what the looping-back looks like on screen, and it reads
+            # as running out of material — which is the opposite of true here,
+            # with over a thousand clips available.
+            #
+            # The clip is also slowed to BROLL_SPEED, so it covers more than its
+            # own length: a 3s clip at 0.7x fills 4.3s before it would repeat.
+            remaining, at = b - a, 0.0
+            while remaining > 0.05:
+                clip = broll_paths[index % len(broll_paths)]
                 index += 1
+                covers = _broll_cover(clip)
+                take = remaining if covers <= 0 else min(remaining, covers)
+                # Never leave a sliver behind that is too short to register.
+                if remaining - take < 0.35:
+                    take = remaining
+                plan.append((clip, 0.0, take, "b-roll"))
+                remaining -= take
+                at += take
         if plan:
             return plan
 
@@ -457,6 +491,29 @@ def _shot_plan(
     if not plan:
         plan = [(speech_path, 0.0, total, "original")]
     return plan
+
+
+def _broll_cover(path: str) -> float:
+    """How many seconds of screen time one b-roll clip can fill without looping.
+
+    Its own length divided by the playback rate, because the cutaways are
+    slowed: a three-second clip at 0.7x covers 4.3 seconds before it would have
+    to start again.
+
+    Returns 0.0 when the length cannot be read, which the caller treats as "no
+    limit" — a shot that is slightly too long is a much smaller problem than a
+    plan that refuses to cover the clip.
+    """
+    try:
+        from asset_library import probe
+        from shorts_builder import BROLL_SPEED
+
+        duration = probe(path)[0]
+        if duration <= 0:
+            return 0.0
+        return duration / max(0.05, BROLL_SPEED)
+    except Exception:
+        return 0.0
 
 
 def _broll_slots(total: float, words: list | None = None) -> int:
