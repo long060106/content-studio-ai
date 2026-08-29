@@ -802,13 +802,27 @@ def make_shorts(
         print("→ Checking every ending against the audio...")
         for i, moment in enumerate(moments, 1):
             before = moment.duration
-            refine_moment(
-                moment,
-                source_file,
-                model_size=model_size,
-                max_total=max_seconds or MAX_TOTAL_SECONDS,
-                log=lambda msg, n=i: print(f"     {n}. {msg}"),
-            )
+            try:
+                refine_moment(
+                    moment,
+                    source_file,
+                    model_size=model_size,
+                    max_total=max_seconds or MAX_TOTAL_SECONDS,
+                    log=lambda msg, n=i: print(f"     {n}. {msg}"),
+                )
+            except Exception as e:
+                # Refining an ending is an improvement, not a requirement: the
+                # moment already has an end time from the transcript, and a
+                # slightly loose one costs a beat of silence. Letting this
+                # abort the run costs every short instead.
+                #
+                # It went unguarded until Windows Application Control blocked
+                # both Whisper engines at once, at which point this line — a
+                # tidy-up that runs before a single clip is cut — took three
+                # whole talks down with it.
+                print(f"  ⚠ Endings left as found ({type(e).__name__}); "
+                      f"continuing without refinement.")
+                break
             after = moment.duration
             if abs(after - before) >= 0.05:
                 print(f"        now {after:.1f}s (was {before:.1f}s)")

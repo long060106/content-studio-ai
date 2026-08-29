@@ -153,12 +153,29 @@ _WORDS_LOCK = threading.Lock()
 
 
 def _words_key(media_path: str, model_size: str, language: str) -> str | None:
+    """Identify a clip by its contents, not by where it happens to sit.
+
+    Keyed on path at first, which almost never hit: a clip lives in a folder
+    named after the moment's hook, the model writes a fresh hook on every run,
+    so byte-identical audio arrived at a new path each time and was transcribed
+    again. Hashing the file costs a few milliseconds and matches the same cut
+    wherever it lands.
+
+    The hash covers the whole file rather than a prefix. Two cuts of one talk
+    share a container header and can share opening frames; only the full
+    contents distinguish a moment that starts a second later.
+    """
+    import hashlib
+
     try:
-        st = os.stat(media_path)
+        h = hashlib.md5()
+        with open(media_path, "rb") as f:
+            for block in iter(lambda: f.read(1 << 20), b""):
+                h.update(block)
+        size = os.path.getsize(media_path)
     except OSError:
         return None
-    return (f"{os.path.abspath(media_path)}::{st.st_size}::{int(st.st_mtime)}"
-            f"::{model_size}::{language}")
+    return f"{size}::{h.hexdigest()}::{model_size}::{language}"
 
 
 def _words_cache() -> dict:
