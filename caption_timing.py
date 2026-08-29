@@ -234,7 +234,67 @@ def save_word_cache() -> None:
 atexit.register(save_word_cache)
 
 
+# What Whisper expects: 16 kHz mono float32.
+WHISPER_RATE = 16000
+
+
+def _decode_audio(media_path: str):
+    """The clip's audio as a float32 array, decoded by ffmpeg.
+
+    ffmpeg rather than PyAV, and that is the entire point of this function.
+    faster-whisper normally decodes with `av`, which Windows Application
+    Control blocks here; ffmpeg is the one component in this project that has
+    never been blocked in four separate incidents.
+    """
+    import subprocess
+
+    import numpy as np
+
+    out = subprocess.run(
+        ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error",
+         "-i", media_path, "-f", "f32le", "-acodec", "pcm_f32le",
+         "-ac", "1", "-ar", str(WHISPER_RATE), "-"],
+        capture_output=True, check=True)
+    return np.frombuffer(out.stdout, dtype=np.float32).copy()
+
+
+def _stub_av_if_blocked() -> bool:
+    """Let faster-whisper import when PyAV will not load. True if stubbed.
+
+    `faster_whisper.transcribe` imports `decode_audio` at module level, which
+    imports `av`, so a blocked PyAV stops the model loading at all — even
+    though every use of `av` inside that module sits *inside* a function. Since
+    the audio is handed over as an array, `decode_audio` is never called and
+    the import is the only thing standing in the way.
+
+    A placeholder module satisfies it. This is the same shape as the workaround
+    in `voice_isolator.py`, which reaches past `demucs.api` because that pulls
+    in a blocked `lameenc` it never needs either.
+
+    Deliberately conditional: when PyAV loads, the real one is used and nothing
+    here applies.
+    """
+    import sys
+
+    if "av" in sys.modules:
+        return False
+    try:
+        import av  # noqa: F401
+
+        return False
+    except Exception:
+        import types
+
+        stub = types.ModuleType("av")
+        stub.__doc__ = "Placeholder: PyAV is blocked; audio is decoded by ffmpeg."
+        sys.modules["av"] = stub
+        for sub in ("av.audio", "av.audio.resampler", "av.audio.fifo"):
+            sys.modules[sub] = types.ModuleType(sub)
+        return True
+
+
 def _transcribe_faster(media_path: str, model_size: str, language: str) -> list[Word]:
+    _stub_av_if_blocked()
     from faster_whisper import WhisperModel
 
     with _WHISPER_LOCK:
@@ -251,8 +311,11 @@ def _transcribe_faster(media_path: str, model_size: str, language: str) -> list[
         # teacher speaking English it returned fluent Malay, correctly timed
         # and completely useless. Every talk this pipeline handles is English,
         # so guessing buys nothing and occasionally destroys a clip.
+        # Decoded here rather than by the library: passing a path makes
+        # faster-whisper call its own `av`-backed decoder, which is exactly the
+        # thing that may be blocked. An array skips it entirely.
         segments, _info = model.transcribe(
-            media_path, word_timestamps=True, language=language
+            _decode_audio(media_path), word_timestamps=True, language=language
         )
 
         words: list[Word] = []
