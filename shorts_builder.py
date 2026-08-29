@@ -321,24 +321,63 @@ def _grade_chain() -> str:
     return f"{chain}," if chain else ""
 
 
-def _to_band(label_in: str, label_out: str, duration: float, extra: str = "") -> str:
-    """Fit any source into the band: full width, cropped to height if taller.
+def _to_band(label_in: str, label_out: str, duration: float, extra: str = "",
+             crop_x: Optional[int] = None) -> str:
+    """Fit any source into the window, cropping the sides to do it.
 
-    A 16:9 source lands exactly on the band with nothing cropped, which is the
-    common case and unchanged from before. Anything taller — 4:3, 4:5, a
-    vertical phone recording — is cropped rather than given a taller band, so
-    the window stays the same size no matter what came in.
+    `crop_x` is the left edge of the crop in scaled pixels — normally computed
+    per shot by `subject_finder` so the window follows whoever is in the shot.
+    Passing None centres it.
+
+    **The x offset was the literal constant 0 until now**, and it was invisible
+    for as long as the window was 16:9: a 16:9 source scaled to a 16:9 window
+    comes out exactly as wide as the window, so `iw - PICTURE_W` is zero and
+    "left edge" and "centre" are the same pixel. Turning the window portrait
+    made the scaled frame 3157px wide against a 1000px window, at which point
+    the same constant silently meant "keep the leftmost third" — which is how a
+    fighter ended up out of frame while his own voice played.
 
     `extra` carries filters that belong to one kind of shot only, such as the
     b-roll grade and slow-down.
     """
+    x = f"(iw-{PICTURE_W})/2" if crop_x is None else str(max(0, int(crop_x)))
     return (
         f"[{label_in}]scale={PICTURE_W}:{BAND_H}:force_original_aspect_ratio=increase,"
-        f"crop={PICTURE_W}:{BAND_H}:0:(ih-{BAND_H})*{CROP_BIAS},"
+        f"crop={PICTURE_W}:{BAND_H}:{x}:(ih-{BAND_H})*{CROP_BIAS},"
         f"setsar=1,fps={FPS},{extra}{_grade_chain()}"
         f"pad={VIDEO_W}:{VIDEO_H}:{SIDE_MARGIN}:{(VIDEO_H - BAND_H) // 2}:black,"
         f"trim=duration={duration:.3f},setpts=PTS-STARTPTS[{label_out}]"
     )
+
+
+# Follow the subject when cropping, instead of taking a fixed slice.
+FOLLOW_SUBJECT = True
+
+
+def _crop_for(path: str, start: float, seconds: float) -> Optional[int]:
+    """Where to take this shot's crop from, or None to centre it.
+
+    Never allowed to break a render: the picture being slightly off is a much
+    smaller problem than the clip not existing, so anything unexpected here
+    falls back to the centred crop.
+    """
+    if not FOLLOW_SUBJECT:
+        return None
+    try:
+        from asset_library import probe
+        from subject_finder import crop_offset, horizontal_focus
+
+        _dur, w, h = probe(path)
+        if w <= 0 or h <= 0:
+            return None
+        scale = max(PICTURE_W / w, BAND_H / h)
+        keep = PICTURE_W / (w * scale)
+        if keep >= 0.999:            # nothing is being cropped away
+            return None
+        focus = horizontal_focus(path, start, seconds, keep=keep)
+        return crop_offset(w, h, PICTURE_W, BAND_H, focus)
+    except Exception:
+        return None
 
 
 def _on_black(label_in: str, label_out: str, duration: float) -> str:
@@ -588,9 +627,14 @@ def build_rough_cut(
     inputs += ["-i", speech_abs]
 
     parts: list[str] = []
-    for i, (path, _source_start, seconds) in enumerate(shots):
+    for i, (path, source_start, seconds) in enumerate(shots):
         span = max(0.2, float(seconds))
         is_speaker = os.path.abspath(path) == speech_abs
+
+        # Measured on the stretch of footage this shot actually uses, not on
+        # the clip as a whole: a speaker who crosses the frame during a talk
+        # is in a different place at 8s than at 40s.
+        crop_x = _crop_for(path, float(source_start), span)
 
         if is_speaker:
             # The whole 16:9 frame, uncropped, centred on solid black.
@@ -607,7 +651,7 @@ def build_rough_cut(
             # design. The empty space is not a gap to be patched — it is where
             # the caption sits, which is the whole reason this layout works on
             # the accounts using it.
-            parts.append(_to_band(f"{i}:v", f"v{i}", span))
+            parts.append(_to_band(f"{i}:v", f"v{i}", span, crop_x=crop_x))
         else:
             # B-roll sits in the same band as the speaker, at the same size and
             # the same position, so the window never changes shape across a cut.
@@ -634,6 +678,7 @@ def build_rough_cut(
             parts.append(_to_band(
                 f"{i}:v", f"v{i}", span,
                 extra=f"setpts={1.0 / BROLL_SPEED:.3f}*PTS,{BROLL_GRADE},",
+                crop_x=crop_x,
             ))
     streams = "".join(f"[v{i}]" for i in range(len(shots)))
 
