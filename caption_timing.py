@@ -277,15 +277,25 @@ def _srt_time(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
 
-# Words per subtitle cue. Two, not three: this is a cap rather than a target —
-# `group_phrases` breaks earlier on punctuation or a pause — and short cues are
-# what the format actually uses. It matches the phrasing that gets built by
-# hand in the editor anyway, so the import needs no repair afterwards.
-SRT_WORDS_PER_CARD = 2
+def _srt_words_per_card() -> int:
+    """Words per subtitle cue — the same number the render uses.
+
+    Read from `kinetic_captions` rather than kept as its own constant here.
+    The subtitle file exists so an editor can reproduce the burned-in captions,
+    and two constants that are meant to agree are two constants that will
+    eventually disagree — at which point the import silently regroups the words
+    and the two versions of the same clip read differently.
+    """
+    try:
+        from kinetic_captions import WORDS_PER_PHRASE
+
+        return max(1, int(WORDS_PER_PHRASE))
+    except Exception:
+        return 2
 
 
 def words_to_srt(words: list[Word], out_path: str,
-                 per_card: int = SRT_WORDS_PER_CARD) -> str:
+                 per_card: int | None = None) -> str:
     """Write the same word timings as a subtitle file CapCut can import.
 
     The alternative to burning captions into the picture. Editors re-cut these
@@ -296,9 +306,13 @@ def words_to_srt(words: list[Word], out_path: str,
     An SRT keeps the timing and hands the styling to the editor: CapCut imports
     it, matches the words to the audio, and the look is chosen there.
 
-    Grouped the same way as `build_ass` — a few words per card rather than one
-    long line — because that is what the format actually shows on screen.
+    Grouped exactly as the burned-in captions are, so importing this file
+    reproduces the render rather than a variation on it. Pass `per_card` only
+    to override that deliberately.
     """
+    if per_card is None:
+        per_card = _srt_words_per_card()
+
     # Grouped by sense, not by counting to three.
     #
     # This chunked every `per_card` words regardless of grammar, which split
@@ -337,7 +351,17 @@ def words_to_srt(words: list[Word], out_path: str,
 
         lines.append(str(index))
         lines.append(f"{_srt_time(start)} --> {_srt_time(end)}")
-        lines.append(" ".join(w.text for w in card))
+        # Cleaned the same way the burned-in captions are — lowercase, no
+        # commas, a full stop only where the statement ends. The subtitle file
+        # and the render have to read identically, or importing it into an
+        # editor silently changes the words.
+        try:
+            from kinetic_captions import caption_text
+
+            shown = " ".join(t for t in (caption_text(w.text) for w in card) if t)
+        except Exception:
+            shown = " ".join(w.text for w in card)
+        lines.append(shown)
         lines.append("")
         index += 1
 

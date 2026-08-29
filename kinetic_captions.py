@@ -192,6 +192,45 @@ def _ff_text(text: str) -> str:
     return "'" + text.replace("'", "'\\''") + "'"
 
 
+# Punctuation that only ever appears mid-sentence. Stripped wherever it lands.
+_MID_PUNCT = ',;:"“”‘’()[]…—–'
+
+# Punctuation that ends a statement. Kept, because it is the only mark that
+# earns its place: it says the thought finished rather than being cut off.
+_END_PUNCT = ".!?"
+
+
+def caption_text(text: str) -> str:
+    """One word as it should appear on screen.
+
+    Three rules, and they are a house style rather than a technical constraint:
+
+    - **Lowercase, always.** Speech has no capitals in it; they are a writing
+      convention, and on a single word held for a third of a second a capital
+      reads as emphasis that was never spoken.
+    - **No commas.** A comma marks a pause the viewer can already hear, and on a
+      one-word caption it is a third of the visual weight for nothing.
+    - **A full stop only where the statement ends.** That one does work — it is
+      what makes the last word land as a conclusion rather than as a word the
+      speaker happened to stop on.
+
+    Apostrophes and hyphens survive, because they sit inside words rather than
+    between them: "don't" and "self-made" are one word each, and stripping them
+    would misspell them.
+    """
+    cleaned = text.strip()
+    for ch in _MID_PUNCT:
+        cleaned = cleaned.replace(ch, "")
+    # Take the terminal mark off, lowercase the word, then put it back — so a
+    # trailing "." survives while the letters are folded down.
+    tail = ""
+    while cleaned and cleaned[-1] in _END_PUNCT:
+        tail = cleaned[-1] + tail
+        cleaned = cleaned[:-1]
+    # Only one mark, however many the transcriber ran together.
+    return (cleaned.lower() + tail[:1]).strip()
+
+
 def _measurer(font_path: str):
     """A function giving the pixel width of a word at a given size.
 
@@ -312,9 +351,10 @@ def build_filter(
             running += h
 
         for i, word in enumerate(phrase):
-            text = _ff_text(word.text.strip())
-            if not text:
+            shown = caption_text(word.text)
+            if not shown:
                 continue
+            text = _ff_text(shown)
             size = sizes[i]
             if len(phrase) == 1:
                 # One word to itself: centre it.
@@ -333,7 +373,10 @@ def build_filter(
             else:
                 x = picture_left + EDGE_PAD + i * INDENT
                 # Pull a long word back so it cannot run past the picture's edge.
-                width = measure(word.text.strip(), size)
+                # Measured on the cleaned word, not the raw one: stripping a
+                # comma changes the width, and sizing to text that is never
+                # drawn is how a line ends up fitting on paper and not on screen.
+                width = measure(shown, size)
                 right_limit = picture_left + picture_width - EDGE_PAD
                 if x + width > right_limit:
                     x = max(picture_left + EDGE_PAD, right_limit - width)
