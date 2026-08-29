@@ -168,7 +168,21 @@ SIDE_MARGIN = 40
 # hidden underneath it, or the margin would be cropping the sides off every
 # shot instead of framing them.
 PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
-BAND_H = (PICTURE_W * 9 // 16) // 2 * 2
+
+# The window is 9:16 — portrait, the same shape as the finished frame.
+#
+# Three shapes have been tried and the reasoning is worth keeping, because each
+# fails differently. A 16:9 strip keeps the whole width of a landscape source
+# but crops a standing person to a chest-up sliver. A square holds a person but
+# throws away 44% of a 1920x1080 frame's width. Portrait throws away more width
+# still — but it is the only one that fills the phone, and these are watched on
+# a phone.
+#
+# It leaves ~71px of black above and below rather than a deep band, so the
+# picture reads as a framed rectangle with a thin border rather than as a strip
+# floating in black. The caption sits on the picture now, not in the bars, so
+# there is nothing left that needs the bars to be deep.
+BAND_H = (PICTURE_W * 16 // 9) // 2 * 2
 
 # Where to take the crop from when a source is taller than the band.
 #
