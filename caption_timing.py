@@ -277,7 +277,15 @@ def _srt_time(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
 
-def words_to_srt(words: list[Word], out_path: str, per_card: int = WORDS_PER_CARD) -> str:
+# Words per subtitle cue. Two, not three: this is a cap rather than a target —
+# `group_phrases` breaks earlier on punctuation or a pause — and short cues are
+# what the format actually uses. It matches the phrasing that gets built by
+# hand in the editor anyway, so the import needs no repair afterwards.
+SRT_WORDS_PER_CARD = 2
+
+
+def words_to_srt(words: list[Word], out_path: str,
+                 per_card: int = SRT_WORDS_PER_CARD) -> str:
     """Write the same word timings as a subtitle file CapCut can import.
 
     The alternative to burning captions into the picture. Editors re-cut these
@@ -291,11 +299,32 @@ def words_to_srt(words: list[Word], out_path: str, per_card: int = WORDS_PER_CAR
     Grouped the same way as `build_ass` — a few words per card rather than one
     long line — because that is what the format actually shows on screen.
     """
+    # Grouped by sense, not by counting to three.
+    #
+    # This chunked every `per_card` words regardless of grammar, which split
+    # sentences mid-phrase — "I'm saying? I" followed by "want to say," — and
+    # that is the version an editor has to repair cue by cue, by hand, which is
+    # the slowest part of finishing one of these videos and the exact work the
+    # file exists to remove.
+    #
+    # `group_phrases` already breaks on punctuation and on a real pause, which
+    # is how a person groups them anyway. Importing it here rather than
+    # duplicating the rule keeps the subtitle file and the burned-in captions
+    # phrased identically, so switching between them changes the look and not
+    # the words.
+    try:
+        from kinetic_captions import group_phrases
+
+        cards = group_phrases(words, per_phrase=per_card)
+    except Exception:
+        # Never lose the file over the grouping: a badly split subtitle is
+        # repairable, a missing one costs the whole transcription again.
+        cards = [words[i : i + per_card] for i in range(0, len(words), per_card)]
+
     lines: list[str] = []
     index = 1
 
-    for i in range(0, len(words), per_card):
-        card = words[i : i + per_card]
+    for n, card in enumerate(cards):
         if not card:
             continue
         start = card[0].start
@@ -303,9 +332,8 @@ def words_to_srt(words: list[Word], out_path: str, per_card: int = WORDS_PER_CAR
 
         # Hold each card until the next one starts, so there is no flicker of
         # empty screen between groups.
-        following = words[i + per_card : i + per_card + 1]
-        if following:
-            end = max(end, following[0].start)
+        if n + 1 < len(cards) and cards[n + 1]:
+            end = max(end, cards[n + 1][0].start)
 
         lines.append(str(index))
         lines.append(f"{_srt_time(start)} --> {_srt_time(end)}")
