@@ -47,6 +47,17 @@ TARGET_GAP = 0.46
 # of a second is the same clip, and every re-encode costs quality.
 MIN_SAVING = 0.45
 
+# How much of the clip's ending is left alone entirely.
+#
+# The tail after the last word was already kept, and clips were still landing
+# on the speaker mid-line. Whisper tends to time a closing word slightly early
+# — a trailing consonant, a sentence tailing off — and the speech continuing
+# past that timestamp looks like a gap to this planner.
+#
+# Three seconds costs at most a beat of tightening and buys the one thing the
+# ending is for: the line finishing, and a breath after it.
+TAIL_GUARD = 3.0
+
 
 def plan_keep_ranges(
     words: list,
@@ -71,9 +82,21 @@ def plan_keep_ranges(
     # A little air before the first word so it does not start on the attack.
     cursor = max(0.0, float(timed[0].start) - target_gap)
 
+    # Nothing is cut inside the closing stretch of the clip.
+    #
+    # The literal tail after the last word was already protected, and that
+    # turned out not to be enough: a clip was still landing on the speaker
+    # mid-line. Whisper often times a final word slightly early — a trailing
+    # consonant, a word tailing off — so the speech continuing past it reads
+    # here as a gap and gets removed. Cutting the end of a sentence is the one
+    # mistake worth giving up a second of tightening to avoid.
+    tail_guard = max(0.0, float(duration) - TAIL_GUARD)
+
     for i, word in enumerate(timed[:-1]):
         gap = float(timed[i + 1].start) - float(word.end)
         if gap <= keep_under:
+            continue
+        if float(word.end) >= tail_guard:
             continue
         # Keep everything up to this word plus the allowance, then jump to just
         # before the next one.

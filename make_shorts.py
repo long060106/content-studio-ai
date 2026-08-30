@@ -86,6 +86,19 @@ ISOLATE_VOICE = True
 # the reason that folder filled up with footage that reads as advertising.
 STOCK_BROLL = False
 
+# Ship the cut, not the edit.
+#
+# short.mp4 is the speaker's own picture at its native 16:9 — no window, no
+# burned-in captions, no cutaways composited in. The b-roll is still chosen and
+# still copied into each clip's broll/ folder, and shotlist.md still says which
+# clip belongs under which line; it is a recommendation to drag onto a timeline
+# rather than a decision baked into the pixels.
+#
+# The reasoning is that undoing a choice made here is expensive and undoing one
+# made in an editor is not. A window, a caption or a cutaway that is already in
+# the frame can only be removed by rendering the whole thing again.
+PLAIN_ONLY = True
+
 
 def _slug(text: str, limit: int = 28) -> str:
     out = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
@@ -1391,7 +1404,20 @@ def make_shorts(
                 "uncaptioned one.")
             return None, log
         try:
-            if broll_local:
+            if PLAIN_ONLY:
+                # The cut, and nothing else: the speaker's own picture at its
+                # native shape, voice separated, silences tightened. No window,
+                # no captions, no cutaways burned in.
+                #
+                # The b-roll is still chosen, still copied into broll/, and
+                # still written into shotlist.md against the line it belongs
+                # under. It is a recommendation now rather than a decision —
+                # dragging a named clip onto a timeline takes seconds, and
+                # undoing one that is already in the pixels does not.
+                build_plain_cut(raw_clip, out_path, render_duration)
+                say(f"  ✓ {out_path} (the cut — no frame, no captions, "
+                    f"{len(broll_local)} b-roll suggested in shotlist.md)")
+            elif broll_local:
                 shots = [(path, src, dur) for path, src, dur, _kind in plan]
                 build_rough_cut(raw_clip, shots, out_path, render_duration,
                                 words=words)
