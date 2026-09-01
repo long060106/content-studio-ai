@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 
 # One word of this in a clip's description is enough to drop it.
 VIOLENT = {
@@ -42,6 +43,14 @@ VIOLENT = {
     "skull", "skeleton", "massacre", "combat", "battle", "battlefield",
     "riot", "axe", "soldier", "soldiers", "army", "armies", "trenches",
     "flames", "burning", "bruised", "bleeding", "noose", "hanging",
+    # Ancient and modern warfare. Added after a batch of Troy footage sat in
+    # the library for weeks: none of the words above appear in
+    # `warriors-spears-charge`, and a charge with shields is exactly the shot
+    # this filter exists to stop.
+    "warrior", "warriors", "spear", "spears", "shield", "shields",
+    "chariot", "chariots", "siege", "armour", "armor", "helmets",
+    "missile", "missiles", "military", "cannon", "warship", "warships",
+    "bomber", "bombers", "tank", "tanks",
 }
 
 # Whole films whose footage is unusable here, by clip prefix.
@@ -73,7 +82,21 @@ BLOCKED_FILMS = (
     # men with weapons, and no description reliably says which frame is which.
     "1917-", "pogl-", "napl-", "koh-", "aksk-", "glad-", "hod2-", "hod3-",
     "madm-", "revt-", "sica-", "andr-", "boys-", "kbrk-", "mifr-", "obaa-",
+    "troy-",
+    # Watermarked. Every Atonement clip carries an "EMVN" bug in the
+    # bottom-left corner, faint enough to survive a contact sheet and obvious
+    # once it is burned into a finished short. The rule against another
+    # creator's mark is not about tidiness — the platforms downrank reposted
+    # footage, and the mark is what identifies it as reposted.
+    "aton-",
 )
+
+# A clip named without a film prefix is invisible to BLOCKED_FILMS, and that is
+# how a war film got in: twelve Troy clips carried hand-written names like
+# `fortress-on-hill-mist`, so the whole-film rule had nothing to match on and
+# the word rule saw only scenery. The prefix is not decoration — it is the only
+# handle the strongest rule has.
+PREFIX = re.compile(r"^[a-z0-9]{4}-\d+-")
 
 # Matches a rule word but is not the thing. Checked as phrases, so only the
 # innocent use is spared — "dead tree" stays, a dead body does not.
@@ -99,6 +122,11 @@ CARDS = {
 }
 
 
+def is_unprefixed(filename: str) -> bool:
+    """True for a clip the whole-film rule cannot see."""
+    return PREFIX.match(os.path.splitext(filename.lower())[0]) is None
+
+
 def is_violent(filename: str) -> bool:
     low = os.path.splitext(filename.lower())[0]
     if set(low.split("-")) & CARDS:
@@ -119,7 +147,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    doomed, spared = [], []
+    doomed, spared, unprefixed = [], [], []
     for r, _dirs, files in os.walk(args.folder):
         for f in files:
             if not f.lower().endswith(".mp4"):
@@ -130,6 +158,8 @@ def main() -> None:
                 spared.append(f)
             elif is_violent(f):
                 doomed.append(path)
+            elif is_unprefixed(f):
+                unprefixed.append(f)
 
     print(f"{len(doomed)} clip(s) to remove")
     for p in sorted(doomed)[:12]:
@@ -139,6 +169,12 @@ def main() -> None:
     if spared:
         print(f"\n{len(spared)} spared as false positives:")
         for f in spared:
+            print(f"    {f[:64]}")
+
+    if unprefixed:
+        print(f"\n{len(unprefixed)} clip(s) with no film prefix — the "
+              f"whole-film rule cannot see these, check them by eye:")
+        for f in sorted(unprefixed):
             print(f"    {f[:64]}")
 
     if args.dry_run:
