@@ -625,8 +625,25 @@ def _score_clip(clip: str, spoken: set, previous: str | None) -> float:
 
     if previous:
         prev_tokens = _clip_tokens(previous)
+        # Charged on the *proportion* of the description shared, not the count.
+        #
+        # Per shared word it was 0.22 against a base of 0.25, so a single word
+        # in common sank a clip to 0.03 and under the 0.05 floor — and in this
+        # library the word in common is almost always "man" or "night", which
+        # nearly every description carries. The effect was that the second
+        # cutaway in a short was refused, then every cutaway after it, and the
+        # shorts came out with one piece of b-roll and a talking head for the
+        # rest. Nothing was wrong with the footage; the shots were rejected for
+        # both containing a man.
+        #
+        # The floor is meant to catch "nearly the same description", which is a
+        # ratio and not a tally. Sharing one word out of five is now a fifth of
+        # the penalty and the clip still ranks and still plays; sharing all of
+        # them spends the whole penalty and is refused, which is the case the
+        # rule was written for.
         shared = len(tokens & prev_tokens)
-        score -= SIMILARITY_PENALTY * shared
+        overlap_ratio = shared / max(1, min(len(tokens), len(prev_tokens)))
+        score -= SIMILARITY_PENALTY * overlap_ratio
         if _film_of(clip) == _film_of(previous):
             score -= SAME_FILM_PENALTY
     return score
@@ -744,8 +761,24 @@ def _broll_slots(total: float, words: list | None = None) -> int:
 
     Counted from the plan itself rather than estimated, so the fetch asks for
     exactly as many as there are cutaways and nothing has to repeat.
+
+    **The placeholders must be distinct, and that is the whole function.** This
+    asked for the plan with a pool of one — `["placeholder"]` — and a pool of
+    one cannot produce more than one cutaway: the second span finds every
+    candidate used, falls back to the same clip, and is then refused by the
+    similarity and same-film penalties for repeating itself. So this returned 1
+    for every short of any length, exactly one clip was fetched, and the real
+    plan was then built against that one clip and refused a second cutaway for
+    the same reason. A self-fulfilling count — the shorts were not choosing one
+    cutaway, they were being told only one existed.
+
+    The names are shaped like real clips (`ph3-00-slot3.mp4`) because the
+    scorer reads them like real clips: it takes the film from the leading token
+    and the description from everything after the number, so each placeholder
+    has to differ in both or the penalties reappear here instead.
     """
-    plan = _shot_plan(total, "SPEECH", ["placeholder"], words)
+    pool = [f"ph{i}-00-slot{i}.mp4" for i in range(MAX_DISTINCT_BROLL)]
+    plan = _shot_plan(total, "SPEECH", pool, words)
     cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
     return min(max(1, cutaways), MAX_DISTINCT_BROLL)
 
