@@ -124,6 +124,35 @@ MIN_ON = 0.30
 # the viewer read across a full stop.
 _SENTENCE_END = ".!?"
 
+# The account handle, stamped on the whole running time.
+WATERMARK_TEXT = "@gobackforthis"
+
+# Top-right, and the corner is chosen by elimination rather than by taste.
+#
+# These renders have no letterbox bars to hide in — cropdetect reports the
+# picture filling all 1920x1080 on almost every shot — so the mark has to sit
+# on the image, and the only question is which part of the image it damages
+# least. The lower-centre band is where the captions live. The middle is where
+# a face is. The top-centre is where a speaker's head reaches on a
+# medium-close shot. The top corners are what is left, and the right one is
+# where a viewer already expects a channel mark.
+WATERMARK_X_FRAC = 0.955      # right edge of the text
+WATERMARK_Y_FRAC = 0.058      # centre line of the text
+
+# Smaller than the captions and considerably quieter. A handle is a signature,
+# not a message: it should be legible when looked for and ignorable when not,
+# which is the opposite of what the caption styling is trying to do.
+WATERMARK_SIZE_FRAC = 0.030   # ~32px at 1080p, against the captions' 90
+
+# ASS alpha runs 00 opaque to FF invisible, so this is about 60% opaque.
+WATERMARK_ALPHA = "66"
+
+# A thin outline, not the captions' heavy one. Without any outline the mark
+# disappears entirely against a bright sky or a white wall — which is exactly
+# the footage a top corner tends to contain — and with the full 5px it stops
+# reading as a signature and starts competing with the captions.
+WATERMARK_OUTLINE_PX = 2
+
 
 def _measurer(font_path: str, size: int):
     """Measure real text width, because character counts are not widths.
@@ -263,6 +292,11 @@ def wrap_lines(texts: list[str], width_of, max_width: float) -> list[str]:
 
 def _header(font_size: int, video_w: int, video_h: int) -> str:
     spacing = round(TRACKING_EM * font_size, 2)
+    mark_size = max(10, int(round(video_h * WATERMARK_SIZE_FRAC)))
+    # The handle is set at normal tracking. The captions are tightened because
+    # they are set very large, where the default spacing reads as loose; at a
+    # third of that size the same tightening just makes the letters touch.
+    mark_spacing = 0
     # MarginV is unused for placement — every line carries an explicit \pos —
     # but libass still wants the style complete, so it is set to something sane.
     margin_v = int(video_h * 0.08)
@@ -277,6 +311,7 @@ YCbCr Matrix: TV.709
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Burned,{FONT_FAMILY},{font_size},{WHITE},{WHITE},{BLACK},{BLACK},{FONT_BOLD},0,0,0,100,100,{spacing},0,1,{OUTLINE_PX},{SHADOW_PX},5,60,60,{margin_v},1
+Style: Mark,{FONT_FAMILY},{mark_size},&H{WATERMARK_ALPHA}FFFFFF,&H{WATERMARK_ALPHA}FFFFFF,&H{WATERMARK_ALPHA}000000,{BLACK},{FONT_BOLD},0,0,0,100,100,{mark_spacing},0,1,{WATERMARK_OUTLINE_PX},0,9,40,40,40,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -289,8 +324,19 @@ def build_ass(
     video_w: int = REF_W,
     video_h: int = REF_H,
     offset: float = 0.0,
+    duration: float | None = None,
+    watermark: str | None = WATERMARK_TEXT,
 ) -> str:
     """Write the caption track. Returns the path written.
+
+    `duration` is only needed for the watermark, which has to be told how long
+    the video is — it is the one event here with no speech to derive its timing
+    from. Passing None falls back to the last word's end, which is right for a
+    clip that ends on the last word and short by whatever tail follows it.
+    Callers with the real duration should pass it.
+
+    `watermark=None` writes captions alone, and `words=[]` with a watermark
+    writes the handle alone — which is how any other video gets stamped.
 
     Timing is the whole point of this function, so it is worth being explicit
     about what each phrase's end is:
@@ -334,12 +380,41 @@ def build_ass(
             f",{{\\an5\\pos({x},{y})}}{text}"
         )
 
+    if watermark:
+        # One event for the entire running time. Layer 1 so it draws above a
+        # caption rather than under one — they do not overlap by design, but a
+        # mark that flickers behind text on the one clip where they do would be
+        # a strange thing to have to debug later.
+        if duration is None:
+            duration = max((w.end for w in words), default=0.0) - offset
+        end = max(0.1, duration)
+        mx = int(round(video_w * WATERMARK_X_FRAC))
+        my = int(round(video_h * WATERMARK_Y_FRAC))
+        # \an6 is middle-right, so the text grows leftward from `mx` and the
+        # right edge stays put however long the handle is.
+        lines.append(
+            f"Dialogue: 1,{_ass_time(0.0)},{_ass_time(end)},Mark,,0,0,0,"
+            f",{{\\an6\\pos({mx},{my})}}{_escape(watermark)}"
+        )
+
     parent = os.path.dirname(out_path)
     if parent:
         os.makedirs(parent, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     return out_path
+
+
+def probe_duration(video: str) -> float:
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", video],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    try:
+        return float(out)
+    except ValueError:
+        return 0.0
 
 
 def _ff_filter_path(path: str) -> str:
@@ -411,25 +486,37 @@ def main() -> None:
     parser.add_argument("--model", default="base", help="whisper size: tiny/base/small")
     parser.add_argument("--offset", type=float, default=0.0,
                         help="seconds to subtract from every timing")
+    parser.add_argument("--handle", default=WATERMARK_TEXT,
+                        help=f"account handle to stamp (default: {WATERMARK_TEXT})")
+    parser.add_argument("--no-watermark", action="store_true",
+                        help="captions only, no handle")
+    parser.add_argument("--watermark-only", action="store_true",
+                        help="stamp the handle and write no captions — for a "
+                             "video that is captioned elsewhere, or not at all")
     args = parser.parse_args()
 
-    if args.words:
+    if args.watermark_only:
+        words = []
+    elif args.words:
         words = load_words(args.words)
     else:
         from caption_timing import transcribe_words
         print(f"  transcribing {os.path.basename(args.video)}...")
         words = transcribe_words(args.video, model_size=args.model)
 
-    if not words:
+    if not words and not args.watermark_only:
         raise SystemExit("no word timings — nothing to caption")
 
     width, height = probe_size(args.video)
     stem = os.path.splitext(args.video)[0]
     ass_path = args.out or f"{stem}.captions.ass"
+    mark = None if args.no_watermark else args.handle
 
-    build_ass(words, ass_path, width, height, offset=args.offset)
+    build_ass(words, ass_path, width, height, offset=args.offset,
+              duration=probe_duration(args.video), watermark=mark)
     phrases = group_phrases(words)
-    print(f"  {len(words)} words -> {len(phrases)} phrase(s) -> {ass_path}")
+    stamped = f", watermark {mark}" if mark else ""
+    print(f"  {len(words)} words -> {len(phrases)} phrase(s){stamped} -> {ass_path}")
 
     if args.burn:
         burned = f"{stem}.captioned.mp4"
