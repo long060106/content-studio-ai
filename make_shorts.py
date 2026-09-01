@@ -339,6 +339,40 @@ SPEAKER_SHOTS = 2
 # the end rather than at it — closing on footage lets the last line land over a
 # picture instead of over a talking head.
 SPEAKER_LATE_AT = 0.72
+
+# How a cutaway is chosen, rather than merely taken next off the pile.
+#
+# The planner used to cycle the pool — broll_paths[index % len] — so a clip's
+# position in a list decided which sentence it illustrated. The pool is already
+# matched to the moment as a whole, but nothing matched a shot to the line it
+# would actually sit under, and nothing stopped two near-identical shots landing
+# back to back.
+
+# Every clip starts here, before matching or penalties.
+#
+# The score ranks candidates; it is not an entrance exam. Written first as a
+# hard gate at 0.18 with no base, it cut one cutaway into an eight-shot clip
+# and left the rest on the speaker — because the speech is abstract and the
+# descriptions are concrete, so most pairs share no words at all and scored
+# zero. A shot that merely fails to match a line is still a fine shot.
+BASE_SCORE = 0.25
+
+# Below this a clip is refused and the next is tried. With the base above, only
+# a clip the penalties have pushed down — the same film again, or nearly the
+# same description — can fall this far.
+MIN_MATCH = 0.05
+
+# Charged per description word a clip shares with the one before it.
+# `corridor-fluorescent` after `corridor-industrial` reads as one shot that
+# jumped rather than as two shots.
+SIMILARITY_PENALTY = 0.22
+
+# Charged for following a clip from the same film. Three shots from one film in
+# a row look like the library ran out, which it has not.
+SAME_FILM_PENALTY = 0.30
+
+# Under this, a cutaway has no room to land and reads as a flicker.
+MIN_CUTAWAY_SECONDS = 1.4
 # One clip per cutaway, never reused inside a short. A repeat is noticeable:
 # the same footage returning twenty seconds later reads as running out of
 # material rather than as a deliberate callback. The ceiling exists only to
@@ -431,6 +465,8 @@ def _shot_plan(
     """
     plan: list[tuple[str, float, float, str]] = []
     index = 0
+    chosen: set = set()
+    previous: str | None = None
     # Anything shorter than this isn't a shot, it's a flicker.
     epsilon = 0.2
 
@@ -469,10 +505,26 @@ def _shot_plan(
             #
             # The clip is also slowed to BROLL_SPEED, so it covers more than its
             # own length: a 3s clip at 0.7x fills 4.3s before it would repeat.
+            # What is said under this span, and whether it wants a picture.
+            spoken_here = " ".join(
+                w.text for w in (words or [])
+                if a <= float(getattr(w, "start", 0.0)) < b
+            )
+            if not _deserves_cutaway(spoken_here, b - a):
+                plan.append((speech_path, a, b - a, "original"))
+                continue
+
+            spoken_set = _content_words(spoken_here)
             remaining, at = b - a, 0.0
             while remaining > 0.05:
-                clip = broll_paths[index % len(broll_paths)]
-                index += 1
+                clip = _choose_broll(spoken_set, broll_paths, chosen, previous)
+                if clip is None:
+                    # Nothing suits this line. The speaker is never the wrong
+                    # shot, so the rest of the span stays on the face.
+                    plan.append((speech_path, a + at, remaining, "original"))
+                    break
+                chosen.add(clip)
+                previous = clip
                 covers = _broll_cover(clip)
                 take = remaining if covers <= 0 else min(remaining, covers)
                 # Never leave a sliver behind that is too short to register.
@@ -504,6 +556,116 @@ def _shot_plan(
     if not plan:
         plan = [(speech_path, 0.0, total, "original")]
     return plan
+
+
+# Words that carry no picture. A caption made of these describes nothing, and a
+# clip matched on them is matched on noise.
+_STOPWORDS = {
+    "that", "this", "with", "your", "from", "have", "will", "what", "when",
+    "they", "them", "then", "than", "there", "here", "been", "being", "just",
+    "like", "into", "about", "would", "could", "should", "because", "which",
+    "their", "these", "those", "some", "more", "most", "very", "much", "only",
+    "even", "also", "know", "think", "want", "make", "made", "does", "done",
+    "going", "gonna", "really", "actually", "something", "anything", "everything",
+}
+
+
+def _content_words(text: str) -> set:
+    """The words in a line that could plausibly describe a picture."""
+    return {w for w in re.findall(r"[a-z]+", text.lower())
+            if len(w) > 3 and w not in _STOPWORDS}
+
+
+def _clip_tokens(path: str) -> set:
+    """The description a clip carries, as words.
+
+    The filename is `<film>-<NN>-<description>.mp4`, so the first two parts are
+    dropped: the film code and the index describe provenance, not the picture,
+    and matching on them would quietly group every shot from one film together.
+    """
+    stem = os.path.splitext(os.path.basename(path))[0].lower()
+    parts = stem.split("-")
+    body = parts[2:] if len(parts) > 2 else parts
+    return {w for w in body if len(w) > 2}
+
+
+def _film_of(path: str) -> str:
+    return os.path.basename(path).split("-")[0]
+
+
+def _score_clip(clip: str, spoken: set, previous: str | None) -> float:
+    """How well this clip suits this line, penalised for repeating the last one.
+
+    Two parts, and the second is what stops a sequence reading as a montage of
+    one thing. Three shots of the same film in a row look like the library ran
+    out even when it did not, and two shots sharing most of their description —
+    `corridor-fluorescent` after `corridor-industrial` — read as one shot that
+    jumped rather than as an edit.
+    """
+    tokens = _clip_tokens(clip)
+    if not tokens:
+        return 0.0
+
+    overlap = len(tokens & spoken)
+    score = BASE_SCORE
+    if spoken:
+        score += overlap / (len(spoken) ** 0.5)
+
+    if previous:
+        prev_tokens = _clip_tokens(previous)
+        shared = len(tokens & prev_tokens)
+        score -= SIMILARITY_PENALTY * shared
+        if _film_of(clip) == _film_of(previous):
+            score -= SAME_FILM_PENALTY
+    return score
+
+
+def _choose_broll(spoken: set, pool: list, used: set, previous: str | None):
+    """The best unused clip for this line, or None to stay on the speaker.
+
+    Returning None is the point of this function rather than a failure of it.
+    The spec this follows is explicit: if no suitable footage exists, keep the
+    original shot. A cutaway that does not belong is worse than no cutaway,
+    because the viewer reads it as a mistake and the speaker's face is never a
+    mistake.
+    """
+    candidates = [c for c in pool if c not in used]
+    if not candidates:
+        candidates = pool
+    if not candidates:
+        return None
+
+    ranked = sorted(candidates, key=lambda c: _score_clip(c, spoken, previous),
+                    reverse=True)
+    best = ranked[0]
+    if _score_clip(best, spoken, previous) < MIN_MATCH:
+        return None
+    return best
+
+
+def _deserves_cutaway(text: str, seconds: float) -> bool:
+    """Whether this line is better served by footage than by the speaker.
+
+    Three cases stay on the face, taken from how these edits actually read:
+
+    - **A short line.** Under a beat and a half there is no room for a cutaway
+      to land; it registers as a flicker rather than as a picture.
+    - **A question.** The speaker is addressing the viewer, and the answer is in
+      their face — cutting away throws away the only thing being offered.
+    A line like "You have to decide" describes nothing filmable and ideally
+    would stay on the face too, but this function does not catch it: it asks
+    whether there is *any* content word, not whether that word is concrete, and
+    "decide" passes. What actually protects that case is the match threshold in
+    `_choose_broll` — an abstract line scores nothing against a library of
+    concrete descriptions, so no clip clears MIN_MATCH and the speaker is kept.
+    Two loose gates in series, rather than one strict one.
+    """
+    if seconds < MIN_CUTAWAY_SECONDS:
+        return False
+    stripped = text.strip()
+    if stripped.endswith("?"):
+        return False
+    return bool(_content_words(stripped))
 
 
 def _broll_cover(path: str) -> float:
