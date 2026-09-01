@@ -26,6 +26,10 @@ assets/music/
 # rebuildable: `python gather_broll.py` refills the folders from their
 # searches. The folder structure is what carries the meaning, not the files.
 assets/broll/
+# Clips pulled out of the library. A sibling of assets/broll/ rather than a
+# child, because the selector walks everything under that folder — see
+# curated_broll. Large video files either way, so never committed.
+assets/broll-rejected/
 
 # Footage pruned out of the library. Kept on disk rather than deleted so a
 # wrong call can be undone without re-downloading, but it is still footage and
