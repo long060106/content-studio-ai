@@ -124,7 +124,16 @@ MIN_ON = 0.30
 # the viewer read across a full stop.
 _SENTENCE_END = ".!?"
 
-# The account handle, stamped on the whole running time.
+# The account handle. **Off by default here, and that is deliberate.**
+#
+# The watermark is rendered by `shorts_builder.py` now, so every file the
+# pipeline produces already carries it — including `short.mp4`, which is what
+# this module burns captions onto. Adding one here as well put two handles on
+# the same clip. It moved into the pipeline because stamping afterwards did not
+# survive a re-run: the next batch rewrote short.mp4 and short_plain.mp4 from
+# scratch and the mark was silently gone.
+#
+# It stays available for a video from anywhere else, via `--watermark`.
 WATERMARK_TEXT = "@gobackforthis"
 
 # Top-right, and the corner is chosen by elimination rather than by taste.
@@ -325,7 +334,7 @@ def build_ass(
     video_h: int = REF_H,
     offset: float = 0.0,
     duration: float | None = None,
-    watermark: str | None = WATERMARK_TEXT,
+    watermark: str | None = None,
 ) -> str:
     """Write the caption track. Returns the path written.
 
@@ -488,8 +497,10 @@ def main() -> None:
                         help="seconds to subtract from every timing")
     parser.add_argument("--handle", default=WATERMARK_TEXT,
                         help=f"account handle to stamp (default: {WATERMARK_TEXT})")
-    parser.add_argument("--no-watermark", action="store_true",
-                        help="captions only, no handle")
+    parser.add_argument("--watermark", action="store_true",
+                        help="also stamp the handle. Off by default because "
+                             "the pipeline already renders it into its own "
+                             "output; use this for a video from elsewhere")
     parser.add_argument("--watermark-only", action="store_true",
                         help="stamp the handle and write no captions — for a "
                              "video that is captioned elsewhere, or not at all")
@@ -510,7 +521,7 @@ def main() -> None:
     width, height = probe_size(args.video)
     stem = os.path.splitext(args.video)[0]
     ass_path = args.out or f"{stem}.captions.ass"
-    mark = None if args.no_watermark else args.handle
+    mark = args.handle if (args.watermark or args.watermark_only) else None
 
     build_ass(words, ass_path, width, height, offset=args.offset,
               duration=probe_duration(args.video), watermark=mark)

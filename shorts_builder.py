@@ -268,6 +268,66 @@ CLICKS_ON_CUTS = False
 KINETIC_CAPTIONS = False
 
 
+# The account's own mark, burned into every render.
+#
+# This lives here rather than in `burned_captions.py` because it has to survive
+# a re-run. Stamping it afterwards worked and then quietly came undone: the
+# next batch rewrote `short.mp4` and `short_plain.mp4` from scratch and the mark
+# was gone, with nothing to say so. Rendering it means every file the pipeline
+# produces carries it, including the ones nobody remembered to stamp.
+#
+# `burned_captions.py` therefore no longer adds a watermark by default — one
+# owner, or a clip that goes through both ends up wearing two.
+WATERMARK_TEXT = "@gobackforthis"
+
+# Top-right, chosen by elimination rather than taste: the lower-centre band is
+# where captions get added later, the middle of the frame is a face, and
+# top-centre is where a speaker's head reaches on a medium-close shot.
+WATERMARK_X_FRAC = 0.955      # right edge of the text
+WATERMARK_Y_FRAC = 0.058      # centre line of the text
+
+# A signature, not a message — about a third the size captions are set at, and
+# quiet enough to ignore while still being legible when looked for.
+WATERMARK_SIZE_FRAC = 0.030
+WATERMARK_OPACITY = 0.60
+
+# Thin. Without any outline the mark disappears against a bright sky, which is
+# exactly what a top corner tends to contain; at the captions' 5px it stops
+# reading as a signature and starts competing with them.
+WATERMARK_OUTLINE = 2
+
+
+def watermark_chain(label_in: str, label_out: str) -> str:
+    """A drawtext filter putting the account handle in the top-right corner.
+
+    Returns a plain pass-through when the font is missing rather than failing
+    the render: a short without a watermark is a much smaller problem than no
+    short at all, and the missing mark is visible the moment anyone looks.
+    """
+    from kinetic_captions import find_font
+
+    font = find_font()
+    if not font or not WATERMARK_TEXT:
+        return f"[{label_in}]null[{label_out}]"
+
+    from kinetic_captions import _ff_path
+
+    size = max(10, int(round(VIDEO_H * WATERMARK_SIZE_FRAC)))
+    # Positioned by expression rather than by a measured pixel count, so the
+    # right edge stays put however long the handle is and the text stays
+    # centred on its line whatever the font's ascent turns out to be.
+    x = f"w*{WATERMARK_X_FRAC}-text_w"
+    y = f"h*{WATERMARK_Y_FRAC}-text_h/2"
+    return (
+        f"[{label_in}]drawtext=fontfile='{_ff_path(font)}'"
+        f":text='{WATERMARK_TEXT}'"
+        f":fontsize={size}"
+        f":fontcolor=white@{WATERMARK_OPACITY}"
+        f":borderw={WATERMARK_OUTLINE}:bordercolor=black@{WATERMARK_OPACITY}"
+        f":x={x}:y={y}[{label_out}]"
+    )
+
+
 # The window's shape.
 #
 # The reference style's signature is a rounded rectangle of picture sitting on
@@ -476,9 +536,10 @@ def build_short(spec: ShortSpec) -> str:
             filters.append(f"[top][bottom]vstack=inputs=2,setsar=1[vbase]")
 
         if subs_name:
-            filters.append(f"[vbase]subtitles={subs_name}[v]")
+            filters.append(f"[vbase]subtitles={subs_name}[vmark]")
         else:
-            filters.append("[vbase]null[v]")
+            filters.append("[vbase]null[vmark]")
+        filters.append(watermark_chain("vmark", "v"))
 
         # ---- audio ----
         filters.append(
@@ -731,7 +792,7 @@ def build_rough_cut(
                 picture_left=SIDE_MARGIN,
                 picture_width=PICTURE_W,
                 label_in="vframed",
-                label_out="v",
+                label_out="vmark",
             )
         except Exception:
             caption_chain = None
@@ -739,7 +800,8 @@ def build_rough_cut(
     if caption_chain:
         parts.append(caption_chain)
     else:
-        parts.append("[vframed]null[v]")
+        parts.append("[vframed]null[vmark]")
+    parts.append(watermark_chain("vmark", "v"))
 
     # A click on every cut. The shot plan already says where the cuts are, so
     # the track is rendered from it rather than detected — see sound_design.
@@ -843,7 +905,8 @@ def build_plain_cut(speech_source: str, out_path: str, duration: float) -> str:
     os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
 
     graph = (
-        f"[0:v]fps={FPS},trim=duration={duration:.3f},setpts=PTS-STARTPTS[v];"
+        f"[0:v]fps={FPS},trim=duration={duration:.3f},setpts=PTS-STARTPTS[vmark];"
+        + watermark_chain("vmark", "v") + ";"
         f"[0:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
         f"highpass=f=85,{SPEECH_CLEANUP}loudnorm=I=-14:TP=-1.5:LRA=11[a]"
     )
