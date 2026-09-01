@@ -373,6 +373,18 @@ SAME_FILM_PENALTY = 0.30
 
 # Under this, a cutaway has no room to land and reads as a flicker.
 MIN_CUTAWAY_SECONDS = 1.4
+
+# The shortest a shot may be. Anything under this is not a shot, it is a flash.
+#
+# The remainder of a span used to become its own shot whenever it exceeded a
+# 0.35s guard, so a 2.69s span covered by a 2.3s clip left 0.39s — twelve
+# frames of unrelated footage between two cutaways, which is what the flashing
+# between transitions was.
+#
+# A leftover shorter than this is absorbed into the shot before it. That can
+# mean a fraction of a second of the clip repeating, which is invisible; a
+# twelve-frame cut to something else is not.
+MIN_SHOT_SECONDS = 1.0
 # One clip per cutaway, never reused inside a short. A repeat is noticeable:
 # the same footage returning twenty seconds later reads as running out of
 # material rather than as a deliberate callback. The ceiling exists only to
@@ -516,7 +528,7 @@ def _shot_plan(
 
             spoken_set = _content_words(spoken_here)
             remaining, at = b - a, 0.0
-            while remaining > 0.05:
+            while remaining > MIN_SHOT_SECONDS / 2:
                 clip = _choose_broll(spoken_set, broll_paths, chosen, previous)
                 if clip is None:
                     # Nothing suits this line. The speaker is never the wrong
@@ -527,14 +539,14 @@ def _shot_plan(
                 previous = clip
                 covers = _broll_cover(clip)
                 take = remaining if covers <= 0 else min(remaining, covers)
-                # Never leave a sliver behind that is too short to register.
-                if remaining - take < 0.35:
+                # Never leave behind a piece too short to read as a shot.
+                if remaining - take < MIN_SHOT_SECONDS:
                     take = remaining
                 plan.append((clip, 0.0, take, "b-roll"))
                 remaining -= take
                 at += take
         if plan:
-            return plan
+            return _merge_flashes(plan)
 
     t = 0.0
 
@@ -666,6 +678,42 @@ def _deserves_cutaway(text: str, seconds: float) -> bool:
     if stripped.endswith("?"):
         return False
     return bool(_content_words(stripped))
+
+
+def _merge_flashes(plan: list) -> list:
+    """Fold any shot too short to read into the one before it.
+
+    A guarantee applied to the finished plan rather than a rule enforced in
+    three places while it is being built. Short shots arrived from two
+    directions — a leftover slice of a span that no clip quite covered, and a
+    span too brief to earn a cutaway which then became its own shot of the
+    speaker — and each was fixed separately while the other kept producing
+    them.
+
+    Merging into the *previous* shot keeps the total length identical, so the
+    picture still ends where the speech does. The absorbed time simply extends
+    a shot that was already on screen, which is invisible; a twelve-frame cut
+    to something else is not.
+    """
+    if not plan:
+        return plan
+
+    merged: list = []
+    for shot in plan:
+        path, source_start, seconds, kind = shot
+        if merged and seconds < MIN_SHOT_SECONDS:
+            p0, s0, d0, k0 = merged[-1]
+            merged[-1] = (p0, s0, d0 + seconds, k0)
+            continue
+        merged.append((path, source_start, seconds, kind))
+
+    # A first shot that is itself too short has nothing before it to join, so
+    # it takes from the one after instead.
+    while len(merged) > 1 and merged[0][2] < MIN_SHOT_SECONDS:
+        p0, s0, d0, k0 = merged.pop(0)
+        p1, s1, d1, k1 = merged[0]
+        merged[0] = (p1, s1, d1 + d0, k1)
+    return merged
 
 
 def _broll_cover(path: str) -> float:
