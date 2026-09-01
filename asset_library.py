@@ -915,7 +915,19 @@ def curated_broll(
     wanted = {w for q in queries for w in re.split(r"[^a-z0-9]+", q.lower()) if len(w) > 2}
 
     scored: list[tuple[int, Asset]] = []
-    for root, _dirs, names in os.walk(CURATED_DIR):
+    for root, dirs, names in os.walk(CURATED_DIR):
+        # Folders starting with `_` are not part of the library.
+        #
+        # This walk takes *everything* under `assets/broll/`, which made a
+        # quarantine folder dropped in beside `film/` completely ineffective:
+        # clips moved out of the library for carrying a watermark, or for being
+        # a war film, stayed just as selectable as before, because "moved" only
+        # meant "in a different subfolder of the folder being scanned".
+        #
+        # The rejects now live outside `CURATED_DIR` entirely, which is the
+        # real fix. This is the cheap guard that stops the mistake being made
+        # again by anyone who reaches for the obvious place to put them.
+        dirs[:] = [d for d in dirs if not d.startswith("_")]
         for name in sorted(names):
             full = os.path.join(root, name)
             if not os.path.isfile(full) or _kind_for(full) != "video":

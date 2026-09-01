@@ -925,6 +925,17 @@ def read_shorts(video_dir: str) -> dict:
             os.path.relpath(plain_path, OUTPUT_DIR).replace("\\", "/")
             if os.path.isfile(plain_path) else None
         )
+        # The captioned version, when one has been built. Optional for the same
+        # reason as the plain one, and doubly so here: captions are a separate
+        # step run by `burned_captions.py` rather than part of the render, so
+        # most folders will not have this until that step is run over them.
+        # Without it listed the file exists on disk and is invisible in the
+        # browser, which is exactly how it looked like the captions had failed.
+        captioned_path = os.path.join(folder, "short_captioned.mp4")
+        moment["media_captioned"] = (
+            os.path.relpath(captioned_path, OUTPUT_DIR).replace("\\", "/")
+            if os.path.isfile(captioned_path) else None
+        )
         # The editing brief travels with the clip: it is the part that says
         # what must not be trimmed, and it is useless if you have to go
         # looking for it in a folder.

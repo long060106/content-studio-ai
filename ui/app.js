@@ -688,18 +688,25 @@ function renderTab(d, tab) {
             }, { once: true });
             buttons.forEach((b) => b.classList.toggle("on", b === pressed));
           };
-          if (s.media_plain) {
-            const styled = el("button", {
-              className: "btn-sm on", textContent: "Styled",
-              title: "frame, b-roll and captions",
-              onclick: () => show(s.media, styled),
+          // Three renders of the same cut, when all three exist. The labels
+          // describe what is actually in the file now — an earlier pair said
+          // "frame" and "captions", both of which the pipeline stopped
+          // rendering, so the tooltips were describing a version that no
+          // longer existed.
+          const versions = [
+            [s.media, "B-roll", "the cut with b-roll, no captions"],
+            [s.media_plain, "Plain", "the same cut and voice, speaker only"],
+            [s.media_captioned, "Captions", "the b-roll cut with captions burned in"],
+          ].filter(([path]) => path);
+          if (versions.length > 1) {
+            versions.forEach(([path, label, title], i) => {
+              const b = el("button", {
+                className: i === 0 ? "btn-sm on" : "btn-sm",
+                textContent: label, title,
+                onclick: () => show(path, b),
+              });
+              buttons.push(b);
             });
-            const plain = el("button", {
-              className: "btn-sm", textContent: "Plain",
-              title: "same cut and voice, no frame, b-roll or captions",
-              onclick: () => show(s.media_plain, plain),
-            });
-            buttons.push(styled, plain);
           }
           return el("div", { className: "short-card" },
             player,
@@ -724,7 +731,13 @@ function renderTab(d, tab) {
                   ? Object.assign(
                       saveBtn(s.media_plain,
                               clipFileName(s).replace(/\.mp4$/, "-plain.mp4")),
-                      { textContent: "Save plain", title: "the version with no frame, b-roll or captions" })
+                      { textContent: "Save plain", title: "the speaker-only version" })
+                  : null,
+                s.media_captioned
+                  ? Object.assign(
+                      saveBtn(s.media_captioned,
+                              clipFileName(s).replace(/\.mp4$/, "-captioned.mp4")),
+                      { textContent: "Save captioned", title: "the version with captions burned in" })
                   : null),
               s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
               s.brief ? briefBlock(s) : null,
