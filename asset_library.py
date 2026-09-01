@@ -48,6 +48,7 @@ import atexit
 import json
 import mimetypes
 import os
+import random
 import re
 import subprocess
 import threading
@@ -958,6 +959,24 @@ def curated_broll(
             )))
 
     # Best match first; unmatched clips still usable rather than discarded.
+    #
+    # **Ties are broken at random, and that is a fix rather than a flourish.**
+    # The sort is stable, so before this every tie was decided by the order
+    # `os.walk` happened to return — which is alphabetical, by directory first.
+    # Two consequences, both bad and neither obvious:
+    #
+    # - `film/` sorts before `stock/`, so with 625 film clips against 107 stock
+    #   ones the stock was only ever reached after the film library ran out of
+    #   equally-good matches. It never was. Forty-two nature clips were added,
+    #   scored exactly as well as the film clips on every mood word, and were
+    #   picked zero times.
+    # - Within a folder the same clips won every tie every run, so the early
+    #   alphabet was used constantly and the late alphabet almost never.
+    #
+    # Shuffling first and then sorting by score keeps the ranking exactly as it
+    # was — a better match still beats a worse one — and gives every clip that
+    # scores the same an equal chance of being the one that gets used.
+    random.shuffle(scored)
     scored.sort(key=lambda pair: pair[0], reverse=True)
     return [asset for _hits, asset in scored[:count]]
 

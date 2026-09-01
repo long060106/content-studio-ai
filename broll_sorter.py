@@ -120,14 +120,23 @@ def categorise(filename: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Re-file b-roll by content.")
     parser.add_argument("--dry-run", action="store_true")
+    # The film library is the default because it is the one that grows every
+    # time a film is cut up. Stock lives in its own tree beside it and needs
+    # the same treatment for a reason worth stating: the folder a clip sits in
+    # is one of its tags, so a flat folder of nature footage carries only the
+    # word "stock" and loses every match against a mood word like "solitude"
+    # to a film clip that happens to sit in a folder named after one.
+    parser.add_argument("--root", default=ROOT,
+                        help="folder to sort (default: the film library)")
     args = parser.parse_args()
 
+    root = os.path.abspath(args.root)
     clips: list[str] = []
-    for r, _dirs, files in os.walk(ROOT):
+    for r, _dirs, files in os.walk(root):
         clips += [os.path.join(r, f) for f in files if f.lower().endswith(".mp4")]
 
     if not clips:
-        print(f"No clips under {ROOT}")
+        print(f"No clips under {root}")
         return
 
     plan: dict[str, list[str]] = {}
@@ -147,7 +156,7 @@ def main() -> None:
 
     moved = 0
     for category, paths in plan.items():
-        dest_dir = os.path.join(ROOT, category)
+        dest_dir = os.path.join(root, category)
         os.makedirs(dest_dir, exist_ok=True)
         for path in paths:
             dest = os.path.join(dest_dir, os.path.basename(path))
@@ -173,8 +182,8 @@ def main() -> None:
     # Drop the folders nothing landed in. An empty category is a category
     # nobody can use, and it was half the reason the list felt unmanageable.
     removed = 0
-    for name in sorted(os.listdir(ROOT)):
-        folder = os.path.join(ROOT, name)
+    for name in sorted(os.listdir(root)):
+        folder = os.path.join(root, name)
         if not os.path.isdir(folder):
             continue
         if not any(f.lower().endswith(".mp4")
