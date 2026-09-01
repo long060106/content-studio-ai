@@ -35,8 +35,21 @@ import subprocess
 # the job here is to catch what that missed, so it errs toward finding cuts.
 SCENE_THRESHOLD = 0.22
 
-# A boundary within this of either end is a fragment rather than a scene.
-EDGE = 0.05
+# A boundary this close to an end is the detector's own first-frame artefact
+# rather than a real cut. Small on purpose: at 0.05 it also swallowed genuine
+# fragments, and a two-frame flash at the end of a clip is exactly the fault
+# being hunted — the first pass "fixed" a clip while leaving 0.042s of the next
+# scene on it, then reported the library clean.
+EDGE = 0.015
+
+# Cut back this far from a detected boundary rather than landing on it.
+#
+# Two reasons, and either alone is enough. The boundary is reported at the
+# first frame of the *new* scene, so landing exactly on it keeps that frame.
+# And the encoder does not stop precisely where asked: -t 1.6266 produced a
+# 1.6683s file. A tenth of a second of the wanted shot is a cheap price for
+# never showing a frame of the wrong one.
+SAFETY = 0.10
 
 # Below this a clip is not worth keeping once trimmed.
 MIN_KEEP = 1.2
@@ -103,6 +116,12 @@ def main() -> None:
             continue
 
         a, b = longest_run(cuts, total)
+        # Step inside the run at both ends, but only where there is a boundary
+        # to step away from — the clip's own start and end need no margin.
+        if a > 0:
+            a += SAFETY
+        if b < total:
+            b -= SAFETY
         keep = b - a
         name = os.path.basename(path)
 
