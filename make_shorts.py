@@ -391,6 +391,10 @@ MIN_SHOT_SECONDS = 1.0
 # stop a pathological case downloading a hundred files.
 MAX_DISTINCT_BROLL = 24
 
+# How many more clips to request than the trial plan counted. See
+# `_broll_slots` for why the count is a floor rather than a total.
+BROLL_REQUEST_MARGIN = 1.5
+
 
 def _text_between(words: list, start: float, end: float) -> str:
     """What is being said across a span, for the shot list."""
@@ -658,9 +662,19 @@ def _choose_broll(spoken: set, pool: list, used: set, previous: str | None):
     because the viewer reads it as a mistake and the speaker's face is never a
     mistake.
     """
+    # No clip twice in one short, full stop.
+    #
+    # This used to fall back to the whole pool once every clip had been used,
+    # which is how a short ended up cutting to the same shot twice — four of
+    # six in one batch did, one of them three times. Coming back to footage the
+    # viewer saw twenty seconds ago reads as running out of material, and with
+    # a 732-clip library that is not what happened; the planner simply asked
+    # for fewer clips than the plan turned out to need.
+    #
+    # Running out now means staying on the speaker, which is the same answer
+    # this function gives to every other kind of "nothing suitable". The real
+    # remedy is upstream, in how many clips get requested — see `_broll_slots`.
     candidates = [c for c in pool if c not in used]
-    if not candidates:
-        candidates = pool
     if not candidates:
         return None
 
@@ -780,7 +794,20 @@ def _broll_slots(total: float, words: list | None = None) -> int:
     pool = [f"ph{i}-00-slot{i}.mp4" for i in range(MAX_DISTINCT_BROLL)]
     plan = _shot_plan(total, "SPEECH", pool, words)
     cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
-    return min(max(1, cutaways), MAX_DISTINCT_BROLL)
+    # Ask for half again as many, because this count is a floor and not a total.
+    #
+    # A placeholder has no duration, so `_broll_cover` reads it as "no limit"
+    # and the trial plan gives every span a single clip. Real clips are finite:
+    # a 2s clip cannot hold a 4.5s span, so that span becomes two shots wanting
+    # two clips, and the count comes back short of what the real plan needs.
+    #
+    # Being short used to be invisible because the planner quietly reused a
+    # clip. Now that it refuses to, being short costs cutaways instead — so the
+    # margin is what actually keeps them. Clips that go unused are pruned from
+    # the short's `broll/` folder afterwards, so over-asking costs a copy and
+    # not a cluttered folder.
+    wanted = int(cutaways * BROLL_REQUEST_MARGIN + 0.999)
+    return min(max(1, wanted), MAX_DISTINCT_BROLL)
 
 
 def _shotlist(
@@ -1621,6 +1648,24 @@ def make_shorts(
         # Opens on the speaker, cuts away for a second or two, comes back.
         plan = _shot_plan(render_duration, raw_clip, broll_local, words)
         cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
+
+        # Drop the clips the plan did not use.
+        #
+        # More are fetched than the trial count asks for, because that count is
+        # a floor — see `_broll_slots`. The surplus is what keeps the cutaways
+        # up now that a clip can never be used twice, and it has to be cleared
+        # afterwards or this folder stops being the shot list made physical,
+        # which is the one thing it is for.
+        used_paths = {p for p, _s, _d, kind in plan if kind == "b-roll"}
+        for path in list(broll_local):
+            if path in used_paths:
+                continue
+            try:
+                os.remove(path)
+                broll_local.remove(path)
+            except OSError:
+                pass
+
         if broll_local:
             say(f"  ✓ {len(broll_local)} b-roll clip(s), {len(plan)} shots ({cutaways} cutaways)")
 
