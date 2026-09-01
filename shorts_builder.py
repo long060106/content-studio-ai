@@ -45,6 +45,30 @@ JOIN_W = 1920
 JOIN_H = 1080
 
 MUSIC_GAIN = 0.22       # bed level before ducking
+
+# What `make_music_bed` normalises a generated pad to. A real track dropped in
+# `assets/music/` is used as it is, so anything mastered near this sits at the
+# same level under the voice without retuning MUSIC_GAIN.
+PAD_LUFS = -20.0
+
+# The bed under a rough cut, which needs its own numbers rather than the ones
+# `build_short` uses. Two things differ, and both push the same way:
+#
+# - **The mix order.** `build_short` normalises *after* mixing, so the bed gets
+#   lifted along with everything else. Here the speech arrives already at -14
+#   LUFS and nothing lifts the music afterwards, so whatever gain it is given
+#   is the gain it keeps.
+# - **There are no gaps to swell into.** `silence_trimmer` takes out every
+#   pause over about half a second, which is exactly the space a heavily ducked
+#   bed relies on to be heard at all. Measured on a finished short: not one gap
+#   longer than 0.6s in a 35-second clip.
+#
+# So the ducking is gentle — enough to keep the bed off the voice, not enough
+# to pump it out of existence. At ratio 12 the bed was inaudible for the whole
+# running time and the short measured 0.3 dB louder than the same short with
+# no music in it.
+BED_GAIN = 0.35
+BED_DUCK = "threshold=0.1:ratio=4:attack=20:release=300:makeup=1"
 FADE_OUT = 1.2
 
 # Noise reduction on the speech, before loudness normalisation.
@@ -657,6 +681,7 @@ def build_rough_cut(
     out_path: str,
     duration: float,
     words: list | None = None,
+    music_path: Optional[str] = None,
 ) -> str:
     """Cut between the speaker and b-roll over one continuous speech track.
 
@@ -835,6 +860,44 @@ def build_rough_cut(
         parts.append(
             "[sp][ck]amix=inputs=2:duration=first:normalize=0,"
             "alimiter=limit=0.97[a]"
+        )
+    elif music_path and os.path.isfile(music_path):
+        # The bed ducks under the voice rather than sitting at a fixed level.
+        #
+        # A constant-level bed either fights the speech or is inaudible; there
+        # is no volume that is both. `sidechaincompress` keys the music off the
+        # speech itself, so it drops while a word is being said and swells back
+        # in the gaps — which is the thing that makes a bed sound deliberate
+        # instead of like a track left running underneath.
+        #
+        # Order matters: the bed is trimmed and faded *before* it is ducked, so
+        # the fade-out is not fighting the compressor at the end of the clip.
+        music_index = next_input
+        next_input += 1
+        inputs += ["-stream_loop", "-1", "-i", os.path.abspath(music_path)]
+        parts.append(f"{speech}[sp]")
+        parts.append("[sp]asplit=2[speech_out][speech_key]")
+        parts.append(
+            f"[{music_index}:a]atrim=duration={duration:.3f},asetpts=PTS-STARTPTS,"
+            f"volume={BED_GAIN},"
+            f"afade=t=in:st=0:d=1.0,"
+            f"afade=t=out:st={max(0.0, duration - FADE_OUT):.3f}:d={FADE_OUT}[musicraw]"
+        )
+        parts.append(
+            f"[musicraw][speech_key]sidechaincompress={BED_DUCK}[ducked]"
+        )
+        # normalize=0, and leaving it out cost 6 dB.
+        #
+        # `amix` divides by the number of inputs unless told not to, so mixing
+        # a bed into speech that has already been normalised to -14 LUFS
+        # dropped the whole short to -20.3 — quieter than the plain version
+        # beside it, and well under what the platforms target. The speech is
+        # already at level and the bed is already scaled by MUSIC_GAIN and
+        # ducked; nothing here needs rescaling, only a limiter to catch the
+        # peaks where the two coincide.
+        parts.append(
+            "[speech_out][ducked]amix=inputs=2:duration=first:dropout_transition=0"
+            ":normalize=0,alimiter=limit=0.97[a]"
         )
     else:
         parts.append(f"{speech}[a]")
@@ -1025,21 +1088,59 @@ def probe_duration(path: str) -> float:
     return ffmpeg_probe(path)[0]
 
 
-def make_music_bed(out_path: str, duration: float) -> str:
-    """Generate a plain synth pad.
+# Roots for the generated pads, in Hz. A minor triad spread across three
+# separate beds rather than stacked into one, so a batch of shorts does not all
+# sit on the same chord: A2, C3, D3.
+_PAD_ROOTS = {"a-minor": 110.00, "c-major": 130.81, "d-minor": 146.83}
 
-    A placeholder so the audio chain is testable (and a render never fails)
-    before any real music is in the library. Swap in a real track from
-    assets/music/ for anything you actually publish.
+
+def make_music_bed(out_path: str, duration: float, root: float = 110.0) -> str:
+    """Generate a slow ambient pad.
+
+    **This is a floor, not a library.** It exists so the audio chain works and
+    a render never fails before any real music is dropped into `assets/music/`,
+    and a synthesised drone is not the thing to publish behind a talk — put real
+    tracks in that folder and these stop being chosen.
+
+    What it does beyond the two bare sine waves it replaced, and why each part
+    earns its place under speech:
+
+    - **A root, a fifth and an octave**, the fifth detuned by half a hertz. The
+      beating between the two makes the drone move slightly instead of sitting
+      dead still, which is the difference between a pad and a test tone.
+    - **A lowpass at 1.8kHz.** Speech intelligibility lives between roughly 1
+      and 4kHz, so taking the bed's top off keeps it out of the way of the voice
+      before the ducking has to do any work.
+    - **A slow tremolo and a short echo** for movement and space.
+    - **A fade at both ends**, because a bed that starts at full level on the
+      first frame announces itself.
     """
     os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
+    fifth = root * 1.5
+    graph = (
+        "[0:a][1:a][2:a]amix=inputs=3:normalize=1,"
+        "lowpass=f=1800,"
+        "tremolo=f=0.15:d=0.28,"
+        "aecho=0.8:0.85:220:0.28,"
+        f"afade=t=in:st=0:d=2.5,afade=t=out:st={max(0.0, duration - 3.0):.3f}:d=3.0,"
+        # Normalised to a known level, which is the difference between a bed
+        # you can hear and one you cannot. Mixing three sines and a lowpass
+        # left the raw pad at about -35 dB RMS; MUSIC_GAIN then took another
+        # 13 dB off and the ducking the rest, so the finished short measured
+        # 0.46 dB louder than the same short with no music at all. The gain
+        # constant can only be reasoned about if what it multiplies is known.
+        f"loudnorm=I={PAD_LUFS}:TP=-2.0:LRA=7,"
+        "aformat=sample_rates=48000:channel_layouts=stereo[a]"
+    )
     cmd = [
         "ffmpeg", "-y", "-nostdin", "-hide_banner", "-loglevel", "error",
-        "-f", "lavfi", "-i", f"sine=frequency=110:duration={duration:.3f}",
-        "-f", "lavfi", "-i", f"sine=frequency=164.81:duration={duration:.3f}",
-        "-filter_complex",
-        "[0:a][1:a]amix=inputs=2,tremolo=f=0.4:d=0.3,aformat=sample_rates=48000[a]",
-        "-map", "[a]", "-c:a", "libmp3lame", "-q:a", "5", os.path.abspath(out_path),
+        "-f", "lavfi", "-i", f"sine=frequency={root:.2f}:duration={duration:.3f}",
+        # Half a hertz sharp of a true fifth: close enough to be in tune, far
+        # enough to beat slowly against it.
+        "-f", "lavfi", "-i", f"sine=frequency={fifth + 0.5:.2f}:duration={duration:.3f}",
+        "-f", "lavfi", "-i", f"sine=frequency={root * 2:.2f}:duration={duration:.3f}",
+        "-filter_complex", graph,
+        "-map", "[a]", "-c:a", "libmp3lame", "-q:a", "4", os.path.abspath(out_path),
     ]
     _run(cmd)
     return out_path

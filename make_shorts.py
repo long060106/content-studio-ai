@@ -41,6 +41,7 @@ import argparse
 import json
 import os
 import re
+import zlib
 import sys
 import threading
 
@@ -98,6 +99,55 @@ STOCK_BROLL = False
 # made in an editor is not. A window, a caption or a cutaway that is already in
 # the frame can only be removed by rendering the whole thing again.
 PLAIN_ONLY = False
+
+# A music bed under every short, ducked beneath the voice.
+#
+# **This reverses an earlier decision, and the earlier reasoning still stands**
+# — worth stating so nobody re-derives it. Music was switched off because these
+# shorts are deliberately short and typically get stitched two or three at a
+# time into one upload, where a bed baked into each piece has to be cut and
+# re-matched anyway. It was also safer: a track added from TikTok's own library
+# at upload time is licensed for the platform, and one mixed in here is the
+# single most reliably claimed thing on a video.
+#
+# It is on because it was asked for. It is a flag rather than a rewrite so
+# turning it off again costs one line, and `short_plain.mp4` deliberately never
+# gets a bed — that file is the raw material for exactly the stitching case the
+# original decision was about.
+MUSIC_ON = True
+
+# Where beds come from. Any audio file dropped in here is a candidate; the
+# choice is per-short so a batch does not come out sounding like one long
+# track. With the folder empty the pipeline synthesises a plain pad rather than
+# failing, which keeps a render honest but is not something to publish.
+MUSIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "assets", "music")
+
+
+def _pick_music(seed: str) -> str | None:
+    """A bed for one short, or None to leave it dry.
+
+    Chosen by hashing the short's own name rather than at random, so a re-run
+    of the same talk keeps the same track under the same clip. A batch that
+    re-rendered with the music reshuffled would make every short sound subtly
+    different from the version already reviewed.
+
+    `zlib.crc32` rather than the built-in `hash`, which is salted per process
+    for strings — using it here would have given a different track on every run
+    and quietly broken the only property this function promises.
+    """
+    if not MUSIC_ON:
+        return None
+    try:
+        tracks = sorted(
+            os.path.join(MUSIC_DIR, f) for f in os.listdir(MUSIC_DIR)
+            if os.path.splitext(f)[1].lower() in {".mp3", ".m4a", ".wav", ".aac", ".ogg"}
+        )
+    except OSError:
+        tracks = []
+    if not tracks:
+        return None
+    return tracks[zlib.crc32(seed.encode("utf-8")) % len(tracks)]
 
 
 def _slug(text: str, limit: int = 28) -> str:
@@ -1707,9 +1757,13 @@ def make_shorts(
                     f"{len(broll_local)} b-roll suggested in shotlist.md)")
             elif broll_local:
                 shots = [(path, src, dur) for path, src, dur, _kind in plan]
+                bed = _pick_music(os.path.basename(folder))
                 build_rough_cut(raw_clip, shots, out_path, render_duration,
-                                words=words)
-                say(f"  ✓ {out_path} (speaker, cutting to b-roll and back)")
+                                words=words, music_path=bed)
+                bed_note = (f", music: {os.path.basename(bed)}" if bed
+                            else ", no music" if MUSIC_ON else "")
+                say(f"  ✓ {out_path} (speaker, cutting to b-roll and back"
+                    f"{bed_note})")
             else:
                 # No footage available — fall back to the speaker's own picture
                 # so the run still produces something usable.
