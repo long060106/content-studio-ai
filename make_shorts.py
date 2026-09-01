@@ -97,7 +97,7 @@ STOCK_BROLL = False
 # The reasoning is that undoing a choice made here is expensive and undoing one
 # made in an editor is not. A window, a caption or a cutaway that is already in
 # the frame can only be removed by rendering the whole thing again.
-PLAIN_ONLY = True
+PLAIN_ONLY = False
 
 
 def _slug(text: str, limit: int = 28) -> str:

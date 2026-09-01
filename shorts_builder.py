@@ -29,8 +29,11 @@ import tempfile
 from dataclasses import dataclass
 from typing import Optional
 
-VIDEO_W = 1080
-VIDEO_H = 1920
+# Native landscape. The window, the margin and the rounded corners are all
+# gone: the picture is the whole frame now, and the shaping that used to
+# happen here happens in the editor instead.
+VIDEO_W = 1920
+VIDEO_H = 1080
 FPS = 30
 
 RENDER_TIMEOUT = 1800  # a 35s short encodes in well under a minute
@@ -161,7 +164,7 @@ def _fill(label_in: str, label_out: str, duration: float) -> str:
 # How much black sits to the left and right of the picture. 0 gives the
 # full-width band; a margin insets the picture on all four sides, which is what
 # gives the reference style its framed look.
-SIDE_MARGIN = 40
+SIDE_MARGIN = 0
 
 # The picture's width, and from it the band's height. Derived rather than
 # fixed: the picture has to be scaled to the hole in the matte, not merely
@@ -182,7 +185,9 @@ PICTURE_W = VIDEO_W - 2 * SIDE_MARGIN
 # picture reads as a framed rectangle with a thin border rather than as a strip
 # floating in black. The caption sits on the picture now, not in the bars, so
 # there is nothing left that needs the bars to be deep.
-BAND_H = (PICTURE_W * 16 // 9) // 2 * 2
+# The band is the frame. Nothing is inset and nothing is letterboxed, so
+# every shot fills the picture edge to edge.
+BAND_H = VIDEO_H
 
 # Where to take the crop from when a source is taller than the band.
 #
@@ -273,8 +278,10 @@ KINETIC_CAPTIONS = False
 #
 # SIDE_MARGIN of 0 gives the full-width band this project used before; a
 # non-zero margin insets the picture horizontally as well.
-SIDE_MARGIN = 40
-CORNER_RADIUS = 44
+# Both zero: _frame_matte returns None when there is no margin and no
+# radius, so no overlay is built or composited at all.
+SIDE_MARGIN = 0
+CORNER_RADIUS = 0
 
 
 def _frame_matte(width: int, height: int, band_h: int,

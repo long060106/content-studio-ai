@@ -60,19 +60,19 @@ VIOLENT = {
 # So horror sources are excluded whole. A per-clip rule cannot see what a
 # per-clip description leaves out.
 BLOCKED_FILMS = (
-    # Horror sources. The Substance put nudity and body horror into a finished
-    # short behind the description `figure-sitting-bathroom-fluorescent-light`.
+    # Horror.
     "subs-", "nosf-", "28yl-", "alsg-",
-    # Films where graphic violence is a signature rather than an occasional
-    # scene. RoboCop put an extreme close-up of a bloodied eye into a short,
-    # described as `close-up-hand-dark-object` — the second time a composition
-    # was recorded accurately while what made it unusable went unmentioned.
-    #
-    # Two escapes of the same shape is the argument for judging the source
-    # instead of the shot. A description is written by looking at a frame for a
-    # moment; whether a film is full of gore is known before a single frame is
-    # cut.
+    # Films where violence is the subject rather than an occasional scene.
+    # Judged by what the film is, because judging by what a clip's description
+    # says has now failed three times: The Substance behind
+    # `figure-sitting-bathroom-fluorescent-light`, RoboCop behind
+    # `close-up-hand-dark-object`, and a third batch the user caught himself.
     "rbcp-", "sinn-", "sqg2-", "pngn-", "dda1-", "dda2-",
+    # War, combat and thriller. Landscapes from these are often beautiful and
+    # they are not worth the shots that come with them — a war film is mostly
+    # men with weapons, and no description reliably says which frame is which.
+    "1917-", "pogl-", "napl-", "koh-", "aksk-", "glad-", "hod2-", "hod3-",
+    "madm-", "revt-", "sica-", "andr-", "boys-", "kbrk-", "mifr-", "obaa-",
 )
 
 # Matches a rule word but is not the thing. Checked as phrases, so only the
