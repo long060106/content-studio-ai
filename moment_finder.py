@@ -983,7 +983,16 @@ def find_moments(
     client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
     response = client.messages.create(
         model=MODEL,
-        max_tokens=4000,
+        # Generous, because the answer grew a lot and the failure is total.
+        #
+        # Each moment now carries point, explanation, proof, three hook
+        # candidates, the rejection reasoning, opens_on, ends_on, the ending
+        # check, contrast and the rest — call it 300 tokens — and the ceiling
+        # went to 8 moments per window. At 4000 the JSON was simply cut off
+        # mid-object, which does not degrade gracefully: the parse fails and the
+        # whole window returns nothing. Both windows of a talk failed this way
+        # and the run produced no shorts at all.
+        max_tokens=16000,
         system=SYSTEM_PROMPT,
         messages=[{
             "role": "user",
