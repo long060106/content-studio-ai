@@ -193,6 +193,7 @@ def choose(
     theme: str = "",
     api_key: Optional[str] = None,
     model: str = MODEL,
+    record_to: Optional[str] = None,
 ) -> dict[int, str]:
     """Map line index -> chosen filename. Absent keys mean stay on the speaker.
 
@@ -233,6 +234,21 @@ def choose(
         data = json.loads(text)
     except json.JSONDecodeError:
         return {}
+
+    # Keep the reasoning next to the short.
+    #
+    # The mute test is the whole mechanism, and a mechanism you cannot read is
+    # one you have to take on faith. Written beside the clips it produced, a bad
+    # cutaway can be traced to the sentence that justified it — and a check that
+    # was performed rather than reasoned through is obvious at a glance.
+    if record_to:
+        try:
+            os.makedirs(os.path.dirname(record_to) or ".", exist_ok=True)
+            with open(record_to, "w", encoding="utf-8") as f:
+                json.dump({"lines": lines, "picks": data.get("picks", [])},
+                          f, indent=2, ensure_ascii=False)
+        except OSError:
+            pass
 
     valid = set(library)
     out: dict[int, str] = {}

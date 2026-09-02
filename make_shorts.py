@@ -1801,6 +1801,7 @@ def make_shorts(
                 by_name = {os.path.basename(p): p for p in broll_local}
                 chosen_names = broll_picker.choose(
                     lines, list(by_name), hook=moment.hook, theme=moment.theme,
+                    record_to=os.path.join(folder, "broll_choices.json"),
                 )
                 if chosen_names:
                     picks = {i: by_name[n] for i, n in chosen_names.items()}
