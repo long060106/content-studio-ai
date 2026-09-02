@@ -190,6 +190,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   flex-shrink: 0;
 }
 
+/* `display: flex` above beats the `hidden` attribute, whose only power is a
+   default `display: none` from the user-agent stylesheet — any class rule with
+   a display outranks it. The chip is marked hidden in the markup and hidden
+   again by every code path that ends a run, and it sat there permanently
+   anyway: a spinner reading "Running…" next to a live Stop button, on an idle
+   app that had never started a job.
+   Worth knowing generally: toggling visibility with the `hidden` attribute
+   only works if nothing sets `display` on the element. */
+.running-chip[hidden] { display: none; }
+
 .running-chip .chip-label {
   border: none;
   background: none;
