@@ -1622,7 +1622,8 @@ def make_shorts(
                     # it leaves, so the library gets better every time you add
                     # to assets/broll/ without anything else changing.
                     picked = asset_library.curated_broll(
-                        queries, count=wanted, exclude=used_broll
+                        queries, count=wanted, exclude=used_broll,
+                        theme=moment.theme,
                     )
                     # The library is finite. Once earlier shorts have claimed
                     # most of it, insisting on unused clips pushes the rest of
@@ -1634,7 +1635,8 @@ def make_shorts(
                     if len(picked) < wanted:
                         already = {a.id for a in picked}
                         picked += asset_library.curated_broll(
-                            queries, count=wanted - len(picked), exclude=already
+                            queries, count=wanted - len(picked), exclude=already,
+                            theme=moment.theme,
                         )
                     # Stock is not a fallback any more, it is excluded.
                     #

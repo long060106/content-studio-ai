@@ -887,11 +887,41 @@ def fetch_stock(
 CURATED_DIR = os.path.join(ASSETS_DIR, "broll")
 
 
+# Themes the account wants drawn from a particular source, whatever the words
+# in the moment happen to be.
+#
+# The Michael Jordan footage is the reason this exists. All 23 clips are named
+# for what is visible in them — `basketball-player-arena-crowd` and so on — and
+# a moment about training or discipline produces queries like "athlete
+# training" or "practice at dawn". They share no words, so the footage scored
+# zero and was never picked for exactly the shorts it was collected for.
+#
+# Filename matching cannot fix that on its own: renaming the clips "discipline"
+# would break the thing the naming convention is for, which is describing the
+# picture. The association is editorial, so it is stated editorially.
+THEME_AFFINITY = {
+    "discipline": ("mjor-",),
+    "consistency": ("mjor-",),
+    "focus": ("mjor-",),
+}
+
+# Enough to put an affinity clip above one that merely shares a word. Query hits
+# are usually 0-2, so three promotes reliably.
+AFFINITY_BONUS = 3
+
+# ...and at most this share of the returned pool, because the bonus alone was
+# too blunt: every one of eight slots came back Jordan, which is not "use the
+# Jordan footage on discipline", it is "make a basketball montage". Half keeps
+# the association visible while leaving the short somewhere else to cut to.
+AFFINITY_MAX_SHARE = 0.5
+
+
 def curated_broll(
     queries: list[str],
     count: int,
     exclude: Optional[set] = None,
     min_duration: float = 0.0,
+    theme: str = "",
 ) -> list[Asset]:
     """Hand-picked b-roll from `assets/broll/`, matched by filename.
 
@@ -952,6 +982,10 @@ def curated_broll(
                 tags += [p for p in re.split(r"[^a-z0-9]+", folders.lower()) if len(p) > 2]
 
             hits = len(wanted.intersection(tags))
+            for prefix in THEME_AFFINITY.get((theme or "").lower(), ()):
+                if name.lower().startswith(prefix):
+                    hits += AFFINITY_BONUS
+                    break
             scored.append((hits, Asset(
                 id=asset_id, kind="video", path=rel, tags=tags,
                 duration=duration, width=width, height=height,
@@ -978,7 +1012,28 @@ def curated_broll(
     # scores the same an equal chance of being the one that gets used.
     random.shuffle(scored)
     scored.sort(key=lambda pair: pair[0], reverse=True)
-    return [asset for _hits, asset in scored[:count]]
+
+    prefixes = THEME_AFFINITY.get((theme or "").lower(), ())
+    if not prefixes:
+        return [asset for _hits, asset in scored[:count]]
+
+    # Take the best affinity clips up to their share, the best of everything
+    # else for the rest, and only then let affinity clips fill what is left —
+    # so a thin library still returns a full pool rather than a short one.
+    def is_affinity(asset: Asset) -> bool:
+        return os.path.basename(asset.path).lower().startswith(prefixes)
+
+    ranked = [asset for _hits, asset in scored]
+    cap = max(1, int(count * AFFINITY_MAX_SHARE))
+    affinity = [a for a in ranked if is_affinity(a)]
+    others = [a for a in ranked if not is_affinity(a)]
+
+    chosen = affinity[:cap] + others[: count - min(cap, len(affinity))]
+    if len(chosen) < count:
+        chosen += [a for a in affinity[cap:] if a not in chosen][: count - len(chosen)]
+    # Back into score order, so the caller still gets best-first.
+    order = {id(a): i for i, a in enumerate(ranked)}
+    return sorted(chosen, key=lambda a: order[id(a)])[:count]
 
 
 def fetch_broll_set(
