@@ -51,6 +51,49 @@ MODEL = "claude-sonnet-4-6"
 # showing it to the model would reintroduce the bug this module exists to fix.
 MAX_LIBRARY = 1500
 
+# Clips that have been judged wrong in a finished short, kept between runs.
+#
+# Without this the same mistake returns: `phml-12-hands-holding-fish-ocean` was
+# picked under a line about reaching out, removed, and picked again on the next
+# run for the same reason — the pull of "reach"/"hands" is in the words and does
+# not go away because a human disliked the result once.
+#
+# A plain text file, one filename per line, `#` for comments, so it can be
+# edited by hand while reviewing a batch. Blocked clips are withheld from the
+# model entirely rather than penalised, because a penalty is a suggestion and
+# this is a decision that has already been made.
+BLOCKLIST_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", "broll-blocklist.txt"
+)
+
+
+def blocked() -> set:
+    """Filenames never to offer. Missing file means nothing is blocked."""
+    try:
+        with open(BLOCKLIST_PATH, encoding="utf-8") as f:
+            names = set()
+            for ln in f:
+                # The note after `#` is for whoever reads the file; only the
+                # filename before it is the entry. Keeping the whole line was a
+                # silent no-op — every comparison against a real filename
+                # failed and the blocklist blocked nothing.
+                name = ln.split("#", 1)[0].strip()
+                if name:
+                    names.add(name)
+            return names
+    except OSError:
+        return set()
+
+
+def block(filename: str, reason: str = "") -> None:
+    """Add a clip to the blocklist, with the reason beside it."""
+    os.makedirs(os.path.dirname(BLOCKLIST_PATH), exist_ok=True)
+    if filename in blocked():
+        return
+    with open(BLOCKLIST_PATH, "a", encoding="utf-8") as f:
+        note = f"  # {reason}" if reason else ""
+        f.write(f"{filename}{note}\n")
+
 SYSTEM_PROMPT = """You choose b-roll for motivational shorts. You are given the \
 lines a speaker says, and a library of clips described by filename. For each \
 line you pick the clip that belongs under it, or decline.
@@ -74,6 +117,26 @@ If nothing in the library means anything for a line, return null and let the \
 speaker hold the screen. Returning null is a correct answer and you should use \
 it — an honest half of a shot list beats a full one of near-misses.
 
+THE LITERAL-ASSOCIATION TRAP, which is the hardest failure to guard against. \
+A word in the line matching an object in the clip is NOT a reason to use it. \
+"Always reach out to better yourself" over `hands-holding-fish-ocean` is the \
+canonical mistake: "reach out" and "hands" are the same idea in a dictionary and \
+nothing alike on screen. The viewer does not hear a word and see an object, they \
+see a man holding a fish while somebody talks about self-improvement, and the \
+edit goes as slack as if the clip were chosen at random.
+
+Test every clip this way: would it still work if the line were spoken in a \
+language you did not understand and you only had the picture? If the only \
+connection is a word, drop it and return null. Objects that turn up inside \
+idioms — hands, doors, roads, keys, bridges, mountains, light, water — are where \
+this goes wrong most, because the idiom is carrying the meaning and the picture \
+is not.
+
+WRITE THE INTENT BEFORE YOU CHOOSE. For every line, say in `intent` what the \
+shot has to DO — the feeling or the idea the picture must carry — before you \
+name any clip. "Aspiration, something opening up" is an intent. "Hands" is not: \
+it is already a search term, and writing one is how the literal trap gets in.
+
 THE SEQUENCE MATTERS, not just each choice. You see the whole list at once, so:
 - Never use the same clip twice.
 - Do not put two clips from the same film back to back — the prefix before the \
@@ -93,8 +156,12 @@ Return a JSON object with exactly this shape:
   "picks": [
     {{
       "line": number,        // the line's index, 0 to {n - 1}
+      "intent": string,      // what the shot must DO, written BEFORE choosing. A feeling or an
+                             // idea, never an object or a search term.
       "clip": string|null,   // exact filename from the library, or null for none
-      "why": string          // a few words: what makes it belong. "" when null.
+      "why": string          // a few words: what makes it belong. "" when null. If the only
+                             // honest answer is that a word matched, the clip is wrong —
+                             // return null instead.
     }}
   ]
 }}
