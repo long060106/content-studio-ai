@@ -54,6 +54,13 @@ MIN_CUT_SECONDS = 4
 # eats into the following sentence.
 LULL_SECONDS = 0.6
 
+# How far past the model's end boundary to look for a real sentence ending.
+#
+# The failure is always the same shape — a statement cut short — so the search
+# runs forward first. Four seconds is about one more sentence: enough to finish
+# a thought that was clipped, not enough to bolt on the next idea.
+ENDING_REACH = 4.0
+
 # The finished short, all cuts added together. Overridable per run via
 # make_shorts.py's --min-seconds / --max-seconds.
 MIN_TOTAL_SECONDS = 7
@@ -224,6 +231,10 @@ So when you place the boundaries, check WHERE THE STRONGEST LINE SITS inside the
 
 This constrains hook-stitching. Pulling a framing line to the front is right when it poses the question; it is wrong when it gives away the answer. Name the subject at the front, keep the resolution for the end.
 
+WRITE THE LAST SENTENCE OUT AND JUDGE IT. Before submitting any moment, put its final sentence in `ends_on` verbatim and decide in `ending_check` whether it finishes the thought. This is not the same as checking that the timestamp lands on a sentence boundary — a grammatically complete sentence can still be a promise. One short ended on "And when I say that, I mean this." That is a full sentence, correctly bounded, and it is a cliffhanger with no payoff: the answer came two seconds later and was left out of the cut. Another ended on "Young people." and simply trailed off.
+
+A viewer who reaches the end of a short and has not been given the thing it promised does not feel curious, they feel cheated, and they do not watch the next one. If `ending_complete` would be false, move the end forward until the statement resolves.
+
 END ON THE POINT. The last line heard is what the viewer leaves with, and a \
 moment that trails off into whatever the speaker said next wastes everything \
 before it. Every moment must finish on a line that lands its idea.
@@ -340,6 +351,14 @@ Return a JSON object with exactly this shape:
                                      // first — if it is throat-clearing rather than a hook,
                                      // change where the moment starts or stitch a hook line to
                                      // the front.
+      "ends_on": string,             // the LAST sentence of the moment, verbatim. Write it out.
+      "ending_check": string,        // Does that sentence finish the thought, or set up something
+                                     // the viewer never hears? Judge it cold, as someone who saw
+                                     // only this clip. "Ends on 'And when I say that, I mean
+                                     // this.' — that is a promise, and the answer is in the next
+                                     // sentence which is not in the cut. BROKEN, extend the end."
+      "ending_complete": boolean,    // false means go back and move the end. Do not submit a
+                                     // moment with false here.
       "payoff_at": string,           // "opening" | "middle" | "end" — where the moment's
                                      // strongest line actually falls. Say where it IS, not where
                                      // it should be. Anything other than "end" means the
@@ -393,6 +412,8 @@ class Moment:
     # available to a human reading the folder.
     opens_on: str = ""
     contrast: str = ""
+    ends_on: str = ""
+    ending_check: str = ""
     # Where the strongest line falls inside the moment. Asked for so the model
     # has to look: a short whose best line arrives first has spent itself by
     # the fifth second, which is the failure that structure — as opposed to
@@ -460,6 +481,8 @@ class Moment:
             hook_candidates=list(d.get("hook_candidates") or []),
             hook_rejects=d.get("hook_rejects", ""),
             opens_on=d.get("opens_on", ""),
+            ends_on=d.get("ends_on", ""),
+            ending_check=d.get("ending_check", ""),
             payoff_at=d.get("payoff_at", ""),
             contrast=d.get("contrast", ""),
             peak_rank=int(d.get("peak_rank", 0) or 0),
@@ -477,6 +500,8 @@ class Moment:
             "hook_candidates": self.hook_candidates,
             "hook_rejects": self.hook_rejects,
             "opens_on": self.opens_on,
+            "ends_on": self.ends_on,
+            "ending_check": self.ending_check,
             "payoff_at": self.payoff_at,
             "contrast": self.contrast,
             "quote": self.quote,
@@ -628,6 +653,30 @@ def _snap_cut(
         if float(s["start"]) >= snapped_start
     ]
     snapped_end = min(ends, key=lambda t: abs(t - end)) if ends else end
+
+    # End on a sentence, not merely on a caption boundary.
+    #
+    # Snapping to the nearest segment end is not enough and this is where the
+    # clipped endings came from. YouTube breaks auto-captions every few seconds
+    # regardless of grammar, so the nearest boundary is frequently the middle of
+    # a sentence — one short ended on "but I just wanted to share that with you"
+    # with "this morning" in the next segment, and another on "Young people."
+    #
+    # `_natural_breaks` already knows where a statement actually ends, by
+    # punctuation or by a real pause; it was only being consulted when a moment
+    # overran the maximum length. It applies to every ending.
+    #
+    # Forward first, because the failure is always a sentence cut short. Going
+    # back to the previous break loses the payoff the cut was chosen for, while
+    # going forward costs a couple of seconds and completes it.
+    breaks = _natural_breaks(segments, snapped_start, snapped_end + ENDING_REACH)
+    if breaks:
+        ahead = [t for t in breaks if t >= snapped_end - 0.25]
+        behind = [t for t in breaks if t < snapped_end - 0.25]
+        if ahead:
+            snapped_end = min(ahead)
+        elif behind:
+            snapped_end = max(behind)
 
     if tail > 0:
         following = [t for t in starts if t > snapped_end + 0.05]
@@ -866,6 +915,8 @@ def find_moments(
                              (item.get("hook_candidates") or []) if h.strip()],
             hook_rejects=item.get("hook_rejects", "").strip(),
             opens_on=item.get("opens_on", "").strip().strip('"'),
+            ends_on=item.get("ends_on", "").strip().strip('"'),
+            ending_check=item.get("ending_check", "").strip(),
             payoff_at=item.get("payoff_at", "").strip().lower(),
             contrast=item.get("contrast", "").strip(),
             quote=item.get("quote", "").strip(),
