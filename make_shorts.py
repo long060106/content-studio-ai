@@ -1148,6 +1148,7 @@ def make_shorts(
     workers: int = DEFAULT_WORKERS,
     captions: bool = False,
     keep_old: bool = False,
+    moments_file: str | None = None,
 ) -> list[dict]:
     from video_clipper import download_clip, download_full, cut_from_file, YouTubeBlockedDownload
 
@@ -1195,14 +1196,32 @@ def make_shorts(
         print(f"→ Finding the {count} strongest moments with Claude...")
     from moment_finder import MAX_TOTAL_SECONDS, MIN_TOTAL_SECONDS
 
-    moments = find_moments(
-        segments,
-        count=count,
-        title=data.get("title", ""),
-        hot_windows=hot_windows,
-        min_total=min_seconds or MIN_TOTAL_SECONDS,
-        max_total=max_seconds or MAX_TOTAL_SECONDS,
-    )
+    if moments_file:
+        # A pinned set, rendered as given.
+        #
+        # The model returns different hooks on every call — the same four
+        # passages come back, worded four different ways — so without a way to
+        # save one there is no way to keep a set you liked. Review a few passes,
+        # save the best, edit the wording by hand if you want, render from that.
+        # Nothing here is re-judged: the strength bar and the ceiling have
+        # already done their work by the time a set is saved.
+        from moment_finder import Moment
+        with open(moments_file, encoding="utf-8") as f:
+            saved = json.load(f)
+        if isinstance(saved, dict):
+            saved = saved.get("moments", [])
+        moments = [Moment.from_dict(d) for d in saved]
+        print(f"→ Using {len(moments)} pinned moment(s) from "
+              f"{os.path.basename(moments_file)}")
+    else:
+        moments = find_moments(
+            segments,
+            count=count,
+            title=data.get("title", ""),
+            hot_windows=hot_windows,
+            min_total=min_seconds or MIN_TOTAL_SECONDS,
+            max_total=max_seconds or MAX_TOTAL_SECONDS,
+        )
     if not moments:
         print("✗ No usable moments came back.")
         sys.exit(1)
@@ -1937,6 +1956,9 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS,
                         help=f"how many clips to build at once (default {DEFAULT_WORKERS}; "
                              "1 makes the log easier to read when debugging)")
+    parser.add_argument("--moments-file", default=None,
+                        help="render this saved set of moments instead of "
+                             "asking the model for new ones — see Moment.to_dict")
     parser.add_argument("--source-file", default=None,
                         help="cut from this local video instead of downloading; "
                              "the URL is still used for the transcript and heatmap")
@@ -1968,6 +1990,7 @@ def main() -> None:
         workers=args.workers,
         captions=args.captions,
         keep_old=args.keep_old,
+        moments_file=args.moments_file,
     )
 
 

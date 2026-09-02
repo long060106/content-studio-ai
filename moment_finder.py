@@ -347,6 +347,37 @@ class Moment:
     def end_seconds(self) -> float:
         return self.cuts[-1].end_seconds if self.cuts else 0.0
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "Moment":
+        """Rebuild a Moment from its `to_dict` form.
+
+        The inverse of `to_dict`, so a set of moments can be saved, edited by
+        hand and rendered again without asking the model a second time. That
+        matters for more than convenience: the model returns a different set of
+        hooks on every call, so without this there is no way to keep a wording
+        you liked. Reviewing several passes and pinning the best one is the
+        workflow this enables.
+
+        Fields `to_dict` derives rather than stores — start, end, duration —
+        are ignored, since they come back from the cuts.
+        """
+        return cls(
+            cuts=[Cut(float(c["start_seconds"]), float(c["end_seconds"]))
+                  for c in d.get("cuts", [])],
+            hook=d.get("hook", ""),
+            quote=d.get("quote", ""),
+            theme=d.get("theme", ""),
+            tone=d.get("tone", ""),
+            visual_keywords=list(d.get("visual_keywords") or []),
+            reason=d.get("reason", ""),
+            stitch_reason=d.get("stitch_reason", ""),
+            opens_on=d.get("opens_on", ""),
+            contrast=d.get("contrast", ""),
+            peak_rank=int(d.get("peak_rank", 0) or 0),
+            strength=float(d.get("strength", 0.0) or 0.0),
+            heat=float(d.get("heat", 0.0) or 0.0),
+        )
+
     def to_dict(self) -> dict:
         return {
             "cuts": [asdict(c) for c in self.cuts],
