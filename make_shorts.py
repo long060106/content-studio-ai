@@ -370,6 +370,16 @@ SENTENCE_SHOTS = True
 # measurements behind it. Costs one Claude call per short; turn it off to fall
 # back to word scoring.
 SEMANTIC_BROLL = True
+
+# The fewest cutaways a short may ship with before the declines get overridden.
+#
+# The picker declining a line is a real answer and worth honouring — a cutaway
+# that means nothing reads as a mistake. But honouring every decline produced a
+# 17-second short with two cutaways and five speaker shots, which is not an
+# edit, it is a talking head with interruptions. So the declines stand until
+# they would take a short below this, and then the plan is rebuilt letting the
+# word scoring fill the gaps it left.
+BROLL_FLOOR = 3
 SENTENCE_MIN = 1.2
 
 # The longest a single picture may hold. Lowered from 8s: a shot that runs
@@ -529,6 +539,7 @@ def _shot_plan(
     broll_paths: list[str],
     words: list | None = None,
     picks: dict | None = None,
+    _backfilling: bool = False,
 ) -> list[tuple[str, float, float, str]]:
     """Alternate speaker and b-roll across the clip.
 
@@ -545,6 +556,7 @@ def _shot_plan(
     index = 0
     chosen: set = set()
     previous: str | None = None
+    backfilling = _backfilling
     # Anything shorter than this isn't a shot, it's a flicker.
     epsilon = 0.2
 
@@ -599,14 +611,19 @@ def _shot_plan(
             # `picks` holds an entry for every span the picker considered; a
             # span it declined has no entry and stays on the speaker, which is
             # the answer it meant rather than a gap to fill by other means.
-            if picks is not None and i not in picks:
-                plan.append((speech_path, a, b - a, "original"))
-                continue
             while remaining > MIN_SHOT_SECONDS / 2:
-                if picks is not None:
-                    clip = picks.get(i) if not at else None
+                if picks is not None and i in picks and not at:
+                    # A clip chosen by reading this line.
+                    clip = picks[i]
                     if clip in chosen:
                         clip = None
+                elif picks is not None and i not in picks and not backfilling:
+                    # The picker looked at this line and declined it. That is a
+                    # real answer — a cutaway meaning nothing is worse than the
+                    # speaker's face — so it is honoured, unless honouring every
+                    # decline has left the short with too few cutaways to read
+                    # as an edit at all. See BROLL_FLOOR.
+                    clip = None
                 else:
                     clip = _choose_broll(spoken_set, broll_paths, chosen, previous)
                 if clip is None:
@@ -1769,12 +1786,28 @@ def make_shorts(
                     picks = {i: by_name[n] for i, n in chosen_names.items()}
                     say(f"  ✓ {len(picks)} cutaway(s) chosen by meaning, "
                         f"{len(lines) - len(picks)} line(s) left on the speaker")
+                else:
+                    # An empty answer is a failure, not a set of declines, and
+                    # it used to be indistinguishable from success: one short in
+                    # a batch quietly reverted to word matching with nothing in
+                    # the log to say so. The whole point of the picker is that
+                    # its absence is visible.
+                    say("  ⚠ The b-roll picker returned nothing — "
+                        "falling back to word matching for this short")
             except Exception as e:
-                say(f"  ⚠ Falling back to word matching: {str(e)[:60]}")
+                say(f"  ⚠ B-roll picker failed ({str(e)[:60]}) — "
+                    f"falling back to word matching")
 
         # Opens on the speaker, cuts away for a second or two, comes back.
         plan = _shot_plan(render_duration, raw_clip, broll_local, words, picks)
         cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
+        if picks is not None and cutaways < BROLL_FLOOR:
+            plan = _shot_plan(render_duration, raw_clip, broll_local, words,
+                              picks, _backfilling=True)
+            filled = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
+            say(f"  · {cutaways} cutaway(s) after the declines — "
+                f"backfilled to {filled}")
+            cutaways = filled
 
         # Drop the clips the plan did not use.
         #

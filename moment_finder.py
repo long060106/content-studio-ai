@@ -103,6 +103,33 @@ MAX_MOMENTS = 4
 STRENGTH_THRESHOLD = 7.0
 
 
+# The width a hook has to fit. Enforced here as well as asked for in the prompt,
+# because asking was not enough: with the four-mistake framework in place the
+# model started writing better hooks and stopped counting, and a whole batch
+# came back at 66, 77, 87 and 74 characters. A constraint that competes with a
+# quality bar loses to it.
+HOOK_MAX_CHARS = 60
+
+
+def _pick_hook(chosen: str, candidates: list[str]) -> str:
+    """The best hook that actually fits.
+
+    Prefers the model's own choice when it fits. When it doesn't, the shortest
+    candidate that does is a better answer than truncating — the candidates are
+    complete hooks that were judged against the same framework, while a cut-off
+    hook is the exact failure the limit exists to prevent.
+
+    Falls back to the over-long choice rather than returning nothing, so a batch
+    still renders; `moments_over_length` reports it instead.
+    """
+    if chosen and len(chosen) <= HOOK_MAX_CHARS:
+        return chosen
+    fitting = [c for c in candidates if c and len(c) <= HOOK_MAX_CHARS]
+    if fitting:
+        return max(fitting, key=len)
+    return chosen
+
+
 def transcript_seconds(segments: list[dict]) -> float:
     """Playing time covered by the transcript."""
     if not segments:
@@ -169,6 +196,18 @@ the second, and the join must sound deliberate. If a listener would hear the \
 jump as a mistake, use one cut instead.
 - Each cut must itself start and end on sentence boundaries.
 
+THE SHAPE OF A MOMENT: HOOK, PROGRESSION, CLIMAX. A short is not a good passage with a good first line, it is a small piece of storytelling with three parts, and the middle one is the part most easily forgotten:
+
+- HOOK — the opening seconds. Names the subject and raises a question.
+- PROGRESSION — everything between. Moves *toward* the answer, delivering on what the hook promised. Not restating it, not circling it.
+- CLIMAX — the end. The question gets answered. This is what the viewer stayed for and it belongs last.
+
+THE MISTAKE THAT KILLS OTHERWISE GOOD SHORTS IS PAYING OFF TOO EARLY. If the answer arrives five seconds in, there is nothing left to wait for and the viewer leaves — not because the material was weak, but because it was spent. A short that opens "Mr Beast's secret is to make 100 videos and improve each time" has no reason to continue; the same material, with the secret arriving at the end, holds the viewer for the whole clip.
+
+So when you place the boundaries, check WHERE THE STRONGEST LINE SITS inside the moment. It should fall in the last third. If the best line is the first thing said and everything after it is explanation, you have chosen the wrong boundaries: either start earlier, so the payoff has something to arrive after, or make the strong line the closer of a shorter cut.
+
+This constrains hook-stitching. Pulling a framing line to the front is right when it poses the question; it is wrong when it gives away the answer. Name the subject at the front, keep the resolution for the end.
+
 END ON THE POINT. The last line heard is what the viewer leaves with, and a \
 moment that trails off into whatever the speaker said next wastes everything \
 before it. Every moment must finish on a line that lands its idea.
@@ -187,6 +226,10 @@ stitch a better one on.
 WRITE THREE HOOKS, THEN CHOOSE. Do not write one hook and move on. The first hook that comes to mind is usually the most obvious phrasing of the moment, which is rarely the one that stops a thumb — and the difference between a good and a weak hook for the SAME passage is large. Two real examples from the same moment: "He lived in a car — then published 5 books" against "He lived in a car — then did all of this". Identical material; the second names nothing and promises nothing.
 
 So for every moment: write three genuinely different candidates in `hook_candidates`, name what is wrong with the weaker ones in `hook_rejects` using the four mistakes below, then put the survivor in `hook`. The rejects line is the check that forces the comparison — write it before you choose, not after.
+
+SIXTY CHARACTERS. HARD LIMIT. Every one of the three candidates must be 60 characters or fewer, counted including spaces. This is not a style note, it is the width the title has to fit in — past it the hook is cut off mid-word on the feed, which loses the payoff the whole hook was built to deliver.
+
+Count the characters before you write each candidate down. If one runs long, cut it rather than submitting it: drop the setup clause, drop the second sentence, drop the adjectives. "When you keep pushing to better yourself, things expand — you get happier and healthier" is 87 characters and fails, and the cure is not a better sentence, it is fewer words for the same idea: "Keep pushing yourself and everything expands" is 44. Length is a constraint on the writing, not a filter applied afterwards.
 
 THE HOOK IS THE WHOLE JOB. A hook has exactly one purpose: to make a stranger \
 decide to keep watching. It does that by giving two things at once — TOPIC \
@@ -270,7 +313,8 @@ Return a JSON object with exactly this shape:
       "hook_rejects": string,        // one line naming which candidates you rejected and which
                                      // of the four mistakes each one makes. Write this BEFORE
                                      // choosing — it is the check, not a justification.
-      "hook": string,                // <= 60 chars. Title and caption. Must give topic clarity
+      "hook": string,                // <= 60 CHARACTERS, counted. Title and caption. Must give
+                                     // topic clarity
                                      // AND curiosity — see THE HOOK IS THE WHOLE JOB above.
                                      // Write to "you"/"your", never "he"/"she"/"I". Set up a
                                      // contrast where the material allows one. No hashtags, no
@@ -280,6 +324,10 @@ Return a JSON object with exactly this shape:
                                      // first — if it is throat-clearing rather than a hook,
                                      // change where the moment starts or stitch a hook line to
                                      // the front.
+      "payoff_at": string,           // "opening" | "middle" | "end" — where the moment's
+                                     // strongest line actually falls. Say where it IS, not where
+                                     // it should be. Anything other than "end" means the
+                                     // boundaries want rechecking before you submit them.
       "contrast": string,            // the A-vs-B this hook sets up, as "A -> B", or "" if the
                                      // moment genuinely has no contrast in it. Naming it is how
                                      // you check the hook has one.
@@ -329,6 +377,11 @@ class Moment:
     # available to a human reading the folder.
     opens_on: str = ""
     contrast: str = ""
+    # Where the strongest line falls inside the moment. Asked for so the model
+    # has to look: a short whose best line arrives first has spent itself by
+    # the fifth second, which is the failure that structure — as opposed to
+    # editing — is there to prevent.
+    payoff_at: str = ""
     # The three candidates and the reason the others lost. Kept rather than
     # discarded because the rejected ones are often nearly as good, and a human
     # picking a different one is faster than asking for a fresh set — the
@@ -391,6 +444,7 @@ class Moment:
             hook_candidates=list(d.get("hook_candidates") or []),
             hook_rejects=d.get("hook_rejects", ""),
             opens_on=d.get("opens_on", ""),
+            payoff_at=d.get("payoff_at", ""),
             contrast=d.get("contrast", ""),
             peak_rank=int(d.get("peak_rank", 0) or 0),
             strength=float(d.get("strength", 0.0) or 0.0),
@@ -407,6 +461,7 @@ class Moment:
             "hook_candidates": self.hook_candidates,
             "hook_rejects": self.hook_rejects,
             "opens_on": self.opens_on,
+            "payoff_at": self.payoff_at,
             "contrast": self.contrast,
             "quote": self.quote,
             "theme": self.theme,
@@ -786,11 +841,16 @@ def find_moments(
 
         moments.append(Moment(
             cuts=cuts,
-            hook=item.get("hook", "").strip().strip('"'),
+            hook=_pick_hook(
+                item.get("hook", "").strip().strip('"'),
+                [h.strip().strip('"') for h in
+                 (item.get("hook_candidates") or []) if h.strip()],
+            ),
             hook_candidates=[h.strip().strip('"') for h in
                              (item.get("hook_candidates") or []) if h.strip()],
             hook_rejects=item.get("hook_rejects", "").strip(),
             opens_on=item.get("opens_on", "").strip().strip('"'),
+            payoff_at=item.get("payoff_at", "").strip().lower(),
             contrast=item.get("contrast", "").strip(),
             quote=item.get("quote", "").strip(),
             theme=item.get("theme", "").strip().lower(),
