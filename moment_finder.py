@@ -59,7 +59,7 @@ LULL_SECONDS = 0.6
 # The failure is always the same shape — a statement cut short — so the search
 # runs forward first. Four seconds is about one more sentence: enough to finish
 # a thought that was clipped, not enough to bolt on the next idea.
-ENDING_REACH = 4.0
+ENDING_REACH = 10.0
 
 # The finished short, all cuts added together. Overridable per run via
 # make_shorts.py's --min-seconds / --max-seconds.
@@ -666,6 +666,47 @@ Timestamped transcript segments:
 """
 
 
+
+def _extend_to_floor(
+    cuts: list[Cut],
+    segments: list[dict],
+    min_total: float,
+    max_total: float,
+) -> list[Cut]:
+    """Carry the last cut forward until the short clears the floor.
+
+    Two bugs shared one cause: the floor was checked before the boundaries
+    moved, and nothing re-checked afterwards.
+
+    A moment selected as a comfortable 35 seconds can arrive at 25 once
+    `_snap_cut` pulls its end back to the nearest sentence — and the guard
+    below it compared the total against MIN_CUT_SECONDS, which is 4, so a
+    25-second short sailed through a 30-second floor. Extending rather than
+    dropping is right: the material is there, the cut simply stopped early,
+    which is the same failure as ending mid-statement and has the same fix.
+
+    Each step lands on a natural break, so a short that grows to meet the floor
+    still ends where a sentence ends.
+    """
+    if not cuts or sum(c.duration for c in cuts) >= min_total:
+        return cuts
+
+    last = cuts[-1]
+    horizon = last.end_seconds + (min_total - sum(c.duration for c in cuts)) + 30.0
+    breaks = [t for t in _natural_breaks(segments, last.start_seconds, horizon)
+              if t > last.end_seconds]
+
+    for t in sorted(breaks):
+        grown = cuts[:-1] + [Cut(last.start_seconds, t)]
+        total = sum(c.duration for c in grown)
+        if total > max_total:
+            break
+        cuts = grown
+        if total >= min_total:
+            break
+    return cuts
+
+
 def _snap_cut(
     start: float,
     end: float,
@@ -1050,8 +1091,12 @@ def find_moments(
 
         cuts.sort(key=lambda c: c.start_seconds)
         cuts = _trim_to_budget(cuts, segments, max_total)
+        cuts = _extend_to_floor(cuts, segments, min_total, max_total)
 
-        if sum(c.duration for c in cuts) < MIN_CUT_SECONDS:
+        # Against the real floor, not MIN_CUT_SECONDS. Comparing a whole
+        # moment's length to the single-cut minimum of 4 seconds let a
+        # 25-second short through a 30-second floor without a word of warning.
+        if sum(c.duration for c in cuts) < min_total:
             continue
 
         moments.append(Moment(

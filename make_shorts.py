@@ -1190,6 +1190,73 @@ def build_quote_carousel(
     return [text_path, json_path]
 
 
+
+# Below this share of segments ending in . ! or ?, a transcript carries no
+# sentence signal at all and boundaries cannot be found in it.
+PUNCTUATED_ENOUGH = 0.05
+
+
+def _punctuated_segments(source_file: str, segments: list, model_size: str):
+    """Re-transcribe with Whisper when YouTube's captions have no punctuation.
+
+    Measured on a 46-minute Brian Tracy talk: **zero** of 1332 auto-caption
+    segments ended in a full stop, and only six inter-segment gaps exceeded
+    0.35s — most gaps are negative, because YouTube's rolling captions overlap
+    by design. So `_natural_breaks` found 6 usable boundaries in 46 minutes and
+    every ending landed mid-sentence.
+
+    No amount of tuning fixes that; the signal is not in the file. Whisper
+    punctuates, which is why `caption_timing` already prefers it for captions —
+    this simply gives the moment finder the same benefit, so cuts can start and
+    end where sentences do.
+
+    Costs one transcription of the source. Word timings are cached by
+    `caption_timing`, so a re-run of the same talk pays it once.
+
+    Returns the original segments unchanged if the transcript is already
+    punctuated, or if transcription fails — a talk cut on weaker boundaries is
+    much better than a talk not cut at all.
+    """
+    if not segments:
+        return segments
+    ending = sum(1 for x in segments
+                 if str(x.get("text", "")).strip().endswith((".", "!", "?")))
+    if ending / max(1, len(segments)) >= PUNCTUATED_ENOUGH:
+        return segments
+    if not source_file or not os.path.isfile(source_file):
+        say("  ⚠ Transcript has no punctuation and no local source to "
+            "re-transcribe — boundaries will be rough")
+        return segments
+
+    say(f"  · Transcript has no punctuation ({ending}/{len(segments)} segments) "
+        f"— re-transcribing with Whisper for sentence boundaries")
+    try:
+        from caption_timing import transcribe_words
+        words = transcribe_words(source_file, model_size=model_size)
+    except Exception as e:
+        say(f"  ⚠ Re-transcription failed ({str(e)[:60]}) — keeping captions")
+        return segments
+    if not words:
+        return segments
+
+    # Group words into sentences, so each segment ends where a sentence does.
+    out, buf, start = [], [], None
+    for w in words:
+        if start is None:
+            start = float(w.start)
+        buf.append(w.text)
+        if w.text.rstrip().endswith((".", "!", "?")):
+            out.append({"start": start, "duration": float(w.end) - start,
+                        "text": " ".join(buf).strip()})
+            buf, start = [], None
+    if buf and start is not None:
+        out.append({"start": start, "duration": float(words[-1].end) - start,
+                    "text": " ".join(buf).strip()})
+
+    say(f"  ✓ {len(out)} sentence segments from Whisper "
+        f"(was {len(segments)} caption fragments)")
+    return out or segments
+
 def make_shorts(
     url: str,
     count: int | None = None,
@@ -1221,6 +1288,11 @@ def make_shorts(
 
     data = load_or_fetch_transcript(url, output_dir)
     segments = data.get("transcript_segments") or []
+    # Before the moments are chosen, because the boundaries they are chosen on
+    # come from these segments. A source that has not been downloaded yet is
+    # handled inside — the function returns the captions unchanged rather than
+    # failing, and says so.
+    segments = _punctuated_segments(source_file, segments, model_size)
     if not segments:
         print("✗ This video has no timestamped transcript, so moments can't be located.")
         sys.exit(1)
