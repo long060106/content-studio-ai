@@ -379,7 +379,12 @@ SEMANTIC_BROLL = True
 # edit, it is a talking head with interruptions. So the declines stand until
 # they would take a short below this, and then the plan is rebuilt letting the
 # word scoring fill the gaps it left.
-BROLL_FLOOR = 3
+# Four, not three, so the floor matches the standing target rather than sitting
+# one under it. The intent is three or four cutaways in every short, and a floor
+# of three made "the fewest that is still acceptable" the thing the pipeline
+# aimed at whenever the picker was cautious. A short landing exactly on the
+# floor should be at the bottom of the intended range, not below it.
+BROLL_FLOOR = 4
 SENTENCE_MIN = 1.2
 
 # The longest a single picture may hold. Lowered from 8s: a shot that runs
