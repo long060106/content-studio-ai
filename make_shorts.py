@@ -100,21 +100,26 @@ STOCK_BROLL = False
 # the frame can only be removed by rendering the whole thing again.
 PLAIN_ONLY = False
 
-# A music bed under every short, ducked beneath the voice.
+# Off. The user adds music himself, at upload.
 #
-# **This reverses an earlier decision, and the earlier reasoning still stands**
-# — worth stating so nobody re-derives it. Music was switched off because these
-# shorts are deliberately short and typically get stitched two or three at a
-# time into one upload, where a bed baked into each piece has to be cut and
-# re-matched anyway. It was also safer: a track added from TikTok's own library
-# at upload time is licensed for the platform, and one mixed in here is the
-# single most reliably claimed thing on a video.
+# It was switched on once, briefly, and switched straight back off: the only
+# beds available were synthesised pads, because neither Pexels nor Pixabay
+# serves music through its API, and a generated drone is not music. That is the
+# lesson rather than the flag — **do not put synthesised audio under a talk and
+# call it a music bed.** If music is ever wanted here again it needs real
+# tracks, chosen by him.
 #
-# It is on because it was asked for. It is a flag rather than a rewrite so
-# turning it off again costs one line, and `short_plain.mp4` deliberately never
-# gets a bed — that file is the raw material for exactly the stitching case the
-# original decision was about.
-MUSIC_ON = True
+# The mixing itself works and is tested: drop audio files into `assets/music/`,
+# set this to True, and every short gets one ducked under the voice. With the
+# folder empty nothing is mixed even when this is True, so turning it on by
+# accident cannot put a drone under a video.
+#
+# The original reasoning for having no music here still stands on its own:
+# these shorts are short and typically get stitched two or three at a time into
+# one upload, where a bed baked into each piece has to be re-cut, and a track
+# added from TikTok's own library at upload is licensed for the platform in a
+# way a mixed-in one is not.
+MUSIC_ON = False
 
 # Where beds come from. Any audio file dropped in here is a candidate; the
 # choice is per-short so a batch does not come out sounding like one long
