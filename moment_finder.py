@@ -822,6 +822,79 @@ def _heat_for(cuts: list[Cut], hot_windows: Optional[list[dict]]) -> float:
     return round(best, 3)
 
 
+
+# How much consecutive windows share, in segments. A moment can be a minute
+# long; the overlap has to exceed that or one straddling a boundary is
+# truncated in the earlier window and missing its opening in the later one.
+WINDOW_OVERLAP = 60
+
+
+def _find_in_windows(
+    segments: list[dict],
+    count: int,
+    title: str,
+    summary: str,
+    api_key: Optional[str],
+    hot_windows: Optional[list[dict]],
+    min_total: int,
+    max_total: int,
+    auto: bool,
+) -> list[Moment]:
+    """Search a long talk in overlapping windows and pool the candidates.
+
+    Each window is a separate call, so this costs one request per
+    `MAX_SEGMENTS` of transcript — about twelve for a nine-hour recording. That
+    is the price of reading the whole thing, and the alternative was not a
+    cheaper search but a silent decision to ignore 92% of the material.
+
+    Ranking happens across the pool rather than inside each window, so a talk
+    whose best passages are all in hour seven is not forced to take weaker ones
+    from hour one for balance.
+    """
+    step = MAX_SEGMENTS - WINDOW_OVERLAP
+    windows = [segments[i:i + MAX_SEGMENTS] for i in range(0, len(segments), step)]
+    # A final window of a few segments has nothing to find and still costs a
+    # call; its content is already covered by the overlap of the one before it.
+    windows = [w for w in windows if len(w) > WINDOW_OVERLAP]
+
+    print(f"  · Transcript is {len(segments)} segments — searching "
+          f"{len(windows)} overlapping windows")
+
+    pooled: list[Moment] = []
+    for i, window in enumerate(windows, 1):
+        lo = float(window[0]["start"])
+        hi = float(window[-1]["start"])
+        # Only the peaks inside this window mean anything to it. Passing them
+        # all would point the model at timestamps it cannot see.
+        peaks = [
+            w for w in (hot_windows or [])
+            if lo <= float(w.get("start", -1)) <= hi
+        ] or None
+        try:
+            found = find_moments(
+                window, count=count, title=title, summary=summary,
+                api_key=api_key, hot_windows=peaks,
+                min_total=min_total, max_total=max_total,
+            )
+        except Exception as e:
+            print(f"    window {i}/{len(windows)} ({lo/60:.0f}-{hi/60:.0f} min) "
+                  f"failed: {str(e)[:60]}")
+            continue
+        print(f"    window {i}/{len(windows)} ({lo/60:.0f}-{hi/60:.0f} min): "
+              f"{len(found)} candidate(s)")
+        pooled += found
+
+    # Drop duplicates from the overlap, keeping the stronger reading of the
+    # same passage. Two windows seeing one moment is the overlap working, not a
+    # fault, but shipping it twice would be.
+    pooled.sort(key=lambda m: m.strength, reverse=True)
+    kept: list[Moment] = []
+    for m in pooled:
+        if any(abs(m.start_seconds - k.start_seconds) < 10 for k in kept):
+            continue
+        kept.append(m)
+    return kept[:count] if not auto else kept
+
 def find_moments(
     segments: list[dict],
     count: Optional[int] = None,
@@ -845,6 +918,24 @@ def find_moments(
     # clear the bar. The model is asked for the maximum so it has room to
     # return everything worth cutting.
     count = MAX_MOMENTS if auto else max(1, min(int(count), MAX_MOMENTS))
+
+    # A talk longer than one prompt is searched in windows, not truncated.
+    #
+    # `segments[:MAX_SEGMENTS]` silently decided *which part of the talk
+    # exists*. On a nine-hour recording that is 8% of it — the first 42 minutes
+    # — and the other eight hours were never read. The failure looks like "the
+    # model didn't find much" rather than "the model never saw it", which is
+    # why it could sit here unnoticed.
+    #
+    # Windows overlap, because a moment that straddles a boundary would
+    # otherwise be lost from both sides. Every window is searched, the
+    # candidates are pooled, and the usual strength bar picks the winners — so a
+    # nine-hour video still yields MAX_MOMENTS shorts, but chosen from all of it.
+    if len(segments) > MAX_SEGMENTS:
+        return _find_in_windows(
+            segments, count, title, summary, api_key, hot_windows,
+            min_total, max_total, auto,
+        )
 
     client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
     response = client.messages.create(

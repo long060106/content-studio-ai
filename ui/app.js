@@ -285,7 +285,13 @@ function renderAssetsNote() {
   const note = $("#assets-note");
   if (!note) return;
   const c = state.assets.counts || {};
-  const parts = [`${c.video || 0} b-roll`, `${c.image || 0} images`, `${c.music || 0} tracks`];
+  // "video assets", not "b-roll", because the count is every video in the
+  // asset tree — the curated library plus whatever `assets/video/` holds from
+  // past stock fetches. Those two numbers differ a lot: 810 clips the picker
+  // can actually reach against 1049 total. Calling the larger number "b-roll"
+  // overstated the usable footage by a third and read as a bug when the two
+  // were compared.
+  const parts = [`${c.video || 0} video assets`, `${c.image || 0} images`, `${c.music || 0} tracks`];
   note.textContent = state.assets.stock
     ? `Library: ${parts.join(" · ")} — stock API connected`
     : `Library: ${parts.join(" · ")} — no stock key, using the talk's own footage`;
