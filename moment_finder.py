@@ -74,11 +74,33 @@ MAX_CUTS = 3
 # score, and only those clearing the bar are cut. A weak talk gives three; a
 # rich one gives eight. Nothing is padded to reach a number, and nothing good
 # is discarded to respect one.
-MAX_MOMENTS = 8
+MAX_MOMENTS = 4
+
+# Lowered from 8, and the reason is a measurement rather than a preference.
+#
+# Raising STRENGTH_THRESHOLD from 6.0 to 7.0 was expected to cut the batch and
+# barely moved it: seven shorts became six, because the model scores relative to
+# the bar it is given rather than on an absolute scale. Everything it wanted to
+# keep arrived at exactly 7.0. A threshold alone cannot make a model more
+# selective — it just moves where the scores cluster.
+#
+# The ceiling is the lever that actually bites, and it stays consistent with the
+# design above: it is a maximum, not a target. A thin talk still returns two.
 
 # On a 1-10 scale, where 5 is "fine but forgettable". Raise it if the weakest
 # clips in a batch aren't worth posting; lower it if good material is missing.
-STRENGTH_THRESHOLD = 6.0
+#
+# Raised from 6.0 to 7.0: fewer shorts, each carrying a real hook. The prompt
+# tells the model a typical talk has one or two passages at 8+, a few at 6-7,
+# and a lot at 4-5 — so 6.0 was admitting the whole middle band, which is where
+# the moments live that are pleasant to listen to and have nothing a stranger
+# would stop for. Seven shorts a talk became three or four.
+#
+# The hook standard is what makes this a real bar rather than a knob. A moment
+# that cannot be opened on a line giving topic clarity and curiosity does not
+# have a hook, and a short without a hook is not a short worth posting however
+# good the sentiment inside it is.
+STRENGTH_THRESHOLD = 7.0
 
 
 def transcript_seconds(segments: list[dict]) -> float:
@@ -162,6 +184,53 @@ think, not a restatement of what was just said.
 middle, you have not finished — either trim back to the strong ending or \
 stitch a better one on.
 
+THE HOOK IS THE WHOLE JOB. A hook has exactly one purpose: to make a stranger \
+decide to keep watching. It does that by giving two things at once — TOPIC \
+CLARITY (they know what this is about) and ON-TARGET CURIOSITY (they believe it \
+is for them, and they want the next line). A hook that gives only one of the two \
+fails.
+
+This applies in two places, and the first matters more:
+
+1. THE MOMENT'S OPENING SPOKEN LINE. What is actually heard in the first two \
+seconds. A viewer decides there, before any title is read.
+2. The written `hook` field, which becomes the title and caption.
+
+Four ways a hook fails. Check every moment against all four.
+
+DELAY — the context arrives too late. If the first sentence is throat-clearing \
+and the topic only appears in the third, the viewer has already gone. The \
+opening line must land the subject immediately. This is the strongest reason to \
+use a second cut: if the sharp framing line sits later in the talk, STITCH IT TO \
+THE FRONT so the moment opens on it. A moment that opens with "so, you know, I \
+was thinking about..." is a moment that needs its first cut replaced.
+
+CONFUSION — the viewer cannot parse it. Fewer words, simpler words, active \
+voice. Aim at a sixth-grade reading level. Test it: read the hook alone, cold, \
+and ask whether there is more than one way to read it. If there is, rewrite it \
+so only one reading survives.
+
+IRRELEVANCE — the viewer does not see themselves in it. Two fixes, both cheap:
+- Write to "you" and "your", not "I", "me" or "he". "If you have ever felt \
+behind" beats "I felt behind for years", and it beats "he felt behind" by \
+further still. A third-person hook about the speaker asks the viewer to care \
+about a stranger before they have any reason to.
+- Aim at a pain the viewer already has. A hook that solves a problem they feel \
+beats one that describes something merely interesting.
+
+DISINTEREST — no curiosity. Build it with CONTRAST: A, what the viewer already \
+believes, against B, the alternative this moment offers. "Most people think X, \
+this says Y." The distance between A and B is what makes them stay for the \
+answer. State both sides, or state only B when A is obvious enough to be \
+understood without saying it.
+
+Two things follow that are easy to get wrong:
+- Curiosity is NOT vagueness. "This one thing changed everything" is a \
+non-hook: no topic, so nothing to be curious about. Withhold the ANSWER, never \
+the SUBJECT.
+- A hook is a promise the moment has to keep. If the payoff is not actually in \
+the cut, the hook is a lie and the viewer leaves anyway.
+
 Avoid: housekeeping, introductions, thanking the audience, references to slides \
 or "as I mentioned earlier", statistics without a point, and anything that needs \
 the previous five minutes to make sense.
@@ -190,8 +259,19 @@ Return a JSON object with exactly this shape:
       "peak_rank": number,           // which replay peak this came from (its #), 0 if none
       "strength": number,            // 1-10: how strongly this would stop a stranger
                                      // scrolling, judged cold with no context
-      "hook": string,                // <= 60 chars, the on-screen title card. Punchy, no hashtags,
-                                     // no quotation marks. This is the scroll-stopper.
+      "hook": string,                // <= 60 chars. Title and caption. Must give topic clarity
+                                     // AND curiosity — see THE HOOK IS THE WHOLE JOB above.
+                                     // Write to "you"/"your", never "he"/"she"/"I". Set up a
+                                     // contrast where the material allows one. No hashtags, no
+                                     // quotation marks, no vague teases ("this one thing...").
+      "opens_on": string,            // the moment's first spoken sentence, verbatim. Write it
+                                     // out so you have to look at what the viewer actually hears
+                                     // first — if it is throat-clearing rather than a hook,
+                                     // change where the moment starts or stitch a hook line to
+                                     // the front.
+      "contrast": string,            // the A-vs-B this hook sets up, as "A -> B", or "" if the
+                                     // moment genuinely has no contrast in it. Naming it is how
+                                     // you check the hook has one.
       "quote": string,               // the single strongest verbatim line in the moment
       "theme": string,               // one of: discipline, ownership, failure, fear, consistency,
                                      // identity, focus, growth, resilience, purpose
@@ -231,6 +311,13 @@ class Moment:
     visual_keywords: list[str]
     reason: str
     stitch_reason: str = ""
+    # The first sentence the viewer actually hears, and the A-vs-B the hook
+    # sets up. Both are asked for so the model has to look at them rather than
+    # assume them — a hook is checked against what is heard first, not against
+    # the title written afterwards. Carried into the brief so the same check is
+    # available to a human reading the folder.
+    opens_on: str = ""
+    contrast: str = ""
     # Which replay peak this moment's cuts actually overlap (0 = none).
     # Measured from the finished cuts rather than taken from the model's own
     # answer — see `_peak_for` for why that self-report can't be trusted.
@@ -267,6 +354,8 @@ class Moment:
             "peak_rank": self.peak_rank,
             "strength": self.strength,
             "hook": self.hook,
+            "opens_on": self.opens_on,
+            "contrast": self.contrast,
             "quote": self.quote,
             "theme": self.theme,
             "tone": self.tone,
@@ -350,6 +439,13 @@ def _build_user_prompt(
             f"back a high one to seem discerning. Anything below the bar is "
             f"dropped automatically, so an accurate low score costs nothing — an "
             f"inflated one puts a weak clip in front of an audience.\n\n"
+            f"SCORE THE HOOK, NOT THE SENTIMENT. The question is not whether "
+            f"the passage is wise or well said — most of a good talk is both. It "
+            f"is whether the first two seconds would stop a thumb. A passage you "
+            f"cannot open on a line that gives topic clarity and curiosity does "
+            f"not have a hook, and scores below the bar however true it is. "
+            f"Fewer, stronger moments is the desired outcome: returning three "
+            f"that land beats returning eight where five are filler.\n\n"
             f"For every moment, apply STAGE 2 before writing timestamps: expand "
             f"outwards to the complete statement, then read the boundaries off "
             f"the segment times."
@@ -639,6 +735,8 @@ def find_moments(
         moments.append(Moment(
             cuts=cuts,
             hook=item.get("hook", "").strip().strip('"'),
+            opens_on=item.get("opens_on", "").strip().strip('"'),
+            contrast=item.get("contrast", "").strip(),
             quote=item.get("quote", "").strip(),
             theme=item.get("theme", "").strip().lower(),
             tone=item.get("tone", "").strip(),
