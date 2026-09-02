@@ -364,6 +364,12 @@ BROLL_RUN = 2          # b-roll shots before cutting back to the speaker
 # pause, and ones under the lower bound are folded into their neighbour — a
 # two-word sentence is a beat, not a shot.
 SENTENCE_SHOTS = True
+
+# Choose each cutaway by reading the line it sits under, rather than by counting
+# words shared with a filename. See broll_picker for what this fixes and the
+# measurements behind it. Costs one Claude call per short; turn it off to fall
+# back to word scoring.
+SEMANTIC_BROLL = True
 SENTENCE_MIN = 1.2
 
 # The longest a single picture may hold. Lowered from 8s: a shot that runs
@@ -522,6 +528,7 @@ def _shot_plan(
     speech_path: str,
     broll_paths: list[str],
     words: list | None = None,
+    picks: dict | None = None,
 ) -> list[tuple[str, float, float, str]]:
     """Alternate speaker and b-roll across the clip.
 
@@ -587,8 +594,21 @@ def _shot_plan(
 
             spoken_set = _content_words(spoken_here)
             remaining, at = b - a, 0.0
+            # A pick made by reading the line beats one made by counting shared
+            # words, so it is used when there is one — including its refusals.
+            # `picks` holds an entry for every span the picker considered; a
+            # span it declined has no entry and stays on the speaker, which is
+            # the answer it meant rather than a gap to fill by other means.
+            if picks is not None and i not in picks:
+                plan.append((speech_path, a, b - a, "original"))
+                continue
             while remaining > MIN_SHOT_SECONDS / 2:
-                clip = _choose_broll(spoken_set, broll_paths, chosen, previous)
+                if picks is not None:
+                    clip = picks.get(i) if not at else None
+                    if clip in chosen:
+                        clip = None
+                else:
+                    clip = _choose_broll(spoken_set, broll_paths, chosen, previous)
                 if clip is None:
                     # Nothing suits this line. The speaker is never the wrong
                     # shot, so the rest of the span stays on the face.
@@ -1721,8 +1741,39 @@ def make_shorts(
                     for a in picked
                 ]
 
+        # Ask a model which clip belongs under which line, before planning.
+        #
+        # Word overlap picks the pool; meaning picks the shot. Measured on one
+        # batch, 65-90% of the library scored zero shared words against a given
+        # moment, so once the few real matches ran out the rest of the plan was
+        # arbitrary — a retirement short cut over hands holding a fish. See
+        # broll_picker for the numbers.
+        #
+        # Failure here is not fatal: an empty result falls back to the word
+        # scoring, which is what shipped before.
+        picks = None
+        if SEMANTIC_BROLL and broll_local:
+            try:
+                import broll_picker
+                spans = _sentences(words or [], render_duration)
+                lines = [
+                    " ".join(w.text for w in (words or [])
+                             if a <= float(getattr(w, "start", 0.0)) < b).strip()
+                    for a, b in spans
+                ]
+                by_name = {os.path.basename(p): p for p in broll_local}
+                chosen_names = broll_picker.choose(
+                    lines, list(by_name), hook=moment.hook, theme=moment.theme,
+                )
+                if chosen_names:
+                    picks = {i: by_name[n] for i, n in chosen_names.items()}
+                    say(f"  ✓ {len(picks)} cutaway(s) chosen by meaning, "
+                        f"{len(lines) - len(picks)} line(s) left on the speaker")
+            except Exception as e:
+                say(f"  ⚠ Falling back to word matching: {str(e)[:60]}")
+
         # Opens on the speaker, cuts away for a second or two, comes back.
-        plan = _shot_plan(render_duration, raw_clip, broll_local, words)
+        plan = _shot_plan(render_duration, raw_clip, broll_local, words, picks)
         cutaways = sum(1 for _p, _s, _d, kind in plan if kind == "b-roll")
 
         # Drop the clips the plan did not use.

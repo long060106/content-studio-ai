@@ -184,6 +184,10 @@ think, not a restatement of what was just said.
 middle, you have not finished — either trim back to the strong ending or \
 stitch a better one on.
 
+WRITE THREE HOOKS, THEN CHOOSE. Do not write one hook and move on. The first hook that comes to mind is usually the most obvious phrasing of the moment, which is rarely the one that stops a thumb — and the difference between a good and a weak hook for the SAME passage is large. Two real examples from the same moment: "He lived in a car — then published 5 books" against "He lived in a car — then did all of this". Identical material; the second names nothing and promises nothing.
+
+So for every moment: write three genuinely different candidates in `hook_candidates`, name what is wrong with the weaker ones in `hook_rejects` using the four mistakes below, then put the survivor in `hook`. The rejects line is the check that forces the comparison — write it before you choose, not after.
+
 THE HOOK IS THE WHOLE JOB. A hook has exactly one purpose: to make a stranger \
 decide to keep watching. It does that by giving two things at once — TOPIC \
 CLARITY (they know what this is about) and ON-TARGET CURIOSITY (they believe it \
@@ -259,6 +263,13 @@ Return a JSON object with exactly this shape:
       "peak_rank": number,           // which replay peak this came from (its #), 0 if none
       "strength": number,            // 1-10: how strongly this would stop a stranger
                                      // scrolling, judged cold with no context
+      "hook_candidates": [string],   // exactly 3 different hooks for this moment, each a real
+                                     // attempt rather than a variation of one idea. Come at it
+                                     // from different angles: the concrete detail, the reader's
+                                     // pain, the contrast stated outright.
+      "hook_rejects": string,        // one line naming which candidates you rejected and which
+                                     // of the four mistakes each one makes. Write this BEFORE
+                                     // choosing — it is the check, not a justification.
       "hook": string,                // <= 60 chars. Title and caption. Must give topic clarity
                                      // AND curiosity — see THE HOOK IS THE WHOLE JOB above.
                                      // Write to "you"/"your", never "he"/"she"/"I". Set up a
@@ -318,6 +329,12 @@ class Moment:
     # available to a human reading the folder.
     opens_on: str = ""
     contrast: str = ""
+    # The three candidates and the reason the others lost. Kept rather than
+    # discarded because the rejected ones are often nearly as good, and a human
+    # picking a different one is faster than asking for a fresh set — the
+    # wording varies more between calls than the moments do.
+    hook_candidates: list = field(default_factory=list)
+    hook_rejects: str = ""
     # Which replay peak this moment's cuts actually overlap (0 = none).
     # Measured from the finished cuts rather than taken from the model's own
     # answer — see `_peak_for` for why that self-report can't be trusted.
@@ -371,6 +388,8 @@ class Moment:
             visual_keywords=list(d.get("visual_keywords") or []),
             reason=d.get("reason", ""),
             stitch_reason=d.get("stitch_reason", ""),
+            hook_candidates=list(d.get("hook_candidates") or []),
+            hook_rejects=d.get("hook_rejects", ""),
             opens_on=d.get("opens_on", ""),
             contrast=d.get("contrast", ""),
             peak_rank=int(d.get("peak_rank", 0) or 0),
@@ -385,6 +404,8 @@ class Moment:
             "peak_rank": self.peak_rank,
             "strength": self.strength,
             "hook": self.hook,
+            "hook_candidates": self.hook_candidates,
+            "hook_rejects": self.hook_rejects,
             "opens_on": self.opens_on,
             "contrast": self.contrast,
             "quote": self.quote,
@@ -766,6 +787,9 @@ def find_moments(
         moments.append(Moment(
             cuts=cuts,
             hook=item.get("hook", "").strip().strip('"'),
+            hook_candidates=[h.strip().strip('"') for h in
+                             (item.get("hook_candidates") or []) if h.strip()],
+            hook_rejects=item.get("hook_rejects", "").strip(),
             opens_on=item.get("opens_on", "").strip().strip('"'),
             contrast=item.get("contrast", "").strip(),
             quote=item.get("quote", "").strip(),
