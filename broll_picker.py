@@ -297,7 +297,11 @@ def choose(
         client = Anthropic(api_key=key)
         reply = client.messages.create(
             model=model,
-            max_tokens=4000,
+            # A mute test, an intent and a verdict per line adds up: 22 lines
+            # used 3,503 of 4,000, so a longer short overran and the truncated
+            # JSON failed to parse — the picker "returned nothing" and the
+            # short silently fell back to word matching. Three of eight did.
+            max_tokens=16000,
             system=[
                 {"type": "text", "text": SYSTEM_PROMPT},
                 {
