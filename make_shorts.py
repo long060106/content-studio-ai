@@ -2014,6 +2014,31 @@ def make_shorts(
         except Exception as e:
             say(f"  ⚠ Plain version failed, keeping the styled one: {e}")
 
+        # The captioned cut, built here rather than by hand afterwards.
+        #
+        # It used to be a separate step, on the reasoning that text burned into
+        # pixels can only be undone by rendering again — so `short.mp4` stayed
+        # clean and captions were added when wanted. In practice that meant the
+        # website's Captions toggle was missing on every fresh batch until
+        # someone remembered to run the step, which is a worse failure than the
+        # one the caution was protecting against. `short.mp4` is still clean;
+        # this is a third file beside it, so nothing is lost by making it every
+        # time.
+        try:
+            import burned_captions
+            ass_path = os.path.join(folder, "captions.ass")
+            cw, ch = burned_captions.probe_size(out_path)
+            burned_captions.build_ass(
+                words, ass_path, cw, ch,
+                duration=burned_captions.probe_duration(out_path),
+            )
+            captioned = os.path.join(folder, "short_captioned.mp4")
+            burned_captions.burn(out_path, ass_path, captioned)
+            say(f"  ✓ {captioned} (captions burned in)")
+        except Exception as e:
+            say(f"  ⚠ Captions failed, the other two versions are fine: "
+                f"{str(e)[:70]}")
+
         record = moment.to_dict()
         record.update({
             "index": i,
