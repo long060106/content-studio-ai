@@ -125,12 +125,25 @@ nothing alike on screen. The viewer does not hear a word and see an object, they
 see a man holding a fish while somebody talks about self-improvement, and the \
 edit goes as slack as if the clip were chosen at random.
 
-Test every clip this way: would it still work if the line were spoken in a \
-language you did not understand and you only had the picture? If the only \
-connection is a word, drop it and return null. Objects that turn up inside \
-idioms — hands, doors, roads, keys, bridges, mountains, light, water — are where \
-this goes wrong most, because the idiom is carrying the meaning and the picture \
-is not.
+THE MUTE TEST, and you must WRITE IT OUT for every line rather than applying it \
+in your head. Describe what a viewer sees with the sound off, then say whether \
+the intent survives. An instruction to "watch for literal associations" does not \
+work on its own — the pull of a matching word is strongest exactly when you are \
+not looking at it, so the check has to become something you write down and read \
+back. Three real failures caught this way:
+
+- "you won't hardly know what's going on" over `underwater-silhouette-hands-blue-light`. \
+Muted, that is a diver — not a man losing track of the world. FAILS.
+- "sitting on a front porch" over `person-sitting-white-corridor`. Muted, that is \
+someone in a corridor. The word "sitting" matched and nothing else did. FAILS.
+- "I went to college" over `man-harbor-foggy-dawn`. Muted, that is a harbour. It \
+carries no idea at all, it is merely present. FAILS.
+
+All three should have been null, and null would have been better than any of \
+them. If the only connection is a word, drop it and return null. Objects that \
+turn up inside idioms — hands, doors, roads, keys, bridges, mountains, light, \
+water — are where this goes wrong most, because there the idiom carries the \
+meaning and the picture does not.
 
 WRITE THE INTENT BEFORE YOU CHOOSE. For every line, say in `intent` what the \
 shot has to DO — the feeling or the idea the picture must carry — before you \
@@ -158,10 +171,13 @@ Return a JSON object with exactly this shape:
       "line": number,        // the line's index, 0 to {n - 1}
       "intent": string,      // what the shot must DO, written BEFORE choosing. A feeling or an
                              // idea, never an object or a search term.
-      "clip": string|null,   // exact filename from the library, or null for none
-      "why": string          // a few words: what makes it belong. "" when null. If the only
-                             // honest answer is that a word matched, the clip is wrong —
-                             // return null instead.
+      "candidate": string,   // the filename you are considering, before judging it
+      "mute_test": string,   // THE CHECK, written out. What a viewer sees with the sound OFF,
+                             // then whether the intent survives. Never just "yes".
+      "passes": boolean,     // did it survive the mute test?
+      "clip": string|null,   // the candidate if it passed. MUST be null when passes is false —
+                             // there is no partial credit and no third option.
+      "why": string          // a few words on what makes it belong. "" when null.
     }}
   ]
 }}
@@ -224,6 +240,12 @@ def choose(
         try:
             i = int(pick.get("line"))
         except (TypeError, ValueError):
+            continue
+        # A written mute test that ends in failure beats a `clip` that
+        # contradicts it. The model sometimes reasons its way to FAILS and then
+        # fills the slot anyway — the pull toward a complete shot list is
+        # strong — so the verdict it wrote is honoured over the choice it made.
+        if pick.get("passes") is False:
             continue
         clip = pick.get("clip")
         # Only accept a name that is actually in the library. A hallucinated
