@@ -45,7 +45,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "claude-sonnet-4-6"
+# Haiku: one open question per short. Same reasoning as topic_tags — a small
+# writing task billed 15 times a run.
+MODEL = "claude-haiku-4-5"
 
 # Comments are truncated in the feed long before they are truncated by the
 # platform. A question that needs a "read more" tap has already lost.

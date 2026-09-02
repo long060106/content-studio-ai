@@ -31,7 +31,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "claude-sonnet-4-6"
+# Haiku: this returns hashtags and a handful of search words. Sonnet was
+# doing it 15 times a run at ten times the price for no visible gain.
+MODEL = "claude-haiku-4-5"
 
 SYSTEM_PROMPT = """You produce two separate keyword sets for a short-form video \
 post. They serve different systems and must not be interchangeable.

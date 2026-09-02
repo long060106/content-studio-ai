@@ -281,9 +281,15 @@ def choose(
     numbered = "\n".join(f"{i}. {t}" for i, t in enumerate(lines))
     context = f"The short's hook: {hook}\nIts theme: {theme}\n\n" if hook else ""
 
+    # The library moves into the system block, marked cacheable.
+    #
+    # It is ~8,700 tokens and identical on every call, and there is one call per
+    # short — so a fifteen-short talk re-sent 130,000 tokens of the same
+    # filenames. Caching matches an exact prefix, so the library has to sit in
+    # the stable part of the request rather than beside the lines, which change
+    # every time. Fourteen of those fifteen sends become cache reads.
     prompt = (
-        f"{context}Lines, in the order they are spoken:\n{numbered}\n\n"
-        f"The clip library ({len(library)} clips):\n{listing}\n"
+        f"{context}Lines, in the order they are spoken:\n{numbered}\n"
         f"{_schema(len(lines))}"
     )
 
@@ -292,7 +298,14 @@ def choose(
         reply = client.messages.create(
             model=model,
             max_tokens=4000,
-            system=SYSTEM_PROMPT,
+            system=[
+                {"type": "text", "text": SYSTEM_PROMPT},
+                {
+                    "type": "text",
+                    "text": f"The clip library ({len(library)} clips):\n{listing}",
+                    "cache_control": {"type": "ephemeral"},
+                },
+            ],
             messages=[{"role": "user", "content": prompt}],
         )
         text = "".join(b.text for b in reply.content if getattr(b, "text", ""))

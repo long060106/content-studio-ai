@@ -1273,6 +1273,7 @@ def make_shorts(
     captions: bool = False,
     keep_old: bool = False,
     moments_file: str | None = None,
+    moments_only: bool = False,
 ) -> list[dict]:
     from video_clipper import download_clip, download_full, cut_from_file, YouTubeBlockedDownload
 
@@ -1354,6 +1355,22 @@ def make_shorts(
     if not moments:
         print("✗ No usable moments came back.")
         sys.exit(1)
+
+    # Stop before rendering, and save what was found.
+    #
+    # Testing selection used to mean a whole run: ~47 API calls, fifteen
+    # transcriptions and fifteen renders, to look at a list of hooks. This is
+    # the same two calls that produced them and nothing else. Feed the file back
+    # with --moments-file to render the set once it is worth rendering.
+    if moments_only:
+        out = os.path.join(output_dir, video_id, "moments_found.json")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump([m.to_dict() for m in moments], f, indent=2,
+                      ensure_ascii=False)
+        print(f"\n  ✓ {len(moments)} moment(s) saved to {out}")
+        print("    Nothing rendered. Re-run with --moments-file to build them.")
+        return []
     print(f"  ✓ {len(moments)} moments found")
     for i, m in enumerate(moments, 1):
         heat = f" · replay {m.heat:.2f}" if m.heat else ""
@@ -2133,6 +2150,10 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS,
                         help=f"how many clips to build at once (default {DEFAULT_WORKERS}; "
                              "1 makes the log easier to read when debugging)")
+    parser.add_argument("--moments-only", action="store_true",
+                        help="find the moments, save them, render nothing. Two "
+                             "API calls instead of ~47 — use this to test "
+                             "selection, then --moments-file to render the set")
     parser.add_argument("--moments-file", default=None,
                         help="render this saved set of moments instead of "
                              "asking the model for new ones — see Moment.to_dict")
@@ -2168,6 +2189,7 @@ def main() -> None:
         captions=args.captions,
         keep_old=args.keep_old,
         moments_file=args.moments_file,
+        moments_only=args.moments_only,
     )
 
 
