@@ -205,6 +205,18 @@ def choose(
     if not key or not lines or not library:
         return {}
 
+    # Withhold the blocked clips, comparing without the copy prefix.
+    #
+    # Clips arrive here named as they are inside a short's folder —
+    # `15_f1gp-20-...` — while the blocklist holds plain library names, so a
+    # direct comparison never matches. That is the second silent no-op in this
+    # one small feature; the first kept the `#` comment as part of the name.
+    # Both looked like working code and blocked nothing.
+    stop = blocked()
+    library = [c for c in library if re.sub(r"^\d+_", "", c) not in stop]
+    if not library:
+        return {}
+
     listing = "\n".join(sorted(library)[:MAX_LIBRARY])
     numbered = "\n".join(f"{i}. {t}" for i, t in enumerate(lines))
     context = f"The short's hook: {hook}\nIts theme: {theme}\n\n" if hook else ""
