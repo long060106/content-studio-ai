@@ -1224,17 +1224,17 @@ def _punctuated_segments(source_file: str, segments: list, model_size: str):
     if ending / max(1, len(segments)) >= PUNCTUATED_ENOUGH:
         return segments
     if not source_file or not os.path.isfile(source_file):
-        say("  ⚠ Transcript has no punctuation and no local source to "
+        print("  ⚠ Transcript has no punctuation and no local source to "
             "re-transcribe — boundaries will be rough")
         return segments
 
-    say(f"  · Transcript has no punctuation ({ending}/{len(segments)} segments) "
+    print(f"  · Transcript has no punctuation ({ending}/{len(segments)} segments) "
         f"— re-transcribing with Whisper for sentence boundaries")
     try:
         from caption_timing import transcribe_words
         words = transcribe_words(source_file, model_size=model_size)
     except Exception as e:
-        say(f"  ⚠ Re-transcription failed ({str(e)[:60]}) — keeping captions")
+        print(f"  ⚠ Re-transcription failed ({str(e)[:60]}) — keeping captions")
         return segments
     if not words:
         return segments
@@ -1253,7 +1253,7 @@ def _punctuated_segments(source_file: str, segments: list, model_size: str):
         out.append({"start": start, "duration": float(words[-1].end) - start,
                     "text": " ".join(buf).strip()})
 
-    say(f"  ✓ {len(out)} sentence segments from Whisper "
+    print(f"  ✓ {len(out)} sentence segments from Whisper "
         f"(was {len(segments)} caption fragments)")
     return out or segments
 
