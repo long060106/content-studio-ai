@@ -103,12 +103,28 @@ MAX_MOMENTS = 4
 STRENGTH_THRESHOLD = 7.0
 
 
-# The width a hook has to fit. Enforced here as well as asked for in the prompt,
-# because asking was not enough: with the four-mistake framework in place the
-# model started writing better hooks and stopped counting, and a whole batch
-# came back at 66, 77, 87 and 74 characters. A constraint that competes with a
-# quality bar loses to it.
-HOOK_MAX_CHARS = 60
+# Two numbers, because length is a preference and the story is the point.
+#
+# The hook is not burned into the picture — it goes into `caption.txt`,
+# `brief.md` and the carousel, which is to say it is the text you paste when
+# posting. So the real constraint is softer than a render limit: a YouTube
+# Shorts *title* shows roughly 40-50 characters on a phone before it truncates,
+# while a TikTok or Reels *caption* runs to about 125. Sixty is a sensible
+# target for the tightest of those and no kind of hard boundary.
+#
+# It is still worth asking for, because compressing demonstrably improved the
+# writing rather than damaging it: forced to cut, the model drops the setup
+# clause, which is nearly always the weak half. "When you keep pushing to
+# better yourself, things expand — you get happier and healthier" (87) became
+# "Stop learning and you'll rot on that porch" (42), and the short one is
+# better by any reading.
+#
+# But a length rule must never overrule a quality judgement, which is exactly
+# what a single hard 60 did: a hook the model had chosen as the best of three
+# was thrown out for being 66 characters. So 60 is the target, and only past the
+# ceiling below does length win.
+HOOK_TARGET_CHARS = 60
+HOOK_MAX_CHARS = 80
 
 
 def _pick_hook(chosen: str, candidates: list[str]) -> str:
@@ -227,9 +243,9 @@ WRITE THREE HOOKS, THEN CHOOSE. Do not write one hook and move on. The first hoo
 
 So for every moment: write three genuinely different candidates in `hook_candidates`, name what is wrong with the weaker ones in `hook_rejects` using the four mistakes below, then put the survivor in `hook`. The rejects line is the check that forces the comparison — write it before you choose, not after.
 
-SIXTY CHARACTERS. HARD LIMIT. Every one of the three candidates must be 60 characters or fewer, counted including spaces. This is not a style note, it is the width the title has to fit in — past it the hook is cut off mid-word on the feed, which loses the payoff the whole hook was built to deliver.
+LENGTH: AIM FOR 60 CHARACTERS, NEVER PASS 80. Sixty is a target, not a gate — the story comes first and a hook that needs 66 characters to land should have them. Eighty is the ceiling, because past it a title is truncated on a phone.
 
-Count the characters before you write each candidate down. If one runs long, cut it rather than submitting it: drop the setup clause, drop the second sentence, drop the adjectives. "When you keep pushing to better yourself, things expand — you get happier and healthier" is 87 characters and fails, and the cure is not a better sentence, it is fewer words for the same idea: "Keep pushing yourself and everything expands" is 44. Length is a constraint on the writing, not a filter applied afterwards.
+Aim short anyway, because compressing tends to improve a hook rather than damage it. Forced to cut, what goes is the setup clause, and that is nearly always the weak half. "When you keep pushing to better yourself, things expand — you get happier and healthier" is 87 characters and rambles; "Stop learning and you'll rot on that porch" is 42 and is better by any reading. If a candidate runs long, try saying the same thing in fewer words before you accept the length — but if the long one is genuinely the strongest, keep it.
 
 THE HOOK IS THE WHOLE JOB. A hook has exactly one purpose: to make a stranger \
 decide to keep watching. It does that by giving two things at once — TOPIC \
@@ -313,8 +329,8 @@ Return a JSON object with exactly this shape:
       "hook_rejects": string,        // one line naming which candidates you rejected and which
                                      // of the four mistakes each one makes. Write this BEFORE
                                      // choosing — it is the check, not a justification.
-      "hook": string,                // <= 60 CHARACTERS, counted. Title and caption. Must give
-                                     // topic clarity
+      "hook": string,                // aim for <= 60 characters, hard ceiling 80. Title and
+                                     // caption. Must give topic clarity
                                      // AND curiosity — see THE HOOK IS THE WHOLE JOB above.
                                      // Write to "you"/"your", never "he"/"she"/"I". Set up a
                                      // contrast where the material allows one. No hashtags, no
