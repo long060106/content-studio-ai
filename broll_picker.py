@@ -51,6 +51,41 @@ MODEL = "claude-sonnet-4-6"
 # showing it to the model would reintroduce the bug this module exists to fix.
 MAX_LIBRARY = 1500
 
+# How many cutaways in one short may share a distinctive subject.
+#
+# A Brian Tracy talk produced a short with SIX corridors in forty-five seconds
+# — six different films, no two adjacent, every one passing its mute test on its
+# own. Nothing was checking the set. His language is abstract ("unstoppable",
+# "responsibility", "capacity") with almost nothing filmable in it, and faced
+# with abstraction the picker reaches for the same visual metaphor again and
+# again: a corridor is this library's default for "a person alone with a
+# thought".
+#
+# The existing sequence rules did not catch it because both were satisfied. The
+# clips came from different films and were not adjacent. Repetition of SUBJECT
+# is a third thing, and it is the one a viewer actually notices.
+MAX_SAME_SUBJECT = 2
+
+# Words too common in the library to count as a subject. Nearly every clip is a
+# man, at night, in close-up, so capping on these would cap everything.
+_UBIQUITOUS = {
+    "man", "men", "woman", "women", "person", "people", "figure", "figures",
+    "close", "closeup", "night", "day", "daytime", "daylight", "dark", "light",
+    "lighting", "indoor", "indoors", "interior", "exterior", "silhouette",
+    "view", "shot", "scene", "warm", "cold", "golden", "blue", "green", "red",
+    "white", "black", "grey", "gray", "overcast", "dusk", "dawn", "sunset",
+    "sunrise", "morning", "evening", "and", "the", "with", "mp4",
+}
+
+
+def _subjects(filename: str) -> set:
+    """The distinctive nouns in a clip's description."""
+    stem = re.sub(r"^\d+_", "", os.path.splitext(filename)[0].lower())
+    parts = stem.split("-")
+    # Drop the film prefix and the clip number, keep the description.
+    body = parts[2:] if len(parts) > 2 else parts
+    return {w for w in body if len(w) > 2 and w not in _UBIQUITOUS}
+
 # Clips that have been judged wrong in a finished short, kept between runs.
 #
 # Without this the same mistake returns: `phml-12-hands-holding-fish-ocean` was
@@ -149,6 +184,31 @@ WRITE THE INTENT BEFORE YOU CHOOSE. For every line, say in `intent` what the \
 shot has to DO — the feeling or the idea the picture must carry — before you \
 name any clip. "Aspiration, something opening up" is an intent. "Hands" is not: \
 it is already a search term, and writing one is how the literal trap gets in.
+
+AN ABSTRACT TALK NEEDS DIFFERENT B-ROLL, NOT LESS OF IT. Some speakers deal in \
+things you can film — a car, a blackboard, a harbour — and some deal in ideas: \
+"unstoppable", "responsibility", "capacity", "potential". The second kind is \
+harder and it is not a reason to stop cutting away.
+
+**This version of the short is the one with b-roll in it.** A speaker-only cut \
+is rendered separately and already exists, so leaving a line bare here does not \
+produce a tasteful edit, it produces the plain version with extra steps. Decline \
+when a clip would be actively wrong — that judgement still stands — but do not \
+decline your way through an abstract passage.
+
+What abstraction actually calls for is TEXTURE rather than illustration: ink \
+dispersing in water, smoke, light through dust, embers, frost forming. Those \
+carry a feeling without claiming to depict anything, which is exactly what a \
+line like "you are totally responsible" needs. The library has such clips; \
+reach for them before you reach for another figure in a room.
+
+The failure to avoid is one visual metaphor over and over because nothing \
+better comes to mind. One short came back with SIX corridors in forty-five \
+seconds — six different films, none adjacent, each defensible alone, together a \
+slideshow. A corridor is this library's default for "a person alone with a \
+thought", and an abstract talk asks that of every line. Never use a third clip \
+of the same subject — no third corridor, no third road, no third ocean — \
+however well each tests on its own. Find a different kind of picture instead.
 
 THE SEQUENCE MATTERS, not just each choice. You see the whole list at once, so:
 - Never use the same clip twice.
@@ -264,6 +324,7 @@ def choose(
 
     valid = set(library)
     out: dict[int, str] = {}
+    seen_subjects: dict[str, int] = {}
     for pick in data.get("picks", []):
         try:
             i = int(pick.get("line"))
@@ -280,5 +341,15 @@ def choose(
         # filename would otherwise reach the renderer as a missing input and
         # fail the whole short.
         if isinstance(clip, str) and clip in valid and 0 <= i < len(lines):
+            # Refuse a subject that has already had its turn. Dropping the
+            # cutaway is right rather than substituting one: the picker judged
+            # nothing else fitted this line, and the speaker's face is never
+            # the wrong shot. Six corridors is worse than three corridors and
+            # three lines of speaker.
+            subjects = _subjects(clip)
+            if any(seen_subjects.get(w, 0) >= MAX_SAME_SUBJECT for w in subjects):
+                continue
+            for w in subjects:
+                seen_subjects[w] = seen_subjects.get(w, 0) + 1
             out[i] = clip
     return out
