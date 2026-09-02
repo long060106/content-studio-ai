@@ -448,6 +448,16 @@ def _ff_filter_path(path: str) -> str:
     return "'" + path.replace("\\", "/").replace(":", "\\:") + "'"
 
 
+def _encoder_args(crf: int) -> list:
+    """Hardware encoder when available, software otherwise."""
+    try:
+        from shorts_builder import video_encoder_args
+        return list(video_encoder_args())
+    except Exception:
+        return ["-c:v", "libx264", "-crf", str(crf), "-preset", "medium",
+                "-pix_fmt", "yuv420p"]
+
+
 def burn(video: str, ass_path: str, out_path: str, crf: int = 18) -> str:
     """Render the captions into the picture. Returns the path written."""
     fonts_dir = os.path.dirname(FONT_PATH)
@@ -458,8 +468,12 @@ def burn(video: str, ass_path: str, out_path: str, crf: int = 18) -> str:
     cmd = [
         "ffmpeg", "-v", "error", "-y", "-i", video,
         "-vf", vf,
-        "-c:v", "libx264", "-crf", str(crf), "-preset", "medium",
-        "-pix_fmt", "yuv420p",
+        # The project's own encoder pick, which is the GPU when this machine
+        # has it. Measured elsewhere in the codebase: 9.1s with libx264 at
+        # -preset medium against 4.1s with QSV, and a smaller file. Captions
+        # are burned once per short, so hardcoding the slow encoder here cost
+        # roughly half the caption time on every batch.
+        *_encoder_args(crf),
         "-c:a", "copy",
         out_path,
     ]
