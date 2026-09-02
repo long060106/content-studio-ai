@@ -63,8 +63,15 @@ ENDING_REACH = 4.0
 
 # The finished short, all cuts added together. Overridable per run via
 # make_shorts.py's --min-seconds / --max-seconds.
-MIN_TOTAL_SECONDS = 7
-MAX_TOTAL_SECONDS = 45
+# A short has to make a complete argument, and that sets the floor.
+#
+# The requirement is structural rather than a matter of taste: one short states
+# a point, explains it, and proves it. Three things cannot be done in eight
+# seconds, which is what the previous floor of 7 allowed — and what it produced
+# was a quotable line with nothing behind it. Ninety seconds is available when
+# the material earns it.
+MIN_TOTAL_SECONDS = 30
+MAX_TOTAL_SECONDS = 90
 
 # More than a couple of jumps stops reading as an edit and starts reading as a
 # supercut of unrelated fragments.
@@ -81,7 +88,18 @@ MAX_CUTS = 3
 # score, and only those clearing the bar are cut. A weak talk gives three; a
 # rich one gives eight. Nothing is padded to reach a number, and nothing good
 # is discarded to respect one.
-MAX_MOMENTS = 4
+# The ceiling is per WINDOW of transcript now, not per talk.
+#
+# Four was set when the complaint was too many weak shorts, and it was standing
+# in for a quality bar rather than expressing a real preference for four. The
+# three-part structure is that bar now — a passage either contains a claim, an
+# explanation and a proof or it does not — so the count can follow the material.
+#
+# An hour of dense advice should yield every piece of advice in it, not four.
+# Keeping the cap per window rather than per talk is what makes that scale: a
+# nine-hour recording searched in fourteen windows can return far more than a
+# forty-minute one without the number being set anywhere.
+MAX_MOMENTS = 8
 
 # Lowered from 8, and the reason is a measurement rather than a preference.
 #
@@ -250,6 +268,18 @@ think, not a restatement of what was just said.
 middle, you have not finished — either trim back to the strong ending or \
 stitch a better one on.
 
+EVERY SHORT MAKES A COMPLETE ARGUMENT. This is the first test a passage has to pass, before hooks, before length, before anything else. A short has three parts and needs all three:
+
+1. THE POINT. The claim, stated plainly. "You are responsible for your own life."
+2. THE EXPLANATION. Why it is true, or what it means in practice.
+3. THE PROOF. What makes it land — a story, a number, an example, a consequence. Something a sceptical viewer can weigh.
+
+A passage with only the point is a quotable line, not a short. It sounds excellent read aloud and gives the viewer nothing to hold, which is why clips like that get watched once and never shared. If you cannot find all three parts in a passage, either extend it until they are there — stitching a second cut is exactly the tool for a proof that sits elsewhere in the talk — or drop the passage and say so in `reason`.
+
+This test replaces counting. Do not return a fixed number of moments and do not hold back good material to seem selective: return every passage that makes a complete argument. A dense hour of advice should yield every piece of advice in it. A rambling hour should yield two. The structure decides, not a quota.
+
+LENGTH FOLLOWS THE ARGUMENT. Three parts take time: the floor is 30 seconds because state-explain-prove cannot be done in less, and the ceiling is 90. Reach for the length the argument needs, not the shortest cut that contains the best line.
+
 WRITE THREE HOOKS, THEN CHOOSE. Do not write one hook and move on. The first hook that comes to mind is usually the most obvious phrasing of the moment, which is rarely the one that stops a thumb — and the difference between a good and a weak hook for the SAME passage is large. Two real examples from the same moment: "He lived in a car — then published 5 books" against "He lived in a car — then did all of this". Identical material; the second names nothing and promises nothing.
 
 So for every moment: write three genuinely different candidates in `hook_candidates`, name what is wrong with the weaker ones in `hook_rejects` using the four mistakes below, then put the survivor in `hook`. The rejects line is the check that forces the comparison — write it before you choose, not after.
@@ -333,6 +363,10 @@ Return a JSON object with exactly this shape:
       "peak_rank": number,           // which replay peak this came from (its #), 0 if none
       "strength": number,            // 1-10: how strongly this would stop a stranger
                                      // scrolling, judged cold with no context
+      "point": string,               // the claim, in one sentence
+      "explanation": string,         // how the passage explains or unpacks it
+      "proof": string,               // the story, number, example or consequence that backs it.
+                                     // If you cannot fill all three, this passage is not a short.
       "hook_candidates": [string],   // exactly 3 different hooks for this moment, each a real
                                      // attempt rather than a variation of one idea. Come at it
                                      // from different angles: the concrete detail, the reader's
@@ -412,6 +446,9 @@ class Moment:
     # available to a human reading the folder.
     opens_on: str = ""
     contrast: str = ""
+    point: str = ""
+    explanation: str = ""
+    proof: str = ""
     ends_on: str = ""
     ending_check: str = ""
     # Where the strongest line falls inside the moment. Asked for so the model
@@ -480,6 +517,9 @@ class Moment:
             stitch_reason=d.get("stitch_reason", ""),
             hook_candidates=list(d.get("hook_candidates") or []),
             hook_rejects=d.get("hook_rejects", ""),
+            point=d.get("point", ""),
+            explanation=d.get("explanation", ""),
+            proof=d.get("proof", ""),
             opens_on=d.get("opens_on", ""),
             ends_on=d.get("ends_on", ""),
             ending_check=d.get("ending_check", ""),
@@ -499,6 +539,9 @@ class Moment:
             "hook": self.hook,
             "hook_candidates": self.hook_candidates,
             "hook_rejects": self.hook_rejects,
+            "point": self.point,
+            "explanation": self.explanation,
+            "proof": self.proof,
             "opens_on": self.opens_on,
             "ends_on": self.ends_on,
             "ending_check": self.ending_check,
@@ -1005,6 +1048,9 @@ def find_moments(
             hook_candidates=[h.strip().strip('"') for h in
                              (item.get("hook_candidates") or []) if h.strip()],
             hook_rejects=item.get("hook_rejects", "").strip(),
+            point=item.get("point", "").strip(),
+            explanation=item.get("explanation", "").strip(),
+            proof=item.get("proof", "").strip(),
             opens_on=item.get("opens_on", "").strip().strip('"'),
             ends_on=item.get("ends_on", "").strip().strip('"'),
             ending_check=item.get("ending_check", "").strip(),
