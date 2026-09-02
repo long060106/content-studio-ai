@@ -63,15 +63,19 @@ ENDING_REACH = 4.0
 
 # The finished short, all cuts added together. Overridable per run via
 # make_shorts.py's --min-seconds / --max-seconds.
-# A short has to make a complete argument, and that sets the floor.
+# One topic, covered until the speaker is finished with it. Length is what
+# comes out, not what is aimed at.
 #
-# The requirement is structural rather than a matter of taste: one short states
-# a point, explains it, and proves it. Three things cannot be done in eight
-# seconds, which is what the previous floor of 7 allowed — and what it produced
-# was a quotable line with nothing behind it. Ninety seconds is available when
-# the material earns it.
+# The floor rules out the fragment with no room to develop anything — a
+# quotable line and nothing behind it, which is what a floor of 7 allowed.
+#
+# The ceiling is deliberately generous and is a backstop, not a target. The rule
+# is that a topic is never truncated to fit: if it will not fit, the answer is a
+# smaller complete topic inside it, or nothing. Two and a half minutes is past
+# what anyone would call a short, which is the point — reaching it means
+# something has gone wrong with the selection rather than with the limit.
 MIN_TOTAL_SECONDS = 30
-MAX_TOTAL_SECONDS = 90
+MAX_TOTAL_SECONDS = 150
 
 # More than a couple of jumps stops reading as an edit and starts reading as a
 # supercut of unrelated fragments.
@@ -91,9 +95,10 @@ MAX_CUTS = 3
 # The ceiling is per WINDOW of transcript now, not per talk.
 #
 # Four was set when the complaint was too many weak shorts, and it was standing
-# in for a quality bar rather than expressing a real preference for four. The
-# three-part structure is that bar now — a passage either contains a claim, an
-# explanation and a proof or it does not — so the count can follow the material.
+# in for a quality bar rather than expressing a real preference for four.
+# "One topic, finished" is that bar now — the speaker either gets where they
+# were going inside the cut or they do not — so the count can follow the
+# material.
 #
 # An hour of dense advice should yield every piece of advice in it, not four.
 # Keeping the cap per window rather than per talk is what makes that scale: a
@@ -268,17 +273,22 @@ think, not a restatement of what was just said.
 middle, you have not finished — either trim back to the strong ending or \
 stitch a better one on.
 
-EVERY SHORT MAKES A COMPLETE ARGUMENT. This is the first test a passage has to pass, before hooks, before length, before anything else. A short has three parts and needs all three:
+ONE TOPIC, FINISHED. This is the first test a passage has to pass, before hooks, before length, before anything else, and it is the whole test.
 
-1. THE POINT. The claim, stated plainly. "You are responsible for your own life."
-2. THE EXPLANATION. Why it is true, or what it means in practice.
-3. THE PROOF. What makes it land — a story, a number, an example, a consequence. Something a sceptical viewer can weigh.
+A short covers exactly ONE thing the speaker is talking about — a statement, a lesson, an idea, a story — and it runs from where they begin that thing to where they are DONE with it. Not to where a good line happens to land, and not to wherever the maximum length falls. Where they finish.
 
-A passage with only the point is a quotable line, not a short. It sounds excellent read aloud and gives the viewer nothing to hold, which is why clips like that get watched once and never shared. If you cannot find all three parts in a passage, either extend it until they are there — stitching a second cut is exactly the tool for a proof that sits elsewhere in the talk — or drop the passage and say so in `reason`.
+There is no template for what "finished" contains. Some topics are a claim then a story that proves it. Some are a question then an answer. Some are one idea turned over three times until it is clear. What matters is that a viewer who watched only this clip would not be left waiting for the rest — the speaker got where they were going.
 
-This test replaces counting. Do not return a fixed number of moments and do not hold back good material to seem selective: return every passage that makes a complete argument. A dense hour of advice should yield every piece of advice in it. A rambling hour should yield two. The structure decides, not a quota.
+Two ways to get this wrong, and the first is far more common:
 
-LENGTH FOLLOWS THE ARGUMENT. Three parts take time: the floor is 30 seconds because state-explain-prove cannot be done in less, and the ceiling is 90. Reach for the length the argument needs, not the shortest cut that contains the best line.
+- STOPPING EARLY. The cut ends on a strong line while the speaker is still mid-topic, so the viewer is left holding a promise. This is the worst failure a short can have.
+- RUNNING ON. The cut carries past the end of one topic into the next, so it stops being about one thing.
+
+LENGTH IS AN OUTCOME, NEVER A TARGET. Do not trim a topic to fit a number and do not pad one to reach a number. If the speaker takes ninety seconds to finish a thought, the short is ninety seconds. If a topic genuinely will not fit inside the maximum, do not truncate it — find a smaller complete topic inside it, or drop the passage and say so in `reason`. A truncated topic is not a short.
+
+The floor exists only to rule out the fragment that has no room to develop anything. It is not a length to aim at.
+
+This test replaces counting. Do not return a fixed number and do not hold back good material to seem selective: return every passage where the speaker covers one topic and finishes it. A dense hour of advice should yield every piece of advice in it. A rambling hour should yield two.
 
 WRITE THREE HOOKS, THEN CHOOSE. Do not write one hook and move on. The first hook that comes to mind is usually the most obvious phrasing of the moment, which is rarely the one that stops a thumb — and the difference between a good and a weak hook for the SAME passage is large. Two real examples from the same moment: "He lived in a car — then published 5 books" against "He lived in a car — then did all of this". Identical material; the second names nothing and promises nothing.
 
@@ -363,10 +373,10 @@ Return a JSON object with exactly this shape:
       "peak_rank": number,           // which replay peak this came from (its #), 0 if none
       "strength": number,            // 1-10: how strongly this would stop a stranger
                                      // scrolling, judged cold with no context
-      "point": string,               // the claim, in one sentence
-      "explanation": string,         // how the passage explains or unpacks it
-      "proof": string,               // the story, number, example or consequence that backs it.
-                                     // If you cannot fill all three, this passage is not a short.
+      "topic": string,               // the ONE thing this short is about, in a few words
+      "completeness": string,        // How does the speaker finish it? Name the line or the beat
+                                     // where they are done. If they are still going when the cut
+                                     // ends, this passage is not a short — extend it or drop it.
       "hook_candidates": [string],   // exactly 3 different hooks for this moment, each a real
                                      // attempt rather than a variation of one idea. Come at it
                                      // from different angles: the concrete detail, the reader's
@@ -446,9 +456,8 @@ class Moment:
     # available to a human reading the folder.
     opens_on: str = ""
     contrast: str = ""
-    point: str = ""
-    explanation: str = ""
-    proof: str = ""
+    topic: str = ""
+    completeness: str = ""
     ends_on: str = ""
     ending_check: str = ""
     # Where the strongest line falls inside the moment. Asked for so the model
@@ -517,9 +526,8 @@ class Moment:
             stitch_reason=d.get("stitch_reason", ""),
             hook_candidates=list(d.get("hook_candidates") or []),
             hook_rejects=d.get("hook_rejects", ""),
-            point=d.get("point", ""),
-            explanation=d.get("explanation", ""),
-            proof=d.get("proof", ""),
+            topic=d.get("topic", ""),
+            completeness=d.get("completeness", ""),
             opens_on=d.get("opens_on", ""),
             ends_on=d.get("ends_on", ""),
             ending_check=d.get("ending_check", ""),
@@ -539,9 +547,8 @@ class Moment:
             "hook": self.hook,
             "hook_candidates": self.hook_candidates,
             "hook_rejects": self.hook_rejects,
-            "point": self.point,
-            "explanation": self.explanation,
-            "proof": self.proof,
+            "topic": self.topic,
+            "completeness": self.completeness,
             "opens_on": self.opens_on,
             "ends_on": self.ends_on,
             "ending_check": self.ending_check,
@@ -1057,9 +1064,8 @@ def find_moments(
             hook_candidates=[h.strip().strip('"') for h in
                              (item.get("hook_candidates") or []) if h.strip()],
             hook_rejects=item.get("hook_rejects", "").strip(),
-            point=item.get("point", "").strip(),
-            explanation=item.get("explanation", "").strip(),
-            proof=item.get("proof", "").strip(),
+            topic=item.get("topic", "").strip(),
+            completeness=item.get("completeness", "").strip(),
             opens_on=item.get("opens_on", "").strip().strip('"'),
             ends_on=item.get("ends_on", "").strip().strip('"'),
             ending_check=item.get("ending_check", "").strip(),
