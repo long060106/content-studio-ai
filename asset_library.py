@@ -887,22 +887,29 @@ def fetch_stock(
 CURATED_DIR = os.path.join(ASSETS_DIR, "broll")
 
 
-# Themes the account wants drawn from a particular source, whatever the words
-# in the moment happen to be.
+# Footage the account *recommends* for a theme — a thumb on the scale, not a
+# rule. The selector still decides.
 #
 # The Michael Jordan footage is the reason this exists. All 23 clips are named
 # for what is visible in them — `basketball-player-arena-crowd` and so on — and
 # a moment about training or discipline produces queries like "athlete
 # training" or "practice at dawn". They share no words, so the footage scored
-# zero and was never picked for exactly the shorts it was collected for.
+# zero and was never picked for exactly the shorts it suits.
 #
 # Filename matching cannot fix that on its own: renaming the clips "discipline"
 # would break the thing the naming convention is for, which is describing the
-# picture. The association is editorial, so it is stated editorially.
+# picture. The association is editorial, so it is stated editorially — and kept
+# deliberately weak, because it is a suggestion about what tends to work rather
+# than a requirement. A better literal match should still be able to win.
+# The category is icons the audience already associates with relentless work —
+# Michael Jordan and the Michael Jackson footage here, and anything similar
+# added later. The user's point is that the association is already in the
+# viewer's head: **their training does not need to be shown**, because everyone
+# already knows they put the hours in. Seeing them at all is the argument.
 THEME_AFFINITY = {
-    "discipline": ("mjor-",),
-    "consistency": ("mjor-",),
-    "focus": ("mjor-",),
+    "discipline": ("mjor-", "mchl-"),
+    "consistency": ("mjor-", "mchl-"),
+    "focus": ("mjor-", "mchl-"),
 }
 
 # Enough to put an affinity clip above one that merely shares a word. Query hits
@@ -910,10 +917,30 @@ THEME_AFFINITY = {
 AFFINITY_BONUS = 3
 
 # ...and at most this share of the returned pool, because the bonus alone was
-# too blunt: every one of eight slots came back Jordan, which is not "use the
-# Jordan footage on discipline", it is "make a basketball montage". Half keeps
-# the association visible while leaving the short somewhere else to cut to.
-AFFINITY_MAX_SHARE = 0.5
+# far too blunt: every one of eight slots came back Jordan, which is not a
+# recommendation, it is a basketball montage. A third keeps the suggestion
+# visible — a discipline short reliably cuts to Jordan two or three times —
+# while leaving most of the edit to whatever actually fits the words.
+AFFINITY_MAX_SHARE = 0.34
+
+# Within the recommended footage, the shots where the person is the subject.
+#
+# Not shots of them training — the user was explicit that training does not need
+# showing. What matters is that the icon is *recognisably there*: seeing them
+# locked in, mid-performance, is what makes the viewer think about the work.
+# A wide of a crowded arena is Jordan footage in which Jordan is four pixels
+# tall, and it makes no argument at all; a jersey close-up, a jump, a performer
+# alone in a spotlight, do.
+#
+# Most of the 23 basketball clips are arena wides, so without this the
+# recommendation spends its few slots on its own weakest examples. Matched
+# against the description, which is where the naming convention earns its keep:
+# the filenames already say which is which.
+AFFINITY_FOCUS_WORDS = (
+    "athlete", "close-up", "portrait", "gymnasium", "jump", "jumping",
+    "dunking", "action", "court", "performer", "performance", "stage",
+    "silhouette", "musician",
+)
 
 
 def curated_broll(
@@ -1023,9 +1050,32 @@ def curated_broll(
     def is_affinity(asset: Asset) -> bool:
         return os.path.basename(asset.path).lower().startswith(prefixes)
 
+    def carries_meaning(asset: Asset) -> bool:
+        low = os.path.basename(asset.path).lower()
+        return any(w in low for w in AFFINITY_FOCUS_WORDS)
+
     ranked = [asset for _hits, asset in scored]
     cap = max(1, int(count * AFFINITY_MAX_SHARE))
     affinity = [a for a in ranked if is_affinity(a)]
+    # Performance shots first, arena wides only if the cap is still unfilled.
+    affinity.sort(key=lambda a: not carries_meaning(a))
+
+    # Then spread the slots across the icons rather than letting one take them
+    # all. With Jordan and Jackson both recommended, scoring alone handed all
+    # three slots to whichever film happened to win the shuffle, so half the
+    # recommendation never appeared. Round-robin by prefix keeps the order
+    # within each icon (best shot of each first) and alternates between them.
+    by_icon: dict[str, list[Asset]] = {}
+    for asset in affinity:
+        low = os.path.basename(asset.path).lower()
+        key = next((p for p in prefixes if low.startswith(p)), "")
+        by_icon.setdefault(key, []).append(asset)
+    interleaved: list[Asset] = []
+    while any(by_icon.values()):
+        for key in list(by_icon):
+            if by_icon[key]:
+                interleaved.append(by_icon[key].pop(0))
+    affinity = interleaved
     others = [a for a in ranked if not is_affinity(a)]
 
     chosen = affinity[:cap] + others[: count - min(cap, len(affinity))]
