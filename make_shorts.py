@@ -538,6 +538,23 @@ def _sentences(words: list, total: float) -> list[tuple[float, float]]:
     return [(a, b) for a, b in out if b - a > 0.05]
 
 
+def _usable_spans(total: float, words: list | None) -> list[tuple[float, float]]:
+    """The sentence spans a plan is actually built from.
+
+    Shared with the b-roll picker on purpose. The planner indexes *these*, not
+    the raw output of `_sentences`, and building the picker's line list from the
+    raw spans put every pick after a dropped one under the wrong line — a clip
+    chosen for "I buried a mother, father, sister" landing on "I went to
+    college", silently, with nothing in the output to show it. Two places
+    deriving "the same" list separately is how that happens; one function is the
+    fix.
+    """
+    epsilon = 0.2
+    spans = _sentences(words or [], total) if SENTENCE_SHOTS else []
+    return [(max(0.0, a), min(total, b)) for a, b in spans
+            if min(total, b) - max(0.0, a) > epsilon]
+
+
 def _shot_plan(
     total: float,
     speech_path: str,
@@ -565,12 +582,10 @@ def _shot_plan(
     # Anything shorter than this isn't a shot, it's a flicker.
     epsilon = 0.2
 
-    spans = _sentences(words or [], total) if SENTENCE_SHOTS else []
-    if spans and broll_paths:
+    usable = _usable_spans(total, words)
+    if usable and broll_paths:
         # One picture per sentence. The speaker takes a couple of them and the
         # footage takes the rest.
-        usable = [(max(0.0, a), min(total, b)) for a, b in spans
-                  if min(total, b) - max(0.0, a) > epsilon]
 
         # The first sentence is always the speaker: a short that opens on stock
         # footage with a disembodied voice reads as a montage, and the face is
@@ -1777,7 +1792,7 @@ def make_shorts(
         if SEMANTIC_BROLL and broll_local:
             try:
                 import broll_picker
-                spans = _sentences(words or [], render_duration)
+                spans = _usable_spans(render_duration, words)
                 lines = [
                     " ".join(w.text for w in (words or [])
                              if a <= float(getattr(w, "start", 0.0)) < b).strip()
