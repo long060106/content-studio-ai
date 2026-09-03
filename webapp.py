@@ -928,7 +928,7 @@ def read_shorts(video_dir: str) -> dict:
         )
         # The captioned version, when one has been built. Optional for the same
         # reason as the plain one, and doubly so here: captions are a separate
-        # step run by `burned_captions.py` rather than part of the render, so
+        # a separate step rather than part of the render, so
         # most folders will not have this until that step is run over them.
         # Without it listed the file exists on disk and is invisible in the
         # browser, which is exactly how it looked like the captions had failed.

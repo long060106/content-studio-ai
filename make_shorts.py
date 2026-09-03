@@ -25,10 +25,8 @@ What happens:
   5. Assets          B-roll comes from the local library, topped up from
                      stock APIs when a key is configured. No music — see
                      pick_assets for why.
-  6. Render          ffmpeg assembles 1080x1920. Captions are off by default:
-                     these clips get re-edited, and burned-in text fights that.
-                     Pass --captions to burn them in anyway.
-  7. Carousel        Optional: the card copy as text, for designing by hand.
+  6. Render          ffmpeg assembles the cut. Two versions come out: with
+                     b-roll and speaker-only. No captions of any kind.
 
 Everything lands in output/<video_id>/shorts/, one folder per short, and the
 downloaded clip is kept so you can re-render in a different style without
@@ -46,7 +44,6 @@ import sys
 import threading
 
 import asset_library
-from caption_timing import captions_for_clip
 from moment_finder import MAX_TOTAL_SECONDS, Moment, find_moments
 from shorts_builder import (
     ShortSpec,
@@ -1273,7 +1270,6 @@ def make_shorts(
     max_seconds: int | None = None,
     source_file: str | None = None,
     workers: int = DEFAULT_WORKERS,
-    captions: bool = False,
     keep_old: bool = False,
     moments_file: str | None = None,
     moments_only: bool = False,
@@ -1582,9 +1578,8 @@ def make_shorts(
         # `captions` flag only decides whether they are ALSO burned into the
         # video, which is off by default because baked-in text fights the edit.
         words: list = []
-        captions_path = None
         try:
-            from caption_timing import build_ass, transcribe_words, words_to_srt
+            from caption_timing import transcribe_words
 
             words = transcribe_words(raw_clip, model_size=model_size)
 
@@ -1656,7 +1651,6 @@ def make_shorts(
                 except Exception as e:
                     say(f"  ⚠ Voice separation failed ({str(e)[:60]}) — keeping the mix")
 
-            words_to_srt(words, os.path.join(folder, "captions.srt"))
 
             # The spoken words as plain prose, to be copied into whatever
             # subtitles the clip gets by hand.
@@ -1676,23 +1670,15 @@ def make_shorts(
             except Exception as e:
                 say(f"  ⚠ Couldn't write transcript.txt: {e}")
 
-            say(f"  ✓ {len(words)} words timed → captions.srt, transcript.txt")
-            if captions:
-                captions_path = os.path.join(folder, "captions.ass")
-                build_ass(words, captions_path, hook=moment.hook)
+            say(f"  ✓ {len(words)} words timed → transcript.txt")
         except Exception as e:
             # Whisper is the most fragile piece here — it pulls in numba, which
             # Windows Application Control has blocked outright. Falling back to
-            # transcript timings keeps the shot list and a usable SRT; only the
-            # word-level precision is lost.
+            # transcript timings keeps the shot list; only the word-level
+            # precision is lost.
             say(f"  ⚠ Whisper unavailable ({str(e)[:60]}) — using transcript timings")
             try:
-                from caption_timing import words_to_srt
-
                 words = _words_from_segments(moment, segments)
-                if words:
-                    words_to_srt(words, os.path.join(folder, "captions.srt"))
-                    say(f"  ✓ {len(words)} caption lines → captions.srt (line-level, not word-level)")
             except Exception as inner:
                 say(f"  ⚠ Transcript timings failed too: {inner}")
 
@@ -1994,7 +1980,6 @@ def make_shorts(
                     speech_source=raw_clip,
                     duration=render_duration,
                     out_path=out_path,
-                    captions_path=captions_path,
                     style="speaker",
                 ))
                 say(f"  ✓ {out_path} (speaker footage — no b-roll available)")
@@ -2024,8 +2009,6 @@ def make_shorts(
         # both. A short now has exactly two forms: `short.mp4` with b-roll and
         # `short_plain.mp4` without.
         #
-        # `burned_captions.py` is kept and still works on any 16:9 video from
-        # the command line. It is not called from here.
         except Exception as e:
             say(f"  ⚠ Captions failed, the other two versions are fine: "
                 f"{str(e)[:70]}")
@@ -2039,7 +2022,6 @@ def make_shorts(
             "folder": folder,
             "short": out_path,
             "assets": credits,
-            "caption_words": len(words) if captions_path else 0,
         })
         with open(os.path.join(folder, "moment.json"), "w", encoding="utf-8") as f:
             json.dump(record, f, indent=2, ensure_ascii=False)
@@ -2163,9 +2145,6 @@ def main() -> None:
     parser.add_argument("--keep-old", action="store_true",
                         help="don't remove clip folders left by an earlier run of "
                              "the same talk (they show up as duplicates)")
-    parser.add_argument("--captions", action="store_true",
-                        help="burn karaoke captions into the clip. Off by default, "
-                             "because these clips are usually re-edited afterwards")
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS,
                         help=f"how many clips to build at once (default {DEFAULT_WORKERS}; "
                              "1 makes the log easier to read when debugging)")
@@ -2205,7 +2184,6 @@ def main() -> None:
         max_seconds=args.max_seconds,
         source_file=args.source_file,
         workers=args.workers,
-        captions=args.captions,
         keep_old=args.keep_old,
         moments_file=args.moments_file,
         moments_only=args.moments_only,

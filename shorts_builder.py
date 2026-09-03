@@ -1,8 +1,7 @@
 """
 shorts_builder.py
 
-Assembles the finished vertical short: footage + speech + music bed + burned-in
-captions, at 1080x1920.
+Assembles the finished short: footage + speech, with the account's watermark.
 
 Three layouts:
 
@@ -283,7 +282,7 @@ CINEMATIC_GRADE = "vivid"
 CLICKS_ON_CUTS = False
 
 # Word-by-word captions burned into the picture, appearing as each word is
-# said. See kinetic_captions for the blend and why the words sit on the picture
+# said.
 # rather than in the black bars.
 # Off. The words are delivered as transcript.txt and captions.srt beside each
 # clip instead, and the subtitles get made by hand from those — burned-in text
@@ -294,14 +293,13 @@ KINETIC_CAPTIONS = False
 
 # The account's own mark, burned into every render.
 #
-# This lives here rather than in `burned_captions.py` because it has to survive
+# This lives here because it has to survive
 # a re-run. Stamping it afterwards worked and then quietly came undone: the
 # next batch rewrote `short.mp4` and `short_plain.mp4` from scratch and the mark
 # was gone, with nothing to say so. Rendering it means every file the pipeline
 # produces carries it, including the ones nobody remembered to stamp.
 #
-# `burned_captions.py` therefore no longer adds a watermark by default — one
-# owner, or a clip that goes through both ends up wearing two.
+# It is the only thing left that draws text on the picture.
 WATERMARK_TEXT = "@gobackforthis"
 
 # Top-right, chosen by elimination rather than taste: the lower-centre band is
@@ -321,6 +319,66 @@ WATERMARK_OPACITY = 0.60
 WATERMARK_OUTLINE = 2
 
 
+# Font lookup, moved here when the caption modules were deleted.
+#
+# The watermark is the only thing left that needs a font: burned-in captions
+# were removed, which took those modules with them. These two
+# helpers came along because deleting a module you still call is how a working
+# feature disappears.
+
+BUNDLED_FONT_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", "fonts"
+)
+
+FONT_CANDIDATES = [
+    # Inter Black, shipped with the project. Chosen by name: it is a grotesque
+    # rather than a condensed display face, so a single word set large stays
+    # wide and even rather than tall and narrow — which is what makes one word
+    # at a time read as a caption instead of as a headline.
+    #
+    # Licensed under the SIL Open Font License, which permits redistribution;
+    # Inter-OFL.txt sits beside it as that licence requires.
+    os.path.join(BUNDLED_FONT_DIR, "Inter-Black.ttf"),
+    # Anton, shipped with the project. It is the heavy condensed face these
+    # edits actually use, and it is a real step up from anything Windows
+    # includes — the stock faces are all either too light or too wide.
+    #
+    # Bundled rather than assumed: a caption that silently falls back to a
+    # different face changes the look of every clip, and nothing about the
+    # output would say why. Licensed under the SIL Open Font License, which
+    # permits redistribution; OFL.txt sits beside it as that licence requires.
+    os.path.join(BUNDLED_FONT_DIR, "Anton-Regular.ttf"),
+    os.path.join(BUNDLED_FONT_DIR, "Poppins-Bold.ttf"),
+    os.path.join(BUNDLED_FONT_DIR, "BebasNeue-Regular.ttf"),
+    r"C:\Windows\Fonts\Poppins-Bold.ttf",
+    r"C:\Windows\Fonts\Anton-Regular.ttf",
+    r"C:\Windows\Fonts\Montserrat-Bold.ttf",
+    r"C:\Windows\Fonts\seguibl.ttf",              # Segoe UI Black
+    r"C:\Windows\Fonts\ariblk.ttf",               # Arial Black
+    r"C:\Windows\Fonts\impact.ttf",               # Impact
+    r"C:\Windows\Fonts\seguisb.ttf",              # Segoe UI Semibold
+    r"C:\Windows\Fonts\arialbd.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Black.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+]
+
+
+def find_font() -> str | None:
+    for path in FONT_CANDIDATES:
+        if os.path.isfile(path):
+            return path
+    return None
+
+
+def _ff_path(path: str) -> str:
+    """A Windows font path ffmpeg's filter parser will accept.
+
+    Backslashes and the drive colon both mean something inside a filtergraph,
+    so the path is given with forward slashes and an escaped colon.
+    """
+    return path.replace("\\", "/").replace(":", r"\:")
+
+
 def watermark_chain(label_in: str, label_out: str) -> str:
     """A drawtext filter putting the account handle in the top-right corner.
 
@@ -328,13 +386,9 @@ def watermark_chain(label_in: str, label_out: str) -> str:
     the render: a short without a watermark is a much smaller problem than no
     short at all, and the missing mark is visible the moment anyone looks.
     """
-    from kinetic_captions import find_font
-
     font = find_font()
     if not font or not WATERMARK_TEXT:
         return f"[{label_in}]null[{label_out}]"
-
-    from kinetic_captions import _ff_path
 
     size = max(10, int(round(VIDEO_H * WATERMARK_SIZE_FRAC)))
     # Positioned by expression rather than by a measured pixel count, so the
@@ -797,35 +851,10 @@ def build_rough_cut(
     else:
         parts.append(f"{streams}concat=n={len(shots)}:v=1:a=0[vframed]")
 
-    # Word-by-word captions, blended into the picture.
-    #
-    # Burned in, which is a departure: captions were deliberately left out of
-    # the render before, on the grounds that the SRT beside the file is the
-    # deliverable and baked-in text fights whoever edits afterwards. That
-    # reasoning holds for a rough cut meant to be finished by hand. It does not
-    # hold here — placing sixty words one at a time is precisely the manual
-    # work this is meant to remove, and the SRT is still written either way.
-    caption_chain = None
-    if KINETIC_CAPTIONS and words:
-        try:
-            from kinetic_captions import build_filter
-
-            caption_chain = build_filter(
-                words,
-                band_top=(VIDEO_H - BAND_H) // 2,
-                band_height=BAND_H,
-                picture_left=SIDE_MARGIN,
-                picture_width=PICTURE_W,
-                label_in="vframed",
-                label_out="vmark",
-            )
-        except Exception:
-            caption_chain = None
-
-    if caption_chain:
-        parts.append(caption_chain)
-    else:
-        parts.append("[vframed]null[vmark]")
+    # No captions. The picture goes straight from the framed shot to the
+    # watermark — burned-in captions were removed along with the module that
+    # drew them.
+    parts.append("[vframed]null[vmark]")
     parts.append(watermark_chain("vmark", "v"))
 
     # A click on every cut. The shot plan already says where the cuts are, so
