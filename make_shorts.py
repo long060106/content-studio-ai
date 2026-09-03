@@ -2014,37 +2014,15 @@ def make_shorts(
         except Exception as e:
             say(f"  ⚠ Plain version failed, keeping the styled one: {e}")
 
-        # The captioned cut, built here rather than by hand afterwards.
+        # No captioned version is built.
         #
-        # It used to be a separate step, on the reasoning that text burned into
-        # pixels can only be undone by rendering again — so `short.mp4` stayed
-        # clean and captions were added when wanted. In practice that meant the
-        # website's Captions toggle was missing on every fresh batch until
-        # someone remembered to run the step, which is a worse failure than the
-        # one the caution was protecting against. `short.mp4` is still clean;
-        # this is a third file beside it, so nothing is lost by making it every
-        # time.
-        try:
-            import burned_captions
-            ass_path = os.path.join(folder, "captions.ass")
-            cw, ch = burned_captions.probe_size(out_path)
-            burned_captions.build_ass(
-                words, ass_path, cw, ch,
-                duration=burned_captions.probe_duration(out_path),
-            )
-            captioned = os.path.join(folder, "short_captioned.mp4")
-            burned_captions.burn(out_path, ass_path, captioned)
-            say(f"  ✓ {captioned} (captions burned in)")
-
-            # And the speaker-only cut, graded, with the same captions. One
-            # shot of a person talking has none of the variety the b-roll cut
-            # gets from changing pictures, so a light grade is what stops it
-            # reading as an unedited recording. `short_plain.mp4` stays
-            # ungraded beside it for stitching.
-            if os.path.isfile(plain_path):
-                graded = os.path.join(folder, "short_plain_captioned.mp4")
-                burned_captions.burn(plain_path, ass_path, graded, grade=True)
-                say(f"  ✓ {graded} (speaker only, graded, captioned)")
+        # Two shipped for a while — captions burned into the b-roll cut, and a
+        # graded speaker-only cut with the same captions — and the user removed
+        # both. A short now has exactly two forms: `short.mp4` with b-roll and
+        # `short_plain.mp4` without.
+        #
+        # `burned_captions.py` is kept and still works on any 16:9 video from
+        # the command line. It is not called from here.
         except Exception as e:
             say(f"  ⚠ Captions failed, the other two versions are fine: "
                 f"{str(e)[:70]}")

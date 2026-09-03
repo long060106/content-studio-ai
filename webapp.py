@@ -931,22 +931,9 @@ def read_shorts(video_dir: str) -> dict:
         # most folders will not have this until that step is run over them.
         # Without it listed the file exists on disk and is invisible in the
         # browser, which is exactly how it looked like the captions had failed.
-        # The speaker-only cut, graded and captioned. A fourth option rather
-        # than a replacement: plain stays ungraded for anyone stitching several
-        # shorts together, and this is the one that can be posted as it is.
-        graded_path = os.path.join(folder, "short_plain_captioned.mp4")
-        moment["media_plain_captioned"] = (
-            os.path.relpath(graded_path, OUTPUT_DIR).replace("\\", "/")
-            if os.path.isfile(graded_path) else None
-        )
-        captioned_path = os.path.join(folder, "short_captioned.mp4")
-        moment["media_captioned"] = (
-            os.path.relpath(captioned_path, OUTPUT_DIR).replace("\\", "/")
-            if os.path.isfile(captioned_path) else None
-        )
-        # The editing brief travels with the clip: it is the part that says
-        # what must not be trimmed, and it is useless if you have to go
-        # looking for it in a folder.
+        # No captioned versions any more — a short is the b-roll cut and the
+        # plain cut, nothing else. See make_shorts for why.
+
         moment["brief"] = _read_text(os.path.join(folder, "brief.md")) or ""
         tags = _read_json(os.path.join(folder, "hashtags.json")) or {}
         moment["hashtags"] = tags.get("hashtags", [])
