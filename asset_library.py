@@ -906,10 +906,17 @@ CURATED_DIR = os.path.join(ASSETS_DIR, "broll")
 # added later. The user's point is that the association is already in the
 # viewer's head: **their training does not need to be shown**, because everyone
 # already knows they put the hours in. Seeing them at all is the argument.
+_ICONS = ("mjor-", "mchl-", "kobe-")
+
 THEME_AFFINITY = {
-    "discipline": ("mjor-", "mchl-"),
-    "consistency": ("mjor-", "mchl-"),
-    "focus": ("mjor-", "mchl-"),
+    "discipline": _ICONS,
+    "consistency": _ICONS,
+    "focus": _ICONS,
+    # Kobe was added with the words "lock in, focus, training, unstoppable",
+    # and the first three of those are themes the pipeline already has. There
+    # is no "unstoppable" theme, so `resilience` carries it — that is where a
+    # passage about refusing to stop lands.
+    "resilience": _ICONS,
 }
 
 # Enough to put an affinity clip above one that merely shares a word. Query hits
@@ -937,6 +944,11 @@ AFFINITY_MAX_SHARE = 0.34
 # against the description, which is where the naming convention earns its keep:
 # the filenames already say which is which.
 AFFINITY_FOCUS_WORDS = (
+    # "locked in" is the whole point of this footage: the face, the roar, the
+    # stare. Those read as concentration with the sound off; a wide of the
+    # arena does not.
+    "roaring", "shouting", "intense", "sweat", "focused", "celebration",
+    "jersey", "dunk", "shooting", "raised",
     "athlete", "close-up", "portrait", "gymnasium", "jump", "jumping",
     "dunking", "action", "court", "performer", "performance", "stage",
     "silhouette", "musician",

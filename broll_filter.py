@@ -103,6 +103,11 @@ PREFIX = re.compile(r"^[a-z0-9]{4}-\d+-")
 INNOCENT = (
     "dead-tree", "dead-trees", "war-room", "burning-candle", "burning-lamp",
     "burning-fireplace", "flames-fireplace", "burning-torch", "candle-flames",
+    # Basketball. "Shooting" is in the violence list for the obvious reason and
+    # means the opposite here — `basketball-player-shooting-crowd` is a man
+    # taking a jump shot. Two Kobe clips were flagged for deletion on it.
+    "basketball-player-shooting", "player-shooting", "shooting-crowd",
+    "shooting-hoop", "basketball-shooting",
 )
 
 
