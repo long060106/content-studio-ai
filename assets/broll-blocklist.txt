@@ -1,0 +1,8 @@
+# Clips never to offer as b-roll. One filename per line; text after # is a note.
+#
+# This is the "bad b-roll memory": a clip that was wrong once will be chosen
+# again for the same reason unless the decision is written down, because the
+# pull that caused it lives in the words and does not go away.
+
+phml-12-hands-holding-fish-ocean.mp4   # "reach out" -> hands. Literal-association trap.
+f1gp-20-man-woman-laundromat-conversation.mp4   # reads as an unrelated scene under any line
