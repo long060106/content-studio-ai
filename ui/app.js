@@ -703,6 +703,7 @@ function renderTab(d, tab) {
             [s.media, "B-roll", "the cut with b-roll, no captions"],
             [s.media_plain, "Plain", "the same cut and voice, speaker only"],
             [s.media_captioned, "Captions", "the b-roll cut with captions burned in"],
+            [s.media_plain_captioned, "Speaker+", "speaker only, graded, with captions"],
           ].filter(([path]) => path);
           if (versions.length > 1) {
             versions.forEach(([path, label, title], i) => {
@@ -744,6 +745,12 @@ function renderTab(d, tab) {
                       saveBtn(s.media_captioned,
                               clipFileName(s).replace(/\.mp4$/, "-captioned.mp4")),
                       { textContent: "Save captioned", title: "the version with captions burned in" })
+                  : null,
+                s.media_plain_captioned
+                  ? Object.assign(
+                      saveBtn(s.media_plain_captioned,
+                              clipFileName(s).replace(/\.mp4$/, "-speaker.mp4")),
+                      { textContent: "Save speaker+", title: "speaker only, graded, with captions" })
                   : null),
               s.reason && el("div", { className: "detail", style: "margin-top:8px;color:var(--text-faint);font-size:11.5px;line-height:1.5" }, s.reason),
               s.brief ? briefBlock(s) : null,

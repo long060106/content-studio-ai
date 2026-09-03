@@ -2035,6 +2035,16 @@ def make_shorts(
             captioned = os.path.join(folder, "short_captioned.mp4")
             burned_captions.burn(out_path, ass_path, captioned)
             say(f"  ✓ {captioned} (captions burned in)")
+
+            # And the speaker-only cut, graded, with the same captions. One
+            # shot of a person talking has none of the variety the b-roll cut
+            # gets from changing pictures, so a light grade is what stops it
+            # reading as an unedited recording. `short_plain.mp4` stays
+            # ungraded beside it for stitching.
+            if os.path.isfile(plain_path):
+                graded = os.path.join(folder, "short_plain_captioned.mp4")
+                burned_captions.burn(plain_path, ass_path, graded, grade=True)
+                say(f"  ✓ {graded} (speaker only, graded, captioned)")
         except Exception as e:
             say(f"  ⚠ Captions failed, the other two versions are fine: "
                 f"{str(e)[:70]}")

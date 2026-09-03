@@ -448,6 +448,27 @@ def _ff_filter_path(path: str) -> str:
     return "'" + path.replace("\\", "/").replace(":", "\\:") + "'"
 
 
+# A grade for the speaker-only cut.
+#
+# The plain version is one shot of a person talking for a minute, so it has none
+# of the variety the b-roll cut gets from changing pictures. A light grade is
+# what stops it looking like an unedited recording — contrast to separate the
+# subject from the background, a little saturation, and a vignette to pull the
+# eye to the middle of the frame.
+#
+# Deliberately subtle. These are real people filmed in real rooms, and a heavy
+# look reads as a filter applied to a video rather than as how the video was
+# shot. Every value here is a small nudge; raise them together if you want more.
+GRADE = (
+    "eq=contrast=1.08:saturation=1.10:gamma=0.98,"
+    # An S-curve: deepens the shadows and lifts the highlights slightly, which
+    # is most of what makes footage read as graded rather than flat.
+    "curves=all='0/0 0.25/0.21 0.75/0.79 1/1',"
+    # Gentle, and off-centre-safe: the speaker is not always centre-frame.
+    "vignette=angle=PI/5"
+)
+
+
 def _encoder_args(crf: int) -> list:
     """Hardware encoder when available, software otherwise."""
     try:
@@ -458,13 +479,17 @@ def _encoder_args(crf: int) -> list:
                 "-pix_fmt", "yuv420p"]
 
 
-def burn(video: str, ass_path: str, out_path: str, crf: int = 18) -> str:
+def burn(video: str, ass_path: str, out_path: str, crf: int = 18,
+         grade: bool = False) -> str:
     """Render the captions into the picture. Returns the path written."""
     fonts_dir = os.path.dirname(FONT_PATH)
-    vf = (
+    subs = (
         f"subtitles={_ff_filter_path(ass_path)}"
         f":fontsdir={_ff_filter_path(fonts_dir)}"
     )
+    # Grade first, captions second, so the text stays pure white rather than
+    # being tinted and vignetted along with the picture behind it.
+    vf = f"{GRADE},{subs}" if grade else subs
     cmd = [
         "ffmpeg", "-v", "error", "-y", "-i", video,
         "-vf", vf,
