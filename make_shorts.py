@@ -1264,7 +1264,10 @@ def make_shorts(
     output_dir: str = "output",
     model_size: str = "base",
     fetch: bool = True,
-    carousel: bool = True,
+    # Off. The carousel copy was a second format written from the same
+    # moments, and the account does not use it. The code stays and `--carousel`
+    # turns it back on; nothing calls it by default.
+    carousel: bool = False,
     formats: bool = True,
     min_seconds: int | None = None,
     max_seconds: int | None = None,
@@ -2144,8 +2147,11 @@ def main() -> None:
                         help="tiny/base/small — larger is more accurate, slower")
     parser.add_argument("--no-fetch", action="store_true",
                         help="use only what's already in assets/, never call a stock API")
+    parser.add_argument("--carousel", action="store_true",
+                        help="also write the quote-carousel copy. Off by "
+                             "default; the account does not use it")
     parser.add_argument("--no-carousel", action="store_true",
-                        help="skip the carousel copy (text only, no images)")
+                        help=argparse.SUPPRESS)  # kept so old commands still run
     parser.add_argument("--no-formats", action="store_true",
                         help="skip the publishing set — brief, blog post, X thread, "
                              "captions and descriptions. Saves about four Claude "
@@ -2193,7 +2199,7 @@ def main() -> None:
         output_dir=args.output_dir,
         model_size=args.whisper_model,
         fetch=not args.no_fetch,
-        carousel=not args.no_carousel,
+        carousel=args.carousel,
         formats=not args.no_formats,
         min_seconds=args.min_seconds,
         max_seconds=args.max_seconds,

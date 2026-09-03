@@ -480,12 +480,13 @@ class Job:
             count = self.options.get("count")
             if count:
                 cmd += ["--count", str(int(count))]
-            # The carousel is on by default in the pipeline, so the flag to
-            # send is the one that turns it *off*. Sending "--carousel"
-            # instead is not a no-op — argparse rejects the unknown option and
-            # the run dies at two seconds, before the first stage.
-            if not self.options.get("carousel"):
-                cmd.append("--no-carousel")
+            # The carousel is off in the pipeline now, so the flag to send is
+            # the one that turns it *on*. This was the other way round when it
+            # was a default, and getting it backwards is not a no-op — argparse
+            # rejects an unknown option and the run dies at two seconds, before
+            # the first stage.
+            if self.options.get("carousel"):
+                cmd.append("--carousel")
             return _drop_unknown_flags(cmd, self._script_path("make_shorts.py"),
                                        self._append)
         return [python, "-u", "cli.py", self.url]
@@ -1563,7 +1564,7 @@ def main() -> None:
     # at startup to find out while there is still someone reading the console.
     script = os.path.join(BASE_DIR, "make_shorts.py")
     known = accepted_flags(script)
-    unknown = sorted({"--style", "--count", "--no-carousel"} - known) if known else []
+    unknown = sorted({"--style", "--count", "--carousel"} - known) if known else []
 
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     url = f"http://{HOST}:{PORT}"
